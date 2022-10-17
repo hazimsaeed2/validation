@@ -1,0 +1,3 @@
+site_nbr,purch_dt,tot_sales,tot_trips,tot_pymts,tot_non_gas_sales,tot_non_gas_trips,tot_non_gas_pymts,tot_gas_sales,tot_gas_trips,tot_gas_pymts
+34,2019-03-06,27.00,2,3,27.00,2,3,,0,0
+18,2019-03-06,27.00,2,3,27.00,2,3,,0,0

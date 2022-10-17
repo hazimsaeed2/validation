@@ -1,0 +1,20 @@
+# this is a config file for the validation unit tests
+
+validation:
+    s3_stat_path: 's3://memberanalytics-data-out-prod/STATS/ETL/tmp_unit_stats.yaml'
+    table_params:
+        source:
+            df:
+                amnt_check_cols:
+                    - 'COUNT(to_cnt)'
+                    - 'AVG(to_avg)'
+                key_columns:
+                    - id
+
+        intermediate:
+            df:
+                amnt_check_cols:
+                    - 'COUNT(to_cnt)'
+                    - 'AVG(to_avg)'
+                key_columns:
+                    - id

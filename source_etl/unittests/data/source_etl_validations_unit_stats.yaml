@@ -1,0 +1,28 @@
+source:
+    df:
+        CompareColAggregatesSource:
+            COUNT(to_cnt): 10
+            AVG(to_avg): 15
+        CompareColAggregatesPrior:
+            COUNT(to_cnt): 10
+            AVG(to_avg): 15
+        TestColNames:
+            - id
+            - desc
+            - to_cnt
+            - to_avg
+            - PURCH_DT
+intermediate:
+    df:
+        CompareColAggregatesSource:
+            COUNT(to_cnt): 10
+            AVG(to_avg): 15
+        CompareColAggregatesPrior:
+            COUNT(to_cnt): 10
+            AVG(to_avg): 15
+        TestColNames:
+            - id
+            - desc
+            - to_cnt
+            - to_avg
+            - PURCH_DT

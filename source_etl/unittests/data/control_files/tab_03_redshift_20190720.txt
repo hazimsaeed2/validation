@@ -1,0 +1,2 @@
+mbrshp_sid,tot_sales,tot_trips,tot_dtls
+100001,15.0,1,2

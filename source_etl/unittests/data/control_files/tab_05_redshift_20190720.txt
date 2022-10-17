@@ -1,0 +1,2 @@
+purch_dt,tot_sales,tot_trips,tot_pymts,tot_non_gas_sales,tot_non_gas_trips,tot_non_gas_pymts,tot_gas_sales,tot_gas_trips,tot_gas_pymts
+2019-03-06,54.00,4,6,54.00,4,6,,0,0
