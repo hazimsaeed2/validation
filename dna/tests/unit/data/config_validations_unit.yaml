@@ -1,0 +1,91 @@
+path_setup:
+  root_path: 'memberanalytics-data-out-prod'
+  intermediate_path: 'CUBES'
+validation:
+  s3_stat_path: 's3://memberanalytics-data-out-prod/STATS/DNA/UNIQUE_ID/latest_stats.yaml'
+  table_params:
+    DNA:
+      DNA:
+        TestOutlierWeeks:
+          tolerance: 1
+          aggregates:
+            weekly_mean: >
+                mean(`{col_name}`)
+
+            weekly_zeros: >
+                mean(CAST(
+                    CASE WHEN
+                        `{col_name}`=0
+                    THEN
+                        0
+                    ELSE
+                        1
+                    END AS FLOAT))
+
+            weekly_nulls: >
+                mean(CAST(
+                    CASE WHEN
+                        `{col_name}` IS NULL
+                    THEN
+                        0
+                    ELSE
+                        1
+                    END AS FLOAT
+                ))
+
+            weekly_nans: >
+                mean(CAST(
+                    CASE WHEN
+                        isNaN(`{col_name}`)
+                    THEN
+                        0
+                    ELSE
+                        1
+                    END AS FLOAT
+                ))
+
+        TestCountsPerFISCAL_WEEK_END:
+          tolerance: 0
+
+        TestCountsPerMBRSHP_SID:
+          tolerance: 0
+
+        TestOldDNAvsNewDNAColAggregates:
+          tolerance: 0
+          aggregates:
+            weekly_mean: >
+                mean(`{col_name}`)
+
+            weekly_zeros: >
+                mean(CAST(
+                    CASE WHEN
+                        `{col_name}`=0
+                    THEN
+                        0
+                    ELSE
+                        1
+                    END AS FLOAT))
+
+            weekly_nulls: >
+                mean(CAST(
+                    CASE WHEN
+                        `{col_name}` IS NULL
+                    THEN
+                        0
+                    ELSE
+                        1
+                    END AS FLOAT
+                ))
+
+            weekly_nans: >
+                mean(CAST(
+                    CASE WHEN
+                        isNaN(`{col_name}`)
+                    THEN
+                        0
+                    ELSE
+                        1
+                    END AS FLOAT
+                ))
+
+        TestOldDNAvsNewDNAColNames:

@@ -1,0 +1,26 @@
+# This file defintes paths required for preparation of the supporting files
+# for memebr DNA
+additional_files:
+  tender_type_group:
+    local_file: "data/bcg_maps/tender_type_group.txt"
+    csv: "data_out/pipelined_intermediates/bcg_maps/tender_type_group_csv.txt"
+    parquet: "data_out/pipelined_intermediates/bcg_maps/tender_type_group/"
+  strategic_segments:
+    local_file: "data/bcg_maps/strategic_segments.txt"
+    csv: "data_out/pipelined_intermediates/bcg_maps/strategic_segments_csv.txt"
+    parquet: "data_out/pipelined_intermediates/bcg_maps/strategic_segment/strategic_segments"
+  AH5_custumer_facing_desc_path:
+    local_file: "data/bcg_maps/AH5_custumer_facing_desc.txt"
+    csv: "data_out/pipelined_intermediates/bcg_maps/AH5_custumer_facing_desc/AH5_custumer_facing_desc.csv"
+    parquet: "data_out/pipelined_intermediates/bcg_maps/AH5_custumer_facing_desc/PARQUET"
+  acq_dna_path:
+    local_file: "data/acquisition_dna.csv"
+    parquet: "data_out/pipelined_intermediates/member_dna/recent/"
+    csv: "data_out/pipelined_intermediates/member_dna/acquisition_dna.csv"
+  mbr_basic_path:
+    local_file: "data/member_basic.csv"
+    csv: "data_out/pipelined_intermediates/Membership/PE_Membership_Mstr_20200822.csv"
+    parquet: "data_out/pipelined_intermediates/member_basic/"
+
+root_s3_path:
+  "s3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/"

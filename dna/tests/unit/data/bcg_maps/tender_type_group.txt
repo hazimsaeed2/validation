@@ -1,0 +1,40 @@
+TENDER_TYPE_CD,TENDER_TYPE_CD_DESC,GROUPED_TENDER_TYPE
+PCUB,BONUS COUPON,Coupon
+PCUE,ELECTRONIC  COUPON,Coupon
+PCUM,MANUFACTURER COUPON,Coupon
+PCUR,ROAD HAZARD COUPON,Coupon
+PCUS,MANUAL STORE  COUPON,Coupon
+PTAM,AMERICAN EXPRESS,Credit
+PTBV,BOTTLE VOUCHER,Other
+PTCB,BUSINESS  CHECK,Other
+PTCH,PERSONAL CHECK,Other
+PTCM,MISC  CHECK,Other
+PTCR,MEMBER REWARDS  CHECK,Other
+PTCS,CASH,Cash
+PTDB,DEBIT CARD,Debit
+PTDC,DISCOVER,Credit
+PTEB,EBT CASH ASSISTANCE (SOCIAL SE,EBT
+PTFO,EBT FOOD STAMPS,EBT
+PTGC,GIFT CARDS,Other
+PTMC,MASTER CARD,Credit
+PTPE,BJS PERKS,BJs
+PTVI,VISA,Credit
+YTAM,Membership American Express,Credit
+YTCH,Membership Personal Check,Other
+YTCS,Membership Cash,Cash
+YTDB,Membership Debit Card,Debit
+YTDC,Membership Discover,Credit
+YTEB,Membership EBT Cash Assistance,EBT
+YTFO,Membership EBT Food Stamps,EBT
+YTGC,Membership BJs Gift Card/Certi,Other
+YTMA,Membership Master Card,Credit
+YTVI,Membership Visa,Credit
+ZTAM,FUEL American Express,Credit
+ZTCS,FUEL Cash,Cash
+ZTDB,FUEL Debit Card,Debit
+ZTDC,FUEL Discover,Credit
+ZTDO,FUEL Tender Type 'drive off',Other
+ZTGC,FUEL Master Card,Other
+ZTMC,FUEL Master Card,Credit
+ZTST,FUEL Tender Type 'pump test',Other
+ZTVI,FUEL Visa,Credit

@@ -1,0 +1,34 @@
+# lists local text files simulating the file in memberdna-data-in bucket
+local_test_file_names:
+  - "1010_Transaction_Detail_20190330.txt"
+  - "1010_Transaction_Header_20190330.txt"
+  - "1010_Transaction_Payment_20190330.txt"
+  - "BCG_email_events_2019-02-07.txt"
+  - "BCG_extended_mbrshp_20190720.txt"
+  - "BCG_Member_Hist_20190720.txt"
+  - "BJs_CRM_20190205.txt"
+  - "quotient_id_20190205.csv"
+  - "bjs_loyaltynumbers_usercodes_01222019.txt"
+  - "DataLogix_customer_data_20190720.txt"
+  - "Itemmaster_brand_data_20190720.txt"
+  - "kantar_itemmaster_hierarchy_data_SAP_20190720.txt"
+  - "kantar_storemaster_hierarchy_data_SAP_20190720.txt"
+  - "MEMBER_TRACTS_20190720.txt"
+  - "Tract_Zip_Code_BJS_Costco_Sams_Walmart_Distances_20190720.txt"
+  - "CATEGORY_DNA_full.txt"
+  - "Awards_20190330.txt"
+  - "control_files/tab_01_redshift_20190720.txt"
+  - "control_files/tab_02_redshift_20190720.txt"
+  - "control_files/tab_03_redshift_20190720.txt"
+  - "control_files/tab_04_redshift_20190720.txt"
+  - "control_files/tab_05_redshift_20190720.txt"
+  - "control_files/tab_06_redshift_20190720.txt"
+  - "control_files/tab_07_redshift_20190720.txt"
+  - "control_files/tab_08_redshift_20190720.txt"
+  - "control_files/tab_09_redshift_20190720.txt"
+
+s3_in_path:
+  "s3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/"
+
+root_s3_path:
+  s3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/

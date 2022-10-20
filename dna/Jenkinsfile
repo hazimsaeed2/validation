@@ -1,0 +1,117 @@
+pipeline {
+    agent { node env.node }
+    stages {
+        stage('Clone Source') {
+            steps {
+                dir('memberdna') {
+                    git branch: env.branch,
+                        credentialsId: 'bitbucket-service-account',
+                        url: 'https://bitbucket.bjs.com/scm/an/pe-memberdna.git'
+                }
+            }
+        }
+        stage('Scale up') {
+            steps {
+                script {
+                    if (env.cluster_scaling == 'Spot_Nodes') {
+                        echo "Scaling up"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --num_nodes 50 --wait 120
+                        '''
+                        echo "Scaled up"
+                    }
+                }
+            }
+        }
+        stage('Calculate Features') {
+            parallel {
+                stage('Transaction 1 & 2') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        cd memberdna/dna
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_transaction_1.py
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_transaction_2.py
+                        '''
+                    }
+                }
+                stage('Coupon and Digital 1 & 2') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        cd memberdna/dna
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_coupon_and_digital_1.py
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_coupon_and_digital_2.py
+                        '''
+                    }
+                }
+                stage('Member & Acquisition') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        cd memberdna/dna
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_member.py
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/integrate_acquisition.py
+                        '''
+                    }
+                }
+                stage('Transaction 3') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        cd memberdna/dna
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_transaction_3.py
+                        '''
+                    }
+                }
+                stage('Most Shopped') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        cd memberdna/dna
+                        spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_most_shopped.py
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Calculate Miscellaneous Features') {
+            steps {
+                sh '''
+                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$wrkspce:
+                cd memberdna/dna
+                spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=33g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/generate_misc.py
+                '''
+            }
+        }
+        stage('Merge Features') {
+            steps {
+                sh '''
+                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$wrkspce:
+                cd memberdna/dna
+                spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=33g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            echo "Scaling down"
+            sh '''
+                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$wrkspce:
+                python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --num_nodes 0 --wait 120
+            '''
+            echo "Scaled down"
+        }
+    }
+}

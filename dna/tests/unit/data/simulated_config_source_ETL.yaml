@@ -1,0 +1,90 @@
+# The structure of this file should match the source_etl config file
+# only the paths and bucket names should be different
+data_paths:
+  source:
+    item: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/kantar_itemmaster_hierarchy_data_SAP_%(curr_date)s.txt'
+    brand: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/Itemmaster_brand_data_%(curr_date)s.txt'
+    header: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/1010_Transaction_Header_20190330.txt'
+    detail: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/1010_Transaction_Detail_20190330.txt'
+    payment: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/1010_Transaction_Payment_20190330.txt'
+    member: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/DataLogix_customer_data_%(curr_date)s.txt'
+    member_extended: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/BCG_extended_mbrshp_%(curr_date)s.txt'
+    member_tract: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/MEMBER_TRACTS_%(curr_date)s.txt'
+    distance: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/Tract_Zip_Code_BJS_Costco_Sams_Walmart_Distances_%(curr_date)s.txt'
+    member_history: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/BCG_Member_Hist_%(curr_date)s.txt'
+    club : 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/kantar_storemaster_hierarchy_data_SAP_%(curr_date)s.txt'
+    email: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/BCG_email_events_*.txt'
+    coupon_clip: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/BJs_CRM_*.txt'
+    coupon_clip_usercode: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/bjs_loyaltynumbers_usercodes_*.txt'
+    control_files: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/control_files/'
+    awards: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/Awards_*'
+    quotient_id: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/quotient_id_20190205.csv'
+
+  intermediate:
+    item: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/item'
+    item_with_brand: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/item_with_brand'
+    AH5: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_in/CATEGORY_DNA_full/PARQUET/'
+    brand:  's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/brand'
+    header: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction/header'
+    detail: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction/detail'
+    payment: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction/payment'
+    fiscal_days: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/lookup/fiscal_days'
+    header_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction_fiscal/header'
+    detail_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction_fiscal/detail'
+    detail_isnr_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction_fiscal/detail_isnr'
+    detail_gas_nr_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction_fiscal/detail_gas_nr'
+    payment_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/transaction_fiscal/payment'
+    member: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/member'
+    member_extended: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/member_extended'
+    census_tract: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/census_tract'
+    member_history: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/member_history'
+    club: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/club_with_brand'
+    club_square: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/club_square_with_brand'
+    skeleton: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/skeleton'
+    email: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/email'
+    email_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/master/email_fiscal'
+    coupon_clip: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/coupon_clip'
+    coupon_clip_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/coupon_clip_fiscal'
+    control_files: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/control_files'
+    awards: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/awards'
+    awards_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/awards_fiscal'
+    quotient_id: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/quotient_id'
+
+  sampled:
+    header_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/transaction_fiscal/header'
+    detail_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/transaction_fiscal/detail'
+    detail_isnr_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/transaction_fiscal/detail_isnr'
+    payment_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/transaction_fiscal/payment'
+    member: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/member'
+    member_extended: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/member_extended'
+    census_tract: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/census_tract'
+    member_history: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/member_history'
+    skeleton: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/skeleton'
+    coupon_clip: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/coupon_clip'
+    coupon_clip_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/coupon_clip_fiscal'
+    email: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/email'
+    email_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/email_fiscal'
+    awards: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/awards'
+    awards_fiscal: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/sampled/master/awards_fiscal'
+
+  archived: 's3://memberanalytics-data-out-prod/unit_test_data/DNA/UNIQUE_ID/data_out/pipelined_intermediates/archive'
+
+  fiscal_days:
+    start: '2012-01-01'
+    end: '2029-12-31'
+
+club_square_config:
+  max_date: '2019-07-20'
+  is_monthly: False
+  categories:
+    - col: 'AH4_CD'
+      threshold: 2000
+    - col: 'AH5_CD'
+      threshold: 2000
+    - col: 'ARTICLE_NBR'
+      threshold: 500
+    - col: 'BRAND_CD'
+      threshold: 200
+
+validation:
+  table_params:

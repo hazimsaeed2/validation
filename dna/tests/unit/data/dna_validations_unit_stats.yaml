@@ -1,0 +1,48 @@
+DNA:
+  DNA:
+    TestColNames:
+    - MBRSHP_SID
+    - var1
+    - var2
+    - FISCAL_WEEK_END
+    TestOldDNAvsNewDNAColAggregates:
+      var1:
+        FISCAL_WEEK_END:
+        - '2019-03-02'
+        - '2019-02-23'
+        - '2019-02-16'
+        - '2019-03-02'
+        - '2019-02-23'
+        - '2019-02-16'
+        - '2019-03-02'
+        - '2019-02-23'
+        - '2019-02-16'
+        - '2019-03-02'
+        - '2019-02-23'
+        - '2019-02-16'
+        aggregate_name:
+        - weekly_zeros
+        - weekly_zeros
+        - weekly_zeros
+        - weekly_mean
+        - weekly_mean
+        - weekly_mean
+        - weekly_nulls
+        - weekly_nulls
+        - weekly_nulls
+        - weekly_nans
+        - weekly_nans
+        - weekly_nans
+        aggregate_value:
+        - 1.0
+        - 1.0
+        - 1.0
+        - 20.0
+        - 20.0
+        - 20.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
