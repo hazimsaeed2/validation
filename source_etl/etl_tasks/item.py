@@ -1,14 +1,18 @@
+import argparse
 import logging
+import os
 
+from memberdna.lib.job_manager import JobManager
 from memberdna.source_etl.utils.utility import *
 
-def main(spark, data_paths, config_validation):
 
-    logging.info('Starting processing table item')
+def main(job, data_paths, config_validation):
 
-    source_path = data_paths['source']['item']
+    logging.info("Starting processing table item")
 
-    cast_sql = '''
+    source_path = data_paths["source"]["item"]
+
+    cast_sql = """
     select
         GTIN_CD
         ,ARTICLE_DESC
@@ -40,9 +44,36 @@ def main(spark, data_paths, config_validation):
         ,cast(EXP_DT as date) as EXP_DT
         ,ORDR_AS as REPLACEMENT_ARTICLE
     from df
-    '''
-    dest_path = data_paths['intermediate']['item']
+    """
+    dest_path = data_paths["intermediate"]["item"]
     repartition_val = 1
 
-    createSchemaParquet(spark, source_path, config_validation, 'item', cast_sql, dest_path, repartition_val,
-        header=True)
+    createSchemaParquet(
+        job.spark,
+        source_path,
+        config_validation,
+        "item",
+        cast_sql,
+        dest_path,
+        repartition_val,
+        header=True,
+    )
+
+
+job = JobManager("item")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, config_validation)

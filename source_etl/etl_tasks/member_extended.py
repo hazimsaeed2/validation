@@ -1,14 +1,18 @@
+import argparse
 import logging
+import os
 
+from memberdna.lib.job_manager import JobManager
 from memberdna.source_etl.utils.utility import *
 
-def main(spark, data_paths, config_validation):
 
-    logging.info('Starting processing table member_extended')
+def main(job, data_paths, config_validation):
 
-    source_path = data_paths['source']['member_extended']
+    logging.info("Starting processing table member_extended")
 
-    cast_sql = '''
+    source_path = data_paths["source"]["member_extended"]
+
+    cast_sql = """
     select
          cast(MBRSHP_NBR as string) as MBRSHP_NBR
         ,cast(MBRSHP_SID as int) as MBRSHP_SID
@@ -30,9 +34,36 @@ def main(spark, data_paths, config_validation):
         ,cast(HH_SID as int) as HH_SID
         ,cast(trim(PRI_SUPP_FHH_IND) as int) as PRI_SUPP_FHH_IND
     from df
-    '''
-    dest_path = data_paths['intermediate']['member_extended']
+    """
+    dest_path = data_paths["intermediate"]["member_extended"]
     repartition_val = 20
 
-    createSchemaParquet(spark, source_path, config_validation, 'member_extended', cast_sql, dest_path,
-        repartition_val, sep=',')
+    createSchemaParquet(
+        job.spark,
+        source_path,
+        config_validation,
+        "member_extended",
+        cast_sql,
+        dest_path,
+        repartition_val,
+        sep=",",
+    )
+
+
+job = JobManager("member_extended")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, config_validation)

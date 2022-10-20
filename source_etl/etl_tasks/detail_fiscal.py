@@ -1,25 +1,29 @@
+import argparse
 import logging
+import os
 
-from memberdna.source_etl.utils.utility import *
 import memberdna.source_etl.utils.validations_ETL as validations
+from memberdna.lib.job_manager import JobManager
+from memberdna.source_etl.utils.utility import *
 
 
-def main(spark, data_paths, config_validation):
+def main(job, data_paths, config_validation):
 
-    logging.info('Starting processing table detail_fiscal')
+    logging.info("Starting processing table detail_fiscal")
 
-    detail = spark.read.parquet(data_paths['intermediate']['detail'])
+    detail = job.spark.read.parquet(data_paths["intermediate"]["detail"])
 
-    detail.registerTempTable('detail')
+    detail.registerTempTable("detail")
 
-    header_fiscal = spark.read.parquet(
-        data_paths['intermediate']['header_fiscal'])
-    header_fiscal.registerTempTable('header_fiscal')
+    header_fiscal = job.spark.read.parquet(
+        data_paths["intermediate"]["header_fiscal"]
+    )
+    header_fiscal.registerTempTable("header_fiscal")
 
-    item = spark.read.parquet(data_paths['intermediate']['item'])
-    item.registerTempTable('item')
+    item = job.spark.read.parquet(data_paths["intermediate"]["item"])
+    item.registerTempTable("item")
 
-    sql = '''
+    sql = """
     select
          d.*
         ,h.MBRSHP_SID
@@ -58,20 +62,43 @@ def main(spark, data_paths, config_validation):
     left join item i
         on  d.GTIN_CD = i.GTIN_CD and
             d.ARTICLE_NBR = i.ARTICLE_NBR
-    '''
-    detail_fiscal = spark.sql(sql)
+    """
+    detail_fiscal = job.spark.sql(sql)
 
     validations.validate_table(
-        spark,
-        'intermediate',
-        'detail_fiscal',
+        job.spark,
+        "intermediate",
+        "detail_fiscal",
         config_validation,
-        detail_fiscal
+        detail_fiscal,
     )
 
-    logging.info('Saving the intermediate file ' +
-                 data_paths['intermediate']['detail_fiscal'])
+    logging.info(
+        "Saving the intermediate file "
+        + data_paths["intermediate"]["detail_fiscal"]
+    )
 
-    detail_fiscal.repartition('FISCAL_WEEK_END').write.parquet(
-        data_paths['intermediate']['detail_fiscal'],
-        partitionBy='FISCAL_WEEK_END', mode='overwrite')
+    detail_fiscal.repartition("FISCAL_WEEK_END").write.parquet(
+        data_paths["intermediate"]["detail_fiscal"],
+        partitionBy="FISCAL_WEEK_END",
+        mode="overwrite",
+    )
+
+
+job = JobManager("detail_fiscal")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, config_validation)

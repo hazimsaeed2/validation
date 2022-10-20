@@ -1,14 +1,17 @@
-
+import argparse
 import logging
+import os
 
+from memberdna.lib.job_manager import JobManager
 from memberdna.source_etl.utils.utility import *
 
-def main(spark, data_paths, config_validation):
-    logging.info('Starting processing table header')
 
-    source_path = data_paths['source']['header']
+def main(job, data_paths, config_validation):
+    logging.info("Starting processing table header")
 
-    cast_sql = '''
+    source_path = data_paths["source"]["header"]
+
+    cast_sql = """
     select
          cast(PURCH_HDR_ID as int) as PURCH_HDR_ID
         ,cast(MBRSHP_SID as int) as MBRSHP_SID
@@ -19,9 +22,37 @@ def main(spark, data_paths, config_validation):
         ,cast(TAX_AMT as double) as TAX_AMT
         ,PURCHASE_TM
     from df
-    '''
-    dest_path = data_paths['intermediate']['header']
-    repartition_val = 'PURCH_DT'
+    """
+    dest_path = data_paths["intermediate"]["header"]
+    repartition_val = "PURCH_DT"
     filter_cond = 'PURCH_DT >= "2012-09-01"'
 
-    createSchemaParquet(spark, source_path, config_validation, 'header', cast_sql, dest_path, repartition_val, filter_cond)
+    createSchemaParquet(
+        job.spark,
+        source_path,
+        config_validation,
+        "header",
+        cast_sql,
+        dest_path,
+        repartition_val,
+        filter_cond,
+    )
+
+
+job = JobManager("header")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, config_validation)

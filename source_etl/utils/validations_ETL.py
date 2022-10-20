@@ -2,10 +2,9 @@ import logging
 import subprocess
 
 import pyspark.sql.functions as sqlf
-from pyspark.sql.types import FloatType
 import yaml
-
 from memberdna.lib.data_quality import *
+from pyspark.sql.types import FloatType
 
 
 class TestControlTable(DQ_check):

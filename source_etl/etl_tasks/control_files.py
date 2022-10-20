@@ -1,16 +1,19 @@
+import argparse
 import logging
+import os
 
 import memberdna.lib.misc as misc
 import memberdna.source_etl.utils.validations_ETL as validations
+from memberdna.lib.job_manager import JobManager
 
 
-def load_and_register(spark, path, register_name, filetype="parquet"):
+def load_and_register(job, path, register_name, filetype="parquet"):
     """
     Load a file, display a log message and register
     the resulting table under the supplied name.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         path: path to the file to be loaded
         register_name: name to register the table under
         filetype: extension ('csv' or 'parquet') of the file(s) under path
@@ -20,9 +23,9 @@ def load_and_register(spark, path, register_name, filetype="parquet"):
     logging.info("Reading the input file " + path)
 
     if filetype == "parquet":
-        df_temp = spark.read.parquet(path)
+        df_temp = job.spark.read.parquet(path)
     elif filetype == "csv":
-        df_temp = spark.read.csv(path, header=True)
+        df_temp = job.spark.read.csv(path, header=True)
     else:
         raise Exception(
             "Unknown filetype '"
@@ -55,14 +58,14 @@ def log_cache_save(df, path):
     return df
 
 
-def control_tab_01(spark, data_paths, const_setup):
+def control_tab_01(job, data_paths, const_setup):
     """
     Calculate aggregates by date from detail table and create a
     comparison table that shows detail and redshift aggregates
     side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -80,7 +83,7 @@ def control_tab_01(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_01")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_01_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -89,7 +92,7 @@ def control_tab_01(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_01_engine = spark.sql(
+    df_tab_01_engine = job.spark.sql(
         """
         SELECT
             a.purch_dt AS purch_dt,
@@ -154,7 +157,7 @@ def control_tab_01(spark, data_paths, const_setup):
     )
     df_tab_01_engine.registerTempTable("df_tab_01_engine")
 
-    df_tab_01_comparison = spark.sql(
+    df_tab_01_comparison = job.spark.sql(
         """
         SELECT
             e.purch_dt AS engine_purch_dt,
@@ -202,14 +205,14 @@ def control_tab_01(spark, data_paths, const_setup):
     return df_tab_01_comparison
 
 
-def control_tab_02(spark, data_paths, const_setup):
+def control_tab_02(job, data_paths, const_setup):
     """
     Calculate aggregates by date and site/club number from detail
     table and create a comparison table that shows detail
     and redshift aggregates side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -227,7 +230,7 @@ def control_tab_02(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_02")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_02_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -236,7 +239,7 @@ def control_tab_02(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_02_engine = spark.sql(
+    df_tab_02_engine = job.spark.sql(
         """
         SELECT
             a.purch_dt,
@@ -303,7 +306,7 @@ def control_tab_02(spark, data_paths, const_setup):
 
     df_tab_02_engine.registerTempTable("df_tab_02_engine")
 
-    df_tab_02_comparison = spark.sql(
+    df_tab_02_comparison = job.spark.sql(
         """
         SELECT
             e.purch_dt AS engine_purch_dt,
@@ -353,14 +356,14 @@ def control_tab_02(spark, data_paths, const_setup):
     return df_tab_02_comparison
 
 
-def control_tab_03(spark, data_paths, const_setup):
+def control_tab_03(job, data_paths, const_setup):
     """
     Calculate aggregates grouped by member from detail table
     and create a comparison table that shows detail and redshift
     aggregates side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -378,7 +381,7 @@ def control_tab_03(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_03")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_03_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -387,7 +390,7 @@ def control_tab_03(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_03_01 = spark.sql(
+    df_tab_03_01 = job.spark.sql(
         """
         SELECT
             a.mbrshp_sid,
@@ -416,7 +419,7 @@ def control_tab_03(spark, data_paths, const_setup):
     )
     df_tab_03_01.registerTempTable("df_tab_03_01")
 
-    df_tab_03_engine = spark.sql(
+    df_tab_03_engine = job.spark.sql(
         """
         SELECT
             d.mbrshp_sid,
@@ -434,7 +437,7 @@ def control_tab_03(spark, data_paths, const_setup):
 
     df_tab_03_engine.registerTempTable("df_tab_03_engine")
 
-    df_tab_03_comparison = spark.sql(
+    df_tab_03_comparison = job.spark.sql(
         """
         SELECT
             e.mbrshp_sid AS engine_mbrshp_sid,
@@ -467,14 +470,14 @@ def control_tab_03(spark, data_paths, const_setup):
     return df_tab_03_comparison
 
 
-def control_tab_04(spark, data_paths, const_setup):
+def control_tab_04(job, data_paths, const_setup):
     """
     Join a sample of rows from detail table in redshift to the
     detail table in pipelined_intermediates and create a comparison
     table that shows detail_fiscal and redshift rows side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -492,7 +495,7 @@ def control_tab_04(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_04")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_04_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -501,7 +504,7 @@ def control_tab_04(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_04_comparison = spark.sql(
+    df_tab_04_comparison = job.spark.sql(
         """
         SELECT
             e.purch_hdr_id AS engine_purch_hdr_id,
@@ -559,14 +562,14 @@ def control_tab_04(spark, data_paths, const_setup):
     return df_tab_04_comparison
 
 
-def control_tab_05(spark, data_paths, const_setup):
+def control_tab_05(job, data_paths, const_setup):
     """
     Calculate aggregates by date from payment_fiscal table and create a
     comparison table that shows payment_fiscal and redshift aggregates
     side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -584,7 +587,7 @@ def control_tab_05(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_05")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_05_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -593,7 +596,7 @@ def control_tab_05(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_05_engine = spark.sql(
+    df_tab_05_engine = job.spark.sql(
         """
         SELECT
             a.purch_dt,
@@ -646,7 +649,7 @@ def control_tab_05(spark, data_paths, const_setup):
     )
     df_tab_05_engine.registerTempTable("df_tab_05_engine")
 
-    df_tab_05_comparison = spark.sql(
+    df_tab_05_comparison = job.spark.sql(
         """
         SELECT
             e.purch_dt AS engine_purch_dt,
@@ -694,14 +697,14 @@ def control_tab_05(spark, data_paths, const_setup):
     return df_tab_05_comparison
 
 
-def control_tab_06(spark, data_paths, const_setup):
+def control_tab_06(job, data_paths, const_setup):
     """
     Calculate aggregates by date and site/club number from payment_fiscal
     table and create a comparison table that shows payment_fiscal
     and redshift aggregates side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -719,7 +722,7 @@ def control_tab_06(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_06")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_06_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -728,7 +731,7 @@ def control_tab_06(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_06_engine = spark.sql(
+    df_tab_06_engine = job.spark.sql(
         """
         SELECT
             b.site_nbr,
@@ -783,7 +786,7 @@ def control_tab_06(spark, data_paths, const_setup):
 
     df_tab_06_engine.registerTempTable("df_tab_06_engine")
 
-    df_tab_06_comparison = spark.sql(
+    df_tab_06_comparison = job.spark.sql(
         """
         SELECT
             e.site_nbr AS engine_site_nbr,
@@ -833,14 +836,14 @@ def control_tab_06(spark, data_paths, const_setup):
     return df_tab_06_comparison
 
 
-def control_tab_07(spark, data_paths, const_setup):
+def control_tab_07(job, data_paths, const_setup):
     """
     Calculate aggregates grouped by purch_dt and tender_type_cd
     from payment_fiscal table and create a comparison table that
     shows payment_fiscal and redshift aggregates side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -858,7 +861,7 @@ def control_tab_07(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_07")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_07_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -867,7 +870,7 @@ def control_tab_07(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_07_engine = spark.sql(
+    df_tab_07_engine = job.spark.sql(
         """
         SELECT
             a.purch_dt,
@@ -892,7 +895,7 @@ def control_tab_07(spark, data_paths, const_setup):
     )
     df_tab_07_engine.registerTempTable("df_tab_07_engine")
 
-    df_tab_07_comparison = spark.sql(
+    df_tab_07_comparison = job.spark.sql(
         """
         SELECT
             e.purch_dt AS engine_purch_dt,
@@ -930,14 +933,14 @@ def control_tab_07(spark, data_paths, const_setup):
     return df_tab_07_comparison
 
 
-def control_tab_08(spark, data_paths, const_setup):
+def control_tab_08(job, data_paths, const_setup):
     """
     Calculate aggregates grouped by mbrshp_sid
     from payment_fiscal table and create a comparison table that
     shows payment_fiscal and redshift aggregates side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -955,7 +958,7 @@ def control_tab_08(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_08")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_08_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -964,7 +967,7 @@ def control_tab_08(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_08_01 = spark.sql(
+    df_tab_08_01 = job.spark.sql(
         """
         SELECT
             a.mbrshp_sid,
@@ -992,7 +995,7 @@ def control_tab_08(spark, data_paths, const_setup):
     )
     df_tab_08_01.registerTempTable("df_tab_08_01")
 
-    df_tab_08_comparison = spark.sql(
+    df_tab_08_comparison = job.spark.sql(
         """
         SELECT
             e.mbrshp_sid AS engine_mbrshp_sid,
@@ -1025,14 +1028,14 @@ def control_tab_08(spark, data_paths, const_setup):
     return df_tab_08_comparison
 
 
-def control_tab_09(spark, data_paths, const_setup):
+def control_tab_09(job, data_paths, const_setup):
     """
     Join a sample of rows from payment table in redshift to the
     payment table in pipelined_intermediates and create a comparison
     table that shows payment_fiscal and redshift rows side-by-side.
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         start_date: Defines the lower bound of the date interval the
@@ -1050,7 +1053,7 @@ def control_tab_09(spark, data_paths, const_setup):
     logging.info("Starting processing table control_table_09")
 
     load_and_register(
-        spark,
+        job,
         data_paths["source"]["control_files"]
         + "/tab_09_redshift_{}.txt".format(
             const_setup["end_date"].replace("-", "")
@@ -1059,7 +1062,7 @@ def control_tab_09(spark, data_paths, const_setup):
         filetype="csv",
     )
 
-    df_tab_09_comparison = spark.sql(
+    df_tab_09_comparison = job.spark.sql(
         """
         SELECT
             e.mbrshp_sid AS engine_mbrshp_sid,
@@ -1101,13 +1104,13 @@ def control_tab_09(spark, data_paths, const_setup):
     return df_tab_09_comparison
 
 
-def main(spark, data_paths, club_square_config, config_validation):
+def main(job, data_paths, club_square_config, config_validation):
     """
     Create control tables based on pipelined_intermediates and compare them
     to control tables based on redshift
 
     Args:
-        spark: SPARK object
+        job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
         club_square_config: dictionary structure used to get the source_etl
@@ -1138,25 +1141,31 @@ def main(spark, data_paths, club_square_config, config_validation):
     }
 
     load_and_register(
-        spark,
+        job,
         data_paths["intermediate"]["member_extended"],
         "df_temp_member_extended",
     )
 
     load_and_register(
-        spark, data_paths["intermediate"]["detail_fiscal"], "df_temp_detail"
+        job,
+        data_paths["intermediate"]["detail_fiscal"],
+        "df_temp_detail",
     )
 
     load_and_register(
-        spark, data_paths["intermediate"]["payment_fiscal"], "df_temp_payment"
+        job,
+        data_paths["intermediate"]["payment_fiscal"],
+        "df_temp_payment",
     )
 
     load_and_register(
-        spark, data_paths["intermediate"]["header_fiscal"], "df_temp_header"
+        job,
+        data_paths["intermediate"]["header_fiscal"],
+        "df_temp_header",
     )
 
     load_and_register(
-        spark, data_paths["intermediate"]["member"], "df_temp_member"
+        job, data_paths["intermediate"]["member"], "df_temp_member"
     )
 
     control_table_to_function = {
@@ -1173,16 +1182,33 @@ def main(spark, data_paths, club_square_config, config_validation):
 
     df_comparison_tables = {}
     for name, control_tab in control_table_to_function.items():
-        df_comparison_tables[name] = control_tab(
-            spark, data_paths, const_setup
-        )
+        df_comparison_tables[name] = control_tab(job, data_paths, const_setup)
 
     for name, df_comparison in df_comparison_tables.items():
         validations.validate_table(
-            spark,
+            job.spark,
             "intermediate",
             name,
             config_validation,
             df_comparison,
             check_list=[validations.TestControlTable],
         )
+
+
+job = JobManager("Control_files")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, club_square_config, config_validation)

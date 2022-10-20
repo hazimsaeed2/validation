@@ -1,8 +1,7 @@
 import logging
 
-from pyspark.sql.window import Window as W
-
 import memberdna.source_etl.utils.validations_ETL as validations
+from pyspark.sql.window import Window as W
 
 
 def to_epoch(date_col):

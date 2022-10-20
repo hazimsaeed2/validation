@@ -1,38 +1,41 @@
+import argparse
 import logging
+import os
 
-from memberdna.source_etl.utils.utility import *
 import memberdna.source_etl.utils.validations_ETL as validations
+from memberdna.lib.job_manager import JobManager
+from memberdna.source_etl.utils.utility import *
 
 
-def main(spark, data_paths, config_validation):
+def main(job, data_paths, config_validation):
 
-    logging.info('Starting processing table census_tract')
+    logging.info("Starting processing table census_tract")
 
-    logging.info('Reading the input file ' +
-                 data_paths['source']['member_tract'])
-    member_tract = spark.read.csv(
-        data_paths['source']['member_tract'], header=True)
-
-    validations.validate_table(
-        spark,
-        'source',
-        'member_tract',
-        config_validation,
-        member_tract
+    logging.info(
+        "Reading the input file " + data_paths["source"]["member_tract"]
+    )
+    member_tract = job.spark.read.csv(
+        data_paths["source"]["member_tract"], header=True
     )
 
-    member_tract = member_tract.withColumnRenamed('TRACT', 'CENSUS_TRACT')
+    validations.validate_table(
+        job.spark, "source", "member_tract", config_validation, member_tract
+    )
+
+    member_tract = member_tract.withColumnRenamed("TRACT", "CENSUS_TRACT")
     # In some cases 1 member has 2 rows in member_tract, and we need to drop them
     # to prevent duplicate rows.
     member_tract = member_tract.dropDuplicates(["MBRSHP_SID"])
 
-    distance = spark.read.csv(data_paths['source']['distance'], header=True)
-    distance = distance.withColumnRenamed('Census_Tract', 'CENSUS_TRACT')
+    distance = job.spark.read.csv(
+        data_paths["source"]["distance"], header=True
+    )
+    distance = distance.withColumnRenamed("Census_Tract", "CENSUS_TRACT")
 
-    census_tract = member_tract.join(distance, 'CENSUS_TRACT', 'left_outer')
-    census_tract.registerTempTable('census_tract')
+    census_tract = member_tract.join(distance, "CENSUS_TRACT", "left_outer")
+    census_tract.registerTempTable("census_tract")
 
-    cast_sql = '''
+    cast_sql = """
     select
          CENSUS_TRACT
         ,cast(MBRSHP_SID as int) as MBRSHP_SID
@@ -66,20 +69,40 @@ def main(spark, data_paths, config_validation):
         ,cast(Walmart_Driving_Distance as double) as WALMART_DRIVING_DISTANCE
         ,cast(Walmart_Drive_Time as double) as WALMART_DRIVE_TIME
     from census_tract
-    '''
+    """
 
-    census_tract_schema = spark.sql(cast_sql)
+    census_tract_schema = job.spark.sql(cast_sql)
     census_tract_schema.dropDuplicates()
-    dest_path = data_paths['intermediate']['census_tract']
+    dest_path = data_paths["intermediate"]["census_tract"]
 
     validations.validate_table(
-        spark,
-        'intermediate',
-        'census_tract',
+        job.spark,
+        "intermediate",
+        "census_tract",
         config_validation,
-        census_tract_schema
+        census_tract_schema,
     )
 
-    logging.info('Saving the intermediate file ' + dest_path)
-    census_tract_schema.repartition(
-        30).write.parquet(dest_path, mode='overwrite')
+    logging.info("Saving the intermediate file " + dest_path)
+    census_tract_schema.repartition(30).write.parquet(
+        dest_path, mode="overwrite"
+    )
+
+
+job = JobManager("census_tract")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, config_validation)

@@ -1,8 +1,13 @@
+import argparse
+import logging
+import os
+
+from memberdna.lib.job_manager import JobManager
 from memberdna.source_etl.utils.utility import *
 
 
-def selectSampledMembers(spark, data_paths):
-    member = spark.read.parquet(data_paths["intermediate"]["member"])
+def selectSampledMembers(job, data_paths):
+    member = job.spark.read.parquet(data_paths["intermediate"]["member"])
     print("member count: ", member.count())
 
     sampled_member = member.sample(False, 0.05, 3)
@@ -13,15 +18,15 @@ def selectSampledMembers(spark, data_paths):
     )
 
 
-def readSampledMemberIDs(spark, data_paths):
-    sampled_member = spark.read.parquet(data_paths["sampled"]["member"])
+def readSampledMemberIDs(job, data_paths):
+    sampled_member = job.spark.read.parquet(data_paths["sampled"]["member"])
     sampled_member = sampled_member.select("MBRSHP_SID")
     sampled_member.cache()
     return sampled_member
 
 
-def sampleIntermediate(spark, intermediate_name, sampled_member, data_paths):
-    df = spark.read.parquet(data_paths["intermediate"][intermediate_name])
+def sampleIntermediate(job, intermediate_name, sampled_member, data_paths):
+    df = job.spark.read.parquet(data_paths["intermediate"][intermediate_name])
     sampled_df = df.join(sampled_member, "MBRSHP_SID")
     print(intermediate_name, df.count(), sampled_df.count())
 
@@ -37,12 +42,12 @@ def sampleIntermediate(spark, intermediate_name, sampled_member, data_paths):
         )
 
 
-def main(spark, data_paths):
+def main(job, data_paths):
 
     # running the line directly below gets a new sample of members. if you want continuity in the sample (same members) comment out next line
-    selectSampledMembers(spark, data_paths)
+    selectSampledMembers(job, data_paths)
 
-    sampled_member = readSampledMemberIDs(spark, data_paths)
+    sampled_member = readSampledMemberIDs(job, data_paths)
 
     non_member_intermediates = {
         intermediate_name
@@ -51,6 +56,23 @@ def main(spark, data_paths):
     }
     for intermediate_name in non_member_intermediates:
         print("sampling ", intermediate_name)
-        sampleIntermediate(
-            spark, intermediate_name, sampled_member, data_paths
-        )
+        sampleIntermediate(job, intermediate_name, sampled_member, data_paths)
+
+
+job = JobManager("sampling")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths)

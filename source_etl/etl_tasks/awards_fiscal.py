@@ -1,17 +1,19 @@
+import argparse
 import logging
+import os
 
+from memberdna.lib.job_manager import JobManager
 from memberdna.source_etl.utils.utility import *
 
 
-def main(spark, data_paths, config_validation):
+def main(job, data_paths):
     """
     Reads the intermediate awards table and converts and partitions it with
     respect to fiscal week
 
     Args:
-        spark - spark session object
+        job.spark - spark session object
         data_paths - dict structure containing the source and intermediate paths
-        config_validation - dict structure containing the DQ_check configuration
     Returns:
     """
 
@@ -22,10 +24,12 @@ def main(spark, data_paths, config_validation):
 
     logging.info("Starting processing table awards")
 
-    fiscal_days = spark.read.parquet(data_paths["intermediate"]["fiscal_days"])
+    fiscal_days = job.spark.read.parquet(
+        data_paths["intermediate"]["fiscal_days"]
+    )
     fiscal_days.registerTempTable("fiscal_days")
 
-    awards = spark.read.parquet(awards_intermediate_path)
+    awards = job.spark.read.parquet(awards_intermediate_path)
     awards.registerTempTable("awards")
 
     sql = """
@@ -39,10 +43,29 @@ def main(spark, data_paths, config_validation):
     on
         aw.AWRD_CERT_ISSUE_DT = f.FISCAL_DAY
     """
-    awards_fiscal = spark.sql(sql)
+    awards_fiscal = job.spark.sql(sql)
 
     awards_fiscal.repartition("FISCAL_WEEK_END").write.parquet(
         data_paths["intermediate"]["awards_fiscal"],
         partitionBy="FISCAL_WEEK_END",
         mode="overwrite",
     )
+
+
+job = JobManager("Awards_fiscal")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths)

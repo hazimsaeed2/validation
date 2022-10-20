@@ -1,9 +1,12 @@
+import argparse
 import logging
+import os
 
+from memberdna.lib.job_manager import JobManager
 from memberdna.source_etl.utils.utility import *
 
 
-def main(spark, data_paths, config_validation):
+def main(job, data_paths, config_validation):
     """
     Reads the source csv awards table and converts it to the parquet format
 
@@ -37,7 +40,7 @@ def main(spark, data_paths, config_validation):
     repartition_val = "AWRD_CERT_ISSUE_DT"
 
     createSchemaParquet(
-        spark,
+        job.spark,
         source_path,
         config_validation,
         "awards",
@@ -47,3 +50,22 @@ def main(spark, data_paths, config_validation):
         sep=",",
         header=True,
     )
+
+
+job = JobManager("awards")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+main(job, data_paths, config_validation)

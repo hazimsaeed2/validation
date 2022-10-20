@@ -1,16 +1,18 @@
+import argparse
 import datetime as dt
 import logging
+import os
 import pprint
 
+import memberdna.lib.misc as misc
+import memberdna.source_etl.utils.validations_ETL as validations
 import pyspark.sql.functions as F
+from memberdna.lib.job_manager import JobManager
+from memberdna.source_etl.utils.utility import *
 from pyspark.sql.window import Window as W
 
-import memberdna.lib.misc as misc
-from memberdna.source_etl.utils.utility import *
-import memberdna.source_etl.utils.validations_ETL as validations
 
-
-def load_paths(spark, data_paths):
+def load_paths(job, data_paths):
 
     drop_cols = {
         "SITE_NAME_2",
@@ -25,12 +27,14 @@ def load_paths(spark, data_paths):
         "FIRST_FW_HAS_GAS",
     }
 
-    detail = spark.read.load(data_paths["intermediate"]["detail_fiscal"])
-    item_with_brand = spark.read.load(
+    detail = job.spark.read.load(data_paths["intermediate"]["detail_fiscal"])
+    item_with_brand = job.spark.read.load(
         data_paths["intermediate"]["item_with_brand"]
     )
     detail = add_brand_to_detail(item_with_brand, detail)
-    club = spark.read.load(data_paths["intermediate"]["club"]).drop(*drop_cols)
+    club = job.spark.read.load(data_paths["intermediate"]["club"]).drop(
+        *drop_cols
+    )
 
     return detail, club
 
@@ -64,21 +68,21 @@ def club_category_month(club_square, detail, categories, max_date, is_monthly):
     is required.
 
     Args:
-        club (spark.sql.Dataframe): the club intermediate
-        detail(spark.sql.Dataframe): the detail intermediate
-        categories(spark.sql.Dataframe): the list of categories to compute has_categories for
+        club (job.spark.sql.Dataframe): the club intermediate
+        detail(job.spark.sql.Dataframe): the detail intermediate
+        categories(job.spark.sql.Dataframe): the list of categories to compute has_categories for
         max_date (str): The maximum date the dataset contains
         is_monthly (boolean): Whether or not the output will have month granularity
 
     Returns:
-        club_square (spark.sql.Dataframe): A skeleton of the club square
-        detail_filtered (spark.sql.Dataframe): Detail intermediate filtered properly
+        club_square (job.spark.sql.Dataframe): A skeleton of the club square
+        detail_filtered (job.spark.sql.Dataframe): Detail intermediate filtered properly
     """
 
     # Filter for the most recent year
-    filter_date = (dt.datetime.strptime(max_date, "%Y-%M-%d") - dt.timedelta(
-        days=365
-    )).strftime("%Y-%M-%d")
+    filter_date = (
+        dt.datetime.strptime(max_date, "%Y-%M-%d") - dt.timedelta(days=365)
+    ).strftime("%Y-%M-%d")
 
     detail = (
         detail.filter(detail.FISCAL_WEEK_END >= filter_date)
@@ -126,13 +130,13 @@ def has_categories(detail, club_square, categories, is_monthly):
     dollar amount of sales in that category for that club in the last 52 weeks.
 
     Args:
-        detail (spark.sql.DataFrame): The detail intermediate
-        club_square (spark.sql.DataFrame): The current club square
+        detail (job.spark.sql.DataFrame): The detail intermediate
+        club_square (job.spark.sql.DataFrame): The current club square
         categories (dict): Dictionary of all the categories has_categories needs to be computed for
         is_monthly (boolean): Indicates month granularity
 
     Returns:
-        club_square (spark.sql.Dataframe): The club square with the has_category features
+        club_square (job.spark.sql.Dataframe): The club square with the has_category features
     """
 
     def category_aggregation(
@@ -158,8 +162,7 @@ def has_categories(detail, club_square, categories, is_monthly):
         return tot_purchased
 
     def join_category_aggregations(club_square, is_month, tot_purchased):
-        """
-        """
+        """ """
         monthly_cols = {"SITE_NBR", "MONTH", "YEAR", "CATEGORY"}
 
         standard_cols = {"SITE_NBR", "CATEGORY"}
@@ -228,7 +231,7 @@ def has_categories(detail, club_square, categories, is_monthly):
     return club_square
 
 
-def main(spark, data_paths, club_square_config, config_validation):
+def main(job, data_paths, club_square_config, config_validation):
 
     logging.info("Starting processing table club_square")
 
@@ -243,7 +246,7 @@ def main(spark, data_paths, club_square_config, config_validation):
 
     is_monthly = club_square_config["is_monthly"]
 
-    detail, club = load_paths(spark, data_paths)
+    detail, club = load_paths(job, data_paths)
 
     club_square, detail_filtered = club_category_month(
         club, detail, categories, max_date, is_monthly
@@ -258,8 +261,32 @@ def main(spark, data_paths, club_square_config, config_validation):
     dest_path = data_paths["intermediate"]["club_square"]
 
     validations.validate_table(
-        spark, "intermediate", "club_square", config_validation, club_square
+        job.spark,
+        "intermediate",
+        "club_square",
+        config_validation,
+        club_square,
     )
 
     logging.info("Saving the intermediate file " + dest_path)
     club_square.repartition(1).write.parquet(dest_path, mode="overwrite")
+
+
+job = JobManager("Club_square")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--prod-mode", dest="prod_mode", action="store_true")
+parser.add_argument(
+    "config_path",
+    nargs="?",
+    default=os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../configs/config.yaml",
+    ),
+)
+parser.set_defaults(prod_mode=True)
+args = parser.parse_args()
+config = job.load_config(args)
+data_paths, club_square_config, config_validation = job.split_config(config)
+
+main(job, data_paths, club_square_config, config_validation)
