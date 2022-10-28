@@ -3,10 +3,10 @@ Contains the JobManager class
 """
 
 import logging
+import os
 
 import yaml
-from memberdna.dna.lib.utils import get_latest_path
-from memberdna.lib.misc import get_last_fiscal_weekend, today_helper
+from pe_memberdna.lib.misc import get_last_fiscal_weekend, today_helper, get_latest_path
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 
@@ -79,10 +79,21 @@ class JobManager(object):
             # file will not have the variable date portion, which is ignored here
             pass
 
-        for data_name, data_path in config["data_paths"]["source"].items():
-            config["data_paths"]["source"][data_name] = data_path % {
-                "curr_date": end_date_str_no_dashes
-            }
+        for data_type in ["source", "intermediate", "validation", "archived", "sampled"]:
+            for data_name, data_path in config["data_paths"].get(data_type, {}).items():
+                format_dict = {
+                    "curr_date": end_date_str_no_dashes,
+                    "16,17,18,19,20,21,22": "{16,17,18,19,20,21,22}"
+                }
+                if args.config_path.split(os.sep)[-1] == "config-dev.yaml":
+                    format_dict["output_prefix"] = config["data_paths"].get("output_prefix", "default")
+                config["data_paths"][data_type][data_name] = data_path.format(**format_dict)
+
+        if config.get('validation', {}).get('s3_stat_path', None) is not None:
+            format_dict = {}
+            if args.config_path.split(os.sep)[-1] == "config-dev.yaml":
+                format_dict["output_prefix"] = config["data_paths"].get("output_prefix", "default")
+            config['validation']['s3_stat_path'] = config['validation']['s3_stat_path'].format(**format_dict)
 
         return config
 
@@ -100,8 +111,8 @@ class JobManager(object):
         club_square_config = config["club_square_config"]
         config_validation = config["validation"]
 
-        data_paths["archived"] = (
-            data_paths["archived"] + "/" + "{:%Y-%m-%d}".format(today_helper())
+        data_paths["archived"]["archive"] = (
+            data_paths["archived"]["archive"] + "/" + "{:%Y-%m-%d}".format(today_helper())
         )
         return data_paths, club_square_config, config_validation
 

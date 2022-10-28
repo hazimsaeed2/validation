@@ -22,7 +22,7 @@ from botocore.exceptions import ClientError
 from dateutil import rrule
 import yaml
 
-from memberdna.pipelines.lib.utils import next_fiscal_week_end
+from pe_memberdna.pipelines.lib.utils import next_fiscal_week_end
 
 ALLOWED_DELETE_PREFIXES = [
     re.compile("USERDATA/[^()]"),

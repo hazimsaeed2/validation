@@ -9,7 +9,7 @@ import pyspark.sql.functions as sqlf
 import yaml
 
 
-from memberdna.pipelines.lib.iotools import s3_copy, split_path_bucket_key
+from pe_memberdna.pipelines.lib.iotools import s3_copy, split_path_bucket_key
 
 
 class DataQualityException(Exception):
@@ -486,7 +486,7 @@ def validate_table(
 
     if len(check_list) == 0:
         if tabletype == "source":
-            import memberdna.source_etl.utils.validations_ETL as validations
+            import pe_memberdna.etl.utils.validations_ETL as validations
 
             check_list = [
                 validations.CompareColAggregatesPrior,
@@ -495,7 +495,7 @@ def validate_table(
             ]
 
         if tabletype == "intermediate":
-            import memberdna.source_etl.utils.validations_ETL as validations
+            import pe_memberdna.etl.utils.validations_ETL as validations
 
             check_list = [
                 validations.CompareColAggregatesBoth,

@@ -5,12 +5,13 @@ Includes:
     print_table()
     get_last_fiscal_weekend(start_date_delta=31*14)
     today_helper()
+    get_latest_path()
 """
 
 import boto3
 import datetime
 
-from memberdna.pipelines.lib.iotools import split_path_bucket_key
+from pe_memberdna.pipelines.lib.iotools import split_path_bucket_key
 
 
 def get_weekday_abbreviation(str_date):
@@ -162,3 +163,36 @@ def get_max_fiscal_week(path, date_format="%Y-%m-%d"):
         max_date_str = datetime.datetime.strftime(max_date, date_format)
 
     return max_date_str
+
+def get_latest_path(config_path):
+    """
+    Return the latest file path based on the path date pattern.
+
+    config_path contains YYYYmmdd which is used to match s3 paths.
+
+    Parameters:
+        config_path (str): the config path containing the pattern
+    Returns:
+        (str): the latest file path for matching the config path pattern
+    """
+    pattern = "YYYYmmdd"
+    pattern_position = config_path.find(pattern)
+    if pattern_position < 0:
+        raise ValueError("config path does not have YYYYmmdd pattern")
+
+    bucket, prefix = iotools.split_path_bucket_key(
+        config_path[:pattern_position]
+    )
+    pattern = re.compile(config_path.replace(pattern, "[0-9]{8}"))
+
+    valid_paths = filter(
+        lambda path: pattern.fullmatch(path) is not None,
+        iotools.list_s3_files(bucket, prefix),
+    )
+    path = sorted(
+        valid_paths,
+        key=lambda path: path.split("_")[-1].split(".")[0],
+        reverse=True,
+    )[0]
+
+    return path
