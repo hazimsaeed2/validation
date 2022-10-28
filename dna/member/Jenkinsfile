@@ -1,0 +1,121 @@
+pipeline {
+    agent { node env.node }
+    stages {
+        stage('Clone Source') {
+            steps {
+                dir('memberdna') {
+                    git branch: env.branch,
+                        credentialsId: 'bitbucket-service-account',
+                        url: 'https://bitbucket.bjs.com/scm/an/pe-memberdna.git'
+                }
+            }
+        }
+        stage('Scale up') {
+            steps {
+                script {
+                    if (env.cluster_scaling == 'Spot_Nodes') {
+                        echo "Scaling up"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --num_nodes 50 --wait 120
+                        '''
+                        echo "Scaled up"
+                    }
+                }
+            }
+        }
+        stage('Calculate Features') {
+            parallel {
+                stage('Transaction 1 & 2') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                        cd dna/member
+                        make transaction_1_and_2_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                        '''
+                    }
+                }
+                stage('Coupon and Digital 1 & 2') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                        cd dna/member
+                        make coupon_and_digital_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                        '''
+                    }
+                }
+                stage('Member & Acquisition') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                        cd dna/member
+                        make member_and_acquisition_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                        '''
+                    }
+                }
+                stage('Transaction 3') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                        cd dna/member
+                        make transaction_3_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                        '''
+                    }
+                }
+                stage('Most Shopped') {
+                    steps {
+                        sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                        cd dna/member
+                        make most_shopped_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Calculate Miscellaneous Features') {
+            steps {
+                sh '''
+                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$wrkspce:
+                export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                cd dna/member
+                make misc_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                '''
+            }
+        }
+        stage('Merge Features') {
+            steps {
+                sh '''
+                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$wrkspce:
+                export SPARK_OPTIONS="--conf spark.sql.broadcastTimeout=-1 --driver-memory=15g --executor-memory=16g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g"
+                cd dna/member
+                make merge_prod SPARK_OPTIONS="$SPARK_OPTIONS"
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            echo "Scaling down"
+            sh '''
+                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$wrkspce:
+                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --num_nodes 0 --wait 120
+            '''
+            echo "Scaled down"
+        }
+    }
+}
