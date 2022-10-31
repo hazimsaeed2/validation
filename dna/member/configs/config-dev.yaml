@@ -2,7 +2,7 @@ paths:
       # bucket is prepended to all paths, except to the ones that
       # already begin with s3://...
       output_prefix: 'ref'
-      
+
       bucket: "memberanalytics-data-out-prod"
 
       input:
@@ -37,7 +37,7 @@ paths:
             # TODO: correct spelling in path
             AH5_custumer_facing_desc_path: 'bcg_maps/AH5_custumer_facing_desc/AH5_custumer_facing_desc.csv'
 
-            acq_dna_path: "s3://memberanalytics-data-out-prod/v2/dev/acq/member_dna/recent/"
+            acq_dna_path: "s3://memberanalytics-data-in-prod/v2/dev/acq/member_dna/recent/"
             mbr_basic_path: "s3://memberanalytics-data-in-prod/dev/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 
       output:

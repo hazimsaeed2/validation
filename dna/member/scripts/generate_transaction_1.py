@@ -1,6 +1,6 @@
-import pe_memberdna.dna.lib.generate_population as gp
-import pe_memberdna.dna.lib.managers as managers
-import pe_memberdna.dna.lib.transaction_features as features
+import pe_memberdna.dna.member.lib.generate_population as gp
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.transaction_features as features
 
 
 def generate_transaction(job):
@@ -81,13 +81,13 @@ def main():
 
     features = generate_transaction(job)
     job.data.tables["transaction"] = features
-    
-#     job.data.write(
-#         "transaction",
-#         "transaction_1_path",
-#         partitionby=["MBRSHP_SID", "FISCAL_WEEK_END"],
-#         ftype="parquet",
-#     )
+
+    job.data.write(
+        "transaction",
+        "transaction_1_path",
+        partitionby=["MBRSHP_SID", "FISCAL_WEEK_END"],
+        ftype="parquet",
+    )
 
     job.log.info("Done")
 

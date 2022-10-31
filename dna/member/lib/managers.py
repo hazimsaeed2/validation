@@ -10,21 +10,18 @@ import re
 import socket
 import sys
 
-import memberdna.dna.lib.utils as utils
-import memberdna.pipelines.lib.iotools as iotools
-import memberdna.pipelines.lib.spark_util as spark_util
+import pe_memberdna.dna.member.lib.utils as utils
+import pe_memberdna.pipelines.lib.iotools as iotools
+import pe_memberdna.pipelines.lib.spark_util as spark_util
 import yaml
 
 log = spark_util.get_logger("dna")
 
 
-
 def get_run_args():
     """
     Return the command line arguments used to start the script:
-        --config file_name: specifies the config file to use
-        --test: marks the run as a test and loads a test config
-        --force: forces the run to overwrite existing files
+        --config_path file_name: specifies the config file to use
 
     Parameters:
 
@@ -33,9 +30,17 @@ def get_run_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--config",
-        nargs="?",
-        default="../configs/config.yaml",
+        "--config_path",
+        type=str,
+        default=os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "../configs/config.yaml",
+        ),
+        help=(
+            """
+            path to the config file
+            """
+        ),
     )
 
     args, _ = parser.parse_known_args()
@@ -58,7 +63,7 @@ def load_config(conf_path_in=None):
     """
     if not conf_path_in:
         args = get_run_args()
-        cfg_path = args.config
+        cfg_path = args.config_path
     else:
         cfg_path = conf_path_in
 
@@ -394,8 +399,10 @@ class JobManager(object):
         from pyspark.sql import SparkSession
 
         self.spark = SparkSession.builder.appName(appname).getOrCreate()
-        self.spark.conf.set("spark.sql.legacy.timeParserPolicy","LEGACY")
-        self.spark.conf.set("spark.sql.legacy.parquet.datetimeRebaseModeInWrite","CORRECTED")
+        self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
+        self.spark.conf.set(
+            "spark.sql.legacy.parquet.datetimeRebaseModeInWrite", "CORRECTED"
+        )
         self.sc = self.spark.sparkContext
         self.sc.setLogLevel("WARN")
         self.log = spark_util.get_logger(appname)

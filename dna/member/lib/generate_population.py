@@ -12,13 +12,12 @@ Dataframe prior to development.
 """
 import datetime
 import os
+
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.utils as utils
+import pe_memberdna.lib.misc as misc
 import pyspark
 import pyspark.sql.functions as sqlf
-
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.utils as utils
-import memberdna.lib.misc as misc
-
 
 
 def apply_fw_date_range(job, df):
@@ -34,9 +33,7 @@ def apply_fw_date_range(job, df):
         (pyspark.sql.Dataframe): a filtered dataframe
     """
     _, end_date, lookback_start_date = utils.window_dates(job)
-    df = df.filter(
-        df.FISCAL_WEEK_END.between(lookback_start_date, end_date)
-    )
+    df = df.filter(df.FISCAL_WEEK_END.between(lookback_start_date, end_date))
     return df
 
 

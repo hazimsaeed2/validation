@@ -7,12 +7,11 @@ whereas the ones starting with "__" are helper functions
 """
 
 import numpy as np
+import pe_memberdna.dna.member.lib.utils as utils
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 import pyspark.sql.window as W
 import word2number.w2n as w2n
-
-import memberdna.dna.lib.utils as utils
 
 
 def feature_grouped_tender_spend_nw(job, dna, lb_weeks=51):
