@@ -1,5 +1,5 @@
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.transaction_features as features
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.transaction_features as features
 
 
 def generate_transaction(job):
