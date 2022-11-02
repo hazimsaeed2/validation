@@ -7,7 +7,7 @@ import pyspark.sql.window as W
 import word2number.w2n as w2n
 from pyspark import StorageLevel as SL
 
-import memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.member.lib.utils as utils
 
 
 def feature_most_shopped_category(job, dna, num_weeks):

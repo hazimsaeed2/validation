@@ -1,5 +1,5 @@
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.acquisition_features as features
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.acquisition_features as features
 
 
 def integrate_acquisition(job):

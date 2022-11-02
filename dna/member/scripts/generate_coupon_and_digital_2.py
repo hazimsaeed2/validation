@@ -2,9 +2,9 @@
 The script which calculates intermediate features related to coupon and digital
 and have dependencies on the intermediate from generate_coupon_and_digital_1.py
 """
-import memberdna.dna.lib.coupon_digital_features as features
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.member.lib.coupon_digital_features as features
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.utils as utils
 
 
 def generate_coupon_and_digital(job):

@@ -7,10 +7,10 @@ The output of this script is a dependency for generate_coupon_and_digital_2.py.
 
 import pyspark.sql.functions as sqlf
 
-import memberdna.dna.lib.coupon_digital_features as features
-import memberdna.dna.lib.generate_population as gp
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.member.lib.coupon_digital_features as features
+import pe_memberdna.dna.member.lib.generate_population as gp
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.utils as utils
 
 
 def generate_coupon_and_digital(job):

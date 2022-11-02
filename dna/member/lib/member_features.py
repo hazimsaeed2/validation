@@ -8,7 +8,7 @@ start with "__".
 import pyspark.sql.functions as sqlf
 import pyspark.sql.window as W
 
-import memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.member.lib.utils as utils
 
 
 def feature_member_master(job, dna):

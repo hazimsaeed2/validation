@@ -1,6 +1,6 @@
-import memberdna.dna.lib.generate_population as gp
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.most_shopped_features as features
+import pe_memberdna.dna.member.lib.generate_population as gp
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.most_shopped_features as features
 
 
 def generate_most_shopped(job):

@@ -2,10 +2,10 @@
 The script which calculates intermediate features related to member. It only
 depends on source etl intermediates.
 """
-import memberdna.dna.lib.generate_population as gp
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.lib.member_features as features
-import memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.member.lib.generate_population as gp
+import pe_memberdna.dna.member.lib.managers as managers
+import pe_memberdna.dna.member.lib.member_features as features
+import pe_memberdna.dna.member.lib.utils as utils
 
 
 def generate_member(job):

@@ -32,7 +32,7 @@ member_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_member.py
 
 member_dev:
-	spark-submit ${SPARK_OPTIONS} scripts/generate_member.py --configs configs/config-dev.yaml
+	spark-submit ${SPARK_OPTIONS} scripts/generate_member.py --config configs/config-dev.yaml
 
 acquisition_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/integrate_acquisition.py
@@ -44,7 +44,7 @@ most_shopped_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_most_shopped.py
 
 most_shopped_dev:
-	spark-submit ${SPARK_OPTIONS} scripts/generate_most_shopped.py -config configs/config-dev.yaml
+	spark-submit ${SPARK_OPTIONS} scripts/generate_most_shopped.py --config configs/config-dev.yaml
 
 misc_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_misc.py
@@ -101,10 +101,10 @@ all_features_dev:
 	wait
 
 merge_prod:
-	spark-submit --driver-memory=15g --executor-memory=33g --executor-cores=5 --conf spark.sql.shufflepartitions=800 scripts/merge.py
+	spark-submit ${SPARK_OPTIONS} scripts/merge.py
 
 merge_dev:
-	spark-submit --driver-memory=15g --executor-memory=33g --executor-cores=5 --conf spark.sql.shufflepartitions=800 scripts/merge.py --config configs/config-dev.yaml
+	spark-submit ${SPARK_OPTIONS} scripts/merge.py --config configs/config-dev.yaml
 
 run_member_dna_prod:
 	make all_features_prod && \

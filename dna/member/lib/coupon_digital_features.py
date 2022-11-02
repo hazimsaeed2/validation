@@ -11,7 +11,7 @@ import word2number.w2n as w2n
 import pyspark.sql.functions as sqlf
 import pyspark.sql.window as W
 
-import memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.member.lib.utils as utils
 
 
 def feature_atc(job, dna, weeks_back):

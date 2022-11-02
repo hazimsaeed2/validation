@@ -37,8 +37,8 @@ paths:
             # TODO: correct spelling in path
             AH5_custumer_facing_desc_path: 'bcg_maps/AH5_custumer_facing_desc/AH5_custumer_facing_desc.csv'
 
-            acq_dna_path: "s3://memberanalytics-data-in-prod/v2/dev/acq/member_dna/recent/"
-            mbr_basic_path: "s3://memberanalytics-data-in-prod/dev/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+            acq_dna_path: "s3://memberanalytics-data-in-prod/dev/acq/member_dna/recent/"
+            mbr_basic_path: "s3://memberanalytics-data-in-prod/dev/Membership/PE_Membership_Mstr.csv"
 
       output:
             # dir is not prepended to s3_stat_path
@@ -65,8 +65,8 @@ params:
       # automatically as end_date = date of last Saturday,
       # start_date =  end_date - 14 months
       # Uncomment start_date and end_date in order to set them manually
-      # start_date: "2018-02-01" # (end_date - start_date) should be ~ 14 months
-      # end_date: "2019-04-06"
+      start_date: "2021-09-01" # (end_date - start_date) should be ~ 14 months
+      end_date: "2022-10-22"
       archive: True
 
 validation:
