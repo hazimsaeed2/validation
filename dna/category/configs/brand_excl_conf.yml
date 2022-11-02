@@ -1,0 +1,9 @@
+paths:
+    brand: "s3://memberanalytics-data-out-prod/AD_HOC/Itemmaster_brand_data.zip"
+    item: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item'
+    cat_dna: 's3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/'
+    transactions: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail'
+    exclusions: 's3://memberanalytics-data-out-prod/exclusions/input/brand_exclusions_mixed.csv'
+    output: 's3://memberanalytics-data-out-prod/exclusions/output/for_dna/brand_exclusions'
+params:
+    threshold: 0.8

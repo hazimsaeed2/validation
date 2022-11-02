@@ -1,0 +1,33 @@
+dev:
+  detail:
+    type: 'intermediate'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/pipelined_intermediates/sampled/transaction_fiscal/detail_isnr'
+  member:
+    type: 'master'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/pipelined_intermediates/sampled/master/member'
+  member_extended:
+    type: 'master'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/pipelined_intermediates/sampled/master/member_extended'
+  out:
+    type: 'out'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/CATEGORY_DNA_AH5/PROD/'
+
+prod:
+  detail:
+    type: 'intermediate'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/pipelined_intermediates/transaction_fiscal/detail_isnr'
+  member:
+    type: 'master'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/pipelined_intermediates/master/member'
+  item:
+    type: 'master'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/AD_HOC/pipelined_intermediates/master/item_with_brand'
+  member_extended:
+    type: 'master'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/pipelined_intermediates/master/member_extended'
+  exclusion:
+    type: 'template'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/exclusions/exclusions_with_brand.csv'
+  out:
+    type: 'out'
+    path: 's3://memberanalytics-data-out-prod/unit_test_data/pipelined_intermediates/CATEGORY_DNA/PROD/'

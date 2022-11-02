@@ -1,0 +1,10 @@
+category: 'AH4_CD'
+description: 'AH4_DESC'
+# Commented start_date and end_date means they will be calculated
+# automatically as end = date of last Saturday,
+# start =  end - 14 months
+# Uncomment start_date and end_date in order to set them manually
+# start: '2018-01-06'
+# end: '2019-02-09'
+seasonality: 5
+high_spend: 500000
