@@ -7,6 +7,7 @@ TODO:
 
 # ----- IMPORTS ----- #
 import argparse
+import os
 
 from pyspark import SparkContext
 from pyspark import SparkConf
@@ -65,9 +66,21 @@ def load_config():
         cfg (dict): dictionary representation of config
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', nargs='?', default='../configs/brand_excl_conf.yml')
+    parser.add_argument(
+        "--config_path",
+        type=str,
+        default=os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "../configs/prod/brand_excl_conf.yaml",
+        ),
+        help=(
+            """
+            path to the config file
+            """
+        ),
+    )
     args = parser.parse_args()
-    cfg_path = args.config
+    cfg_path = args.config_path
     with open(cfg_path, 'r') as ymlfile:
         cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
     return cfg
@@ -290,12 +303,19 @@ if __name__ == "__main__":
     # 2. parse config
     cnf = load_config()
     paths = cnf['paths']
+
+    format_dict = {
+        "output_prefix": cnf.get("output_prefix", "default"),
+    }
+    
+    for path in paths.keys():
+        paths[path] = paths[path].format(**format_dict)
     params = cnf['params']
 
     # 3. read and subset input data
     print("reading and preprocessing data..")
 
-    brand_data = spark.read.csv(paths['brand'], header='true', schema=BRAND_SCHEMA)
+    brand_data = spark.read.parquet(paths['brand'])
     brand_data = brand_data.select('ARTICLE_NBR', 'BRAND')
 
     item_mstr = spark.read.parquet(paths['item'])

@@ -6,7 +6,7 @@ member:
   path: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member'
 item:
   type: 'master'
-  path: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item_with_brand'
+  path: 's3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates/master/item_with_brand'
 member_extended:
   type: 'master'
   path: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended'

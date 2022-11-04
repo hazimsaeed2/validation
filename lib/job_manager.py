@@ -83,7 +83,7 @@ class JobManager(object):
             for data_name, data_path in config["data_paths"].get(data_type, {}).items():
                 format_dict = {
                     "curr_date": end_date_str_no_dashes,
-                    "16,17,18,19,20,21,22": "{16,17,18,19,20,21,22}"
+                    "16,17,18,19,20,21,22": "{16,17,18,19,20,21,22}",
                     "output_prefix": config["data_paths"].get("output_prefix", "default"),
                 }
                 config["data_paths"][data_type][data_name] = data_path.format(**format_dict)

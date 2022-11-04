@@ -4,7 +4,7 @@
 # exclusions
 from pyspark.storagelevel import StorageLevel
 
-from pe_memberdna.dna.category.lib.exclusions.exclusion_inheritance import *
+from pe_memberdna.dna.category.lib.exclusion_inheritance import *
 from pe_memberdna.dna.category.lib.square import Square
 from pe_memberdna.dna.category.lib.features import *
 from pe_memberdna.dna.category.lib.seasonality_features import *
