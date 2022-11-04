@@ -5,7 +5,7 @@ import pprint
 import time
 
 import yaml
-from memberdna.category_square.category_square.build import Build
+from pe_memberdna.dna.category.lib.build import Build
 
 
 def open_configs(args):

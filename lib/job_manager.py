@@ -84,15 +84,14 @@ class JobManager(object):
                 format_dict = {
                     "curr_date": end_date_str_no_dashes,
                     "16,17,18,19,20,21,22": "{16,17,18,19,20,21,22}"
+                    "output_prefix": config["data_paths"].get("output_prefix", "default"),
                 }
-                if args.config_path.split(os.sep)[-1] == "config-dev.yaml":
-                    format_dict["output_prefix"] = config["data_paths"].get("output_prefix", "default")
                 config["data_paths"][data_type][data_name] = data_path.format(**format_dict)
 
         if config.get('validation', {}).get('s3_stat_path', None) is not None:
-            format_dict = {}
-            if args.config_path.split(os.sep)[-1] == "config-dev.yaml":
-                format_dict["output_prefix"] = config["data_paths"].get("output_prefix", "default")
+            format_dict = {
+                "output_prefix": config["data_paths"].get("output_prefix", "default"),
+            }
             config['validation']['s3_stat_path'] = config['validation']['s3_stat_path'].format(**format_dict)
 
         return config

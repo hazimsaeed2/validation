@@ -1,4 +1,4 @@
-
+output_prefix: ref
 
 detail:
   type: 'intermediate'
