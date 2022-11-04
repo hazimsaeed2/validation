@@ -77,28 +77,27 @@ class Square(object):
         """
         print("************* Entered  __write method")
         square_path = self.__square_name(path)
-        print(square_path)
-#         parquet_path = square_path + "/PARQUET/"
-#         csv_path = square_path + "/CSV/"
-#         #self.square.persist(storageLevel=StorageLevel.DISK_ONLY)
-#         self.square.repartition(1).write.parquet(parquet_path)
-#         self.square.repartition(1).write.option("emptyValue", None).option(
-#             "nullValue", None
-#         ).csv(csv_path, header=True, escape='"')
-#         if self.config["full_mode"]:
-#             print("************* inside full_mode if condition")
-#             full_square = self.__square_name(
-#                 path, full_mode=self.config["full_mode"]
-#             )
-#             full_parquet = full_square + "/PARQUET/"
-#             full_csv = full_square + "/CSV/"
-#             self.square.repartition(1).write.parquet(
-#                 full_parquet, mode="overwrite"
-#             )
-#             self.square.repartition(1).write.option("emptyValue", None).option(
-#                 "nullValue", None
-#             ).csv(full_csv, header=True, escape='"', mode="overwrite")
-#         print("************* Exiting from __write method")
+        parquet_path = square_path + "/PARQUET/"
+        csv_path = square_path + "/CSV/"
+        #self.square.persist(storageLevel=StorageLevel.DISK_ONLY)
+        self.square.repartition(1).write.parquet(parquet_path)
+        self.square.repartition(1).write.option("emptyValue", None).option(
+            "nullValue", None
+        ).csv(csv_path, header=True, escape='"')
+        if self.config["full_mode"]:
+            print("************* inside full_mode if condition")
+            full_square = self.__square_name(
+                path, full_mode=self.config["full_mode"]
+            )
+            full_parquet = full_square + "/PARQUET/"
+            full_csv = full_square + "/CSV/"
+            self.square.repartition(1).write.parquet(
+                full_parquet, mode="overwrite"
+            )
+            self.square.repartition(1).write.option("emptyValue", None).option(
+                "nullValue", None
+            ).csv(full_csv, header=True, escape='"', mode="overwrite")
+        print("************* Exiting from __write method")
 
     def feature_join(self, df):
         """

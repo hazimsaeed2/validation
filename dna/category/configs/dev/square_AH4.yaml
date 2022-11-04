@@ -4,7 +4,7 @@ description: 'AH4_DESC'
 # automatically as end = date of last Saturday,
 # start =  end - 14 months
 # Uncomment start_date and end_date in order to set them manually
-# start: '2018-01-06'
-# end: '2019-02-09'
+start: '2021-09-01'
+end: '2022-10-22'
 seasonality: 5
 high_spend: 500000
