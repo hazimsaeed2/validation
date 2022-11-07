@@ -486,7 +486,7 @@ def validate_table(
 
     if len(check_list) == 0:
         if tabletype == "source":
-            import pe_memberdna.etl.utils.validations_ETL as validations
+            import pe_memberdna.etl.lib.validations_ETL as validations
 
             check_list = [
                 validations.CompareColAggregatesPrior,
@@ -495,7 +495,7 @@ def validate_table(
             ]
 
         if tabletype == "intermediate":
-            import pe_memberdna.etl.utils.validations_ETL as validations
+            import pe_memberdna.etl.lib.validations_ETL as validations
 
             check_list = [
                 validations.CompareColAggregatesBoth,

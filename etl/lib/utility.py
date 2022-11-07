@@ -1,6 +1,6 @@
 import logging
 
-import pe_memberdna.etl.utils.validations_ETL as validations
+import pe_memberdna.etl.lib.validations_ETL as validations
 from pyspark.sql.window import Window as W
 
 
