@@ -1,0 +1,52 @@
+paths:
+  TEST: "s3://memberanalytics-data-out/MODELDATA/TESTS/"
+  TRANS_INT: "s3://memberanalytics-data-out/MODELDATA/TESTS/input_data/cf_transactions.csv"
+  ITEM_INT: "s3://memberanalytics-data-out/MODELDATA/TESTS/input_data/cf_items.csv"
+  CUBE: "s3://memberanalytics-data-out/MODELDATA/TESTS/input_data/cf_cube.csv"
+  CATEGORY_DNA_AH4: "s3://memberanalytics-data-out/CATEGORY_DNA/PROD/AH4_CD_2017-06-10_2018-06-09_2018-08-09_01:51:00/PARQUET/"
+  CATEGORY_DNA_AH5: "s3://memberanalytics-data-out/CATEGORY_DNA/PROD/AH5_CD_2017-05-27_2018-05-26_2018-08-21_14:10:00/PARQUET/"
+  CLUB_DNA: "s3://memberanalytics-data-out/pipelined_intermediates/master/club_square/"
+  DATA: "s3://memberanalytics-data-out/MODELDATA/TESTS/DATASETS/"
+  MODEL: "s3://memberanalytics-data-out/MODELDATA/TESTS/MODELS/"
+  PREDICTIONS: "s3://memberanalytics-data-out/MODELDATA/TESTS/PREDICTIONS/"
+  LOOKUP: "s3://memberanalytics-data-out/MODELDATA/LOOKUP/"
+  PROPENSITY_PREDICTIONS: "s3://memberanalytics-data-out/MODELDATA/PREDICTIONS/trip_spend_predictions/trip_spend_predictions_2018-08-25.csv"
+shared:
+  start: "2018-04-30"
+  end: "2018-05-14"
+  f_start: "2018-04-30"
+  f_end: "2018-05-14"
+  test: TRUE
+  data_version: "test"
+  model_version: "vtest"
+  category: "AH4"
+  num_cats: 215
+  run_name: "2019-08-01"
+etl:
+  sample: 1
+train:
+  recommendations: 5
+  binary: TRUE
+  backtest: FALSE
+  cat_norm: FALSE # normalize by category purchase frequency
+  member_norm: FALSE # normalize by member trips
+  size_norm: FALSE # normalize by category size
+  inputtype: "TRIPS" # supports: 'TRIPS' 'SALES_UNITS' 'SALES_AMT' 'RED_RATE' 'REDEMPTIONS'
+  scaler: FALSE
+  eval_col: "TRIPS"
+  rank: 3
+  lambda: 0.1
+  alpha: 1
+  iter: 10
+predict:
+  recommendations: 5
+  lambda: # leniency cutoff for stretch eligibility. Defaults: normal=10, strict=0.5, lenient=15
+    - 10
+    - 20
+  cutoff: Null # max number of prior trips for filtering recs
+  scale: FALSE
+  score_limit: Null # min score limit for filtering recs
+  stretch: FALSE # limit to stretch offers
+  hook: FALSE # limit to hook offers
+  subset: Null # sequence of members to limit predictions to
+  pred_date: "2018-06-04" # effective date to make predictions at

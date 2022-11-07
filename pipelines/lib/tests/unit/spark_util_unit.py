@@ -3,7 +3,7 @@ import unittest
 import xmlrunner
 from pyspark.sql import SparkSession
 
-from memberdna.pipelines.lib.spark_util import (
+from pe_memberdna.pipelines.lib.spark_util import (
     count_nulls,
     crosstab_pct,
     grouped_percentiles,

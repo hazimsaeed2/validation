@@ -1,0 +1,185 @@
+paths:
+      TRANSACTIONS_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/pipelined_intermediates/transaction_fiscal/detail
+      ARTICLE_DNA_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/CATEGORY_DNA/PROD/ARTICLE_NBR/CATEGORY_DNA_full/PARQUET
+      AH5_DNA_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET
+      AH4_DNA_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET
+      ARTICLE_AH4_AH5_MAP: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/pipelined_intermediates/master/item
+      RAW_MEMBER: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/pipelined_intermediates/master/member_extended
+      ITEM_MASTER: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/pipelined_intermediates/master/item
+      SAME_DAY_ZIPCODES: s3://memberanalytics-data-out-prod/AD_HOC/same_day_delivery_zip_codes/Same
+            Day Zip Codes Covered 8.22.19.csv
+      CDSA_LOC: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/cdsa/
+      ASSN_LOC: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/cdsa/assn_output/
+      LOG_LOC: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/logs/
+      CUBE: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/CUBES/customer_cube_2019-01-07/customer_cube
+      PROPENSITY: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/MODELDATA/PREDICTIONS/trip_spend_predictions/trip_spend_predictions_2018-12-29.csv
+      PRED_LIST: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/MODELDATA/PREDICTIONS/preds-20190215-combined_ah4_yt_April/PARQUET/
+      FHH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_mail_list
+      MAIL_LIST: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_mail_list
+      BACKTEST_MAIL_LIST: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_mail_list
+      CPG_COUPON_LIST_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_coupon_list/article.csv
+      CATEGORY_COUPON_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_coupon_list/category.csv
+      BASKET_COUPON_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_coupon_list/basket.csv
+      VERSION_MAP: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/campaigns/campaign/input_version_map
+      INPUT_ASSIGNMENTS: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/cdsa/assn_output//mmpc/<haoran-10.13.32.68>/test_2019-02-22/assignments
+      INPUT_CONSTRUCTS: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/cdsa/assn_output//mmpc/<haoran-10.13.32.68>/test_2019-02-22/assignments_allconstructs
+      INPUT_MAILHOUSE: null
+      MAIL_POPULATION_ASSIGNMENT: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/AdjustedTrips/ASSIGNMENTS/cdsa/assn_output//mmpc/<haoran-10.13.32.68>/test_2019-02-22/mail_subset
+      EXCLUSIONS: null
+shared:
+      experiment: 2
+      campaign: mmpc
+      run_name: test
+      run_type: test
+      run_size: full
+      assignment_date: '2019-02-22'
+      sampling_weeks_rev_columns: LAST_TWENTY-SIX_WEEK_SPEND
+regression_test:
+      creation:
+            sample_members: 10
+            pct_fhh: 0.2
+            article_coupons:
+                  num_coupons: 12
+            basket_coupons:
+                  num_coupons: 1
+            category_coupons:
+                  num_coupons: 1
+            csv_rows:
+                  campaign.csv: 1
+                  constructs.csv: 1
+                  cells.csv: 1
+                  segments.csv: 1
+                  handshakes.csv: 1
+                  msmt_cells.csv: 1
+            output_partitions: 3
+      execution: null
+coupon_creation:
+      coupon_inhome_date: '2018-02-05'
+      excluded_coupons_force_back_in: null
+      backfill_exclusions:
+      - null
+      coupon_types:
+      - Paper Coupon
+      - Clipless Coupon
+      exclusion_types:
+      - CONTENT
+      - PURCHASE_CYCLE
+      - INVENTORY
+      hero_coupons:
+      - 100001
+      - 100002
+      coupon_start_date: '2018-02-05'
+      coupon_end_date: '2018-02-05'
+      backfill:
+            cpn_exclusion:
+            - null
+            substitutable_MCH3_exclusion: -SUNDRIES -GENERAL MERCHANDISE
+            cpn_force_in:
+            - null
+assignment:
+      replace_with_null: []
+      downsample_coupons: null
+      backfill_method:
+            category: rank_by_agg_cf
+            basket: hardest
+            dummy: static
+            article: rank_by_cf
+            article_hero: rank_by_agg_trips
+      backfill_priority: low
+sizing:
+      min_cpn_start_date: '2018-02-05'
+      max_cpn_end_date: '2018-02-05'
+      num_days_backwards: 30
+      article_red_over_qual_rate: 0.37
+      article_cann_rate: 0.8
+      category_red_over_qual_rate: 0.25
+      category_cann_rate: 0.5
+      basket_red_over_qual_rate: 0.33
+      basket_cann_rate: 0.6
+      basket_sales_lift_per_capita: 1.1
+subset:
+      sample_size: 1
+      force_in_new: true
+      force_in_cells: null
+      force_out_cells:
+      error: 1
+      max_decile_6: 1
+qc:
+      pre_configured:
+            renewal:
+                  include: false
+                  group_by:
+                  - cell_id
+                  - version
+                  - cpn_nbr
+                  slot_nbr: []
+            descriptive:
+                  include: false
+                  group_by:
+                  - cell_id
+                  - version
+                  - cpn_nbr
+                  slot_nbr: []
+            personalized_content:
+                  include: false
+                  group_by:
+                  - cell_id
+                  - version
+                  - cpn_nbr
+                  slot_nbr: []
+            savings_content:
+                  include: false
+                  version_letter:
+                  - A
+                  slot_content_map:
+                        version_slot: 13
+                        savings: 15
+                        trips: 18
+                        gas_trips: 20
+                        top_category: 19
+                        tenure: 21
+                  group_by: []
+                  slot_nbr: []
+            compare:
+                  group_by:
+                  - cell_id
+                  slot_nbr: []
+      aggregation_params:
+      -     coupon:
+                  tab_names:
+                  - cell-cpn-bfill
+                  - cpn-slot-bfill
+                  group_by:
+                  -     - cell_id
+                        - cpn_type
+                        - is_backfill
+                  -     - cpn_type
+                        - slot_nbr
+                        - is_backfill
+                  aggs:
+                  -     - '*'
+                        - count
+      -     more_coupon:
+                  tab_names:
+                  - cell-backfill
+                  - cell-slot-backfill
+                  group_by:
+                  -     - cell_id
+                        - is_backfill
+                  -     - cell_id
+                        - slot_nbr
+                        - is_backfill
+                  aggs:
+                  -     - '*'
+                        - count
+      -     full:
+                  tab_names:
+                  - full
+                  group_by:
+                  -     - cell_id
+                        - cpn_type
+                        - slot_nbr
+                        - is_backfill
+                  aggs:
+                  -     - '*'
+                        - count

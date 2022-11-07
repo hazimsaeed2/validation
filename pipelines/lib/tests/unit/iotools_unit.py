@@ -3,7 +3,7 @@ import unittest.mock as mock
 import xmlrunner
 
 from unittest import mock
-from memberdna.pipelines.lib.iotools import (
+from pe_member_dna.pipelines.lib.iotools import (
     s3_copy_version,
     s3_copy,
     copy_file_to_s3,
@@ -26,7 +26,7 @@ class S3CopyVersionTestCase(unittest.TestCase):
             s3_copy_version,
             "test_bucket",
             "source_key",
-            "dest_key"
+            "dest_key",
         )
 
     @mock.patch("memberdna.pipelines.lib.iotools.boto3")
@@ -42,10 +42,7 @@ class S3CopyVersionTestCase(unittest.TestCase):
         s3.copy_object.assert_called_with(
             Bucket="test_bucket",
             Key="dest_key",
-            CopySource={
-                "Bucket": "test_bucket",
-                "Key": "source_key"
-            }
+            CopySource={"Bucket": "test_bucket", "Key": "source_key"},
         )
 
     @mock.patch("memberdna.pipelines.lib.iotools.boto3")
@@ -70,8 +67,8 @@ class S3CopyVersionTestCase(unittest.TestCase):
                 "Bucket": "test_bucket",
                 "Key": "source_key",
                 "VersionId": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40"
-                             "Nr8X8gdRQBpUMLUo",
-            }
+                "Nr8X8gdRQBpUMLUo",
+            },
         )
 
 
@@ -89,9 +86,7 @@ class S3CopyTestCase(unittest.TestCase):
         s3_copy("test_bucket", "source_key", "dest_key")
 
         s3_copy_version.assert_called_with(
-            "test_bucket",
-            "source_key",
-            "dest_key"
+            "test_bucket", "source_key", "dest_key"
         )
 
     @mock.patch("memberdna.pipelines.lib.iotools.list_s3_dir")
@@ -109,16 +104,8 @@ class S3CopyTestCase(unittest.TestCase):
 
         s3_copy_version.assert_has_calls(
             [
-                mock.call(
-                    "test_bucket",
-                    "dir/key1",
-                    "dest_dir/key1"
-                ),
-                mock.call(
-                    "test_bucket",
-                    "dir/key2",
-                    "dest_dir/key2"
-                )
+                mock.call("test_bucket", "dir/key1", "dest_dir/key1"),
+                mock.call("test_bucket", "dir/key2", "dest_dir/key2"),
             ]
         )
 
@@ -134,13 +121,11 @@ class CopyFileToS3TestCase(unittest.TestCase):
 
         copy_file_to_s3(
             "unittests/test_data/iotools/file.txt",
-            "s3://test_bucket/test/file.txt"
+            "s3://test_bucket/test/file.txt",
         )
 
         write_text_to_s3.assert_called_with(
-            "test_bucket",
-            "test/file.txt",
-            b"test"
+            "test_bucket", "test/file.txt", b"test"
         )
 
 
@@ -155,31 +140,32 @@ class CopyDirToS3TestCase(unittest.TestCase):
             "Dir dummy_dir does not exist",
             copy_dir_to_s3,
             "dummy_dir",
-            "s3://test_bucket/dummy_dir"
+            "s3://test_bucket/dummy_dir",
         )
 
     @mock.patch("memberdna.pipelines.lib.iotools.copy_file_to_s3")
     def test_copy_dir(self, copy_file_to_s3):
         copy_file_to_s3.return_value = None
-        copy_dir_to_s3("unittests/test_data/iotools", "s3://test_bucket/iotools")
+        copy_dir_to_s3(
+            "unittests/test_data/iotools", "s3://test_bucket/iotools"
+        )
 
         calls = [
             mock.call(
                 "unittests/test_data/iotools/test_dir/test_dir/file.txt",
-                "s3://test_bucket/iotools/test_dir/test_dir/file.txt"
+                "s3://test_bucket/iotools/test_dir/test_dir/file.txt",
             ),
             mock.call(
                 "unittests/test_data/iotools/test_dir/file.txt",
-                "s3://test_bucket/iotools/test_dir/file.txt"
+                "s3://test_bucket/iotools/test_dir/file.txt",
             ),
             mock.call(
                 "unittests/test_data/iotools/file.txt",
-                "s3://test_bucket/iotools/file.txt"
+                "s3://test_bucket/iotools/file.txt",
             ),
         ]
 
         copy_file_to_s3.assert_has_calls(calls)
-
 
 
 if __name__ == "__main__":

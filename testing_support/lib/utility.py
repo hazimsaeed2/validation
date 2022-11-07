@@ -10,17 +10,15 @@ from urllib.parse import urlparse
 import boto3
 import yaml
 
-from memberdna.pipelines.lib.iotools import (
+from pe_memberdna.pipelines.lib.iotools import (
     split_path_bucket_key,
     s3_copy,
     s3_delete,
     write_yaml_to_s3,
     copy_file_to_s3,
-    is_s3_file,
-    write_text_to_s3,
 )
 
-import memberdna.source_etl.utils.validations_ETL as validations
+import pe_memberdna.etl.lib.validations_ETL as validations
 
 
 class DqCheckUnittest(unittest.TestCase):
@@ -46,27 +44,18 @@ class DqCheckUnittest(unittest.TestCase):
             bucket, key = split_path_bucket_key(dynamic)
             write_yaml_to_s3(bucket, key, dict())
         else:
-            bucket, key_source = split_path_bucket_key(
-                self.expected_path
-            )
-            _, key_dest = split_path_bucket_key(
-                dynamic
-            )
+            bucket, key_source = split_path_bucket_key(self.expected_path)
+            _, key_dest = split_path_bucket_key(dynamic)
             s3_copy(bucket, key_source, key_dest)
 
-
     def remove_stats(self):
-        """ Remove the temp version of unit test stats. """
+        """Remove the temp version of unit test stats."""
         f = self.conf["s3_stat_path"]
         bucket, key = split_path_bucket_key(f)
-        s3_delete(
-            bucket,
-            key,
-            allowed_paths=["STATS/ETL/", "STATS/DNA/"]
-        )
+        s3_delete(bucket, key, allowed_paths=["STATS/ETL/", "STATS/DNA/"])
 
     def validation_report_pass(self, method, val_func):
-        """ Ensure the method succeeds when it is supposed to. """
+        """Ensure the method succeeds when it is supposed to."""
         res = val_func(
             spark=self.spark,
             tabletype=self.tabletype,
@@ -80,7 +69,7 @@ class DqCheckUnittest(unittest.TestCase):
         self.assertEqual(res[0]["error_count"], 0)
 
     def validation_report_fail(self, method, val_func):
-        """ Ensure the method succeeds when it is supposed to. """
+        """Ensure the method succeeds when it is supposed to."""
         res = val_func(
             spark=self.spark,
             tabletype=self.tabletype,
@@ -95,7 +84,7 @@ class DqCheckUnittest(unittest.TestCase):
         self.assertGreater(res[0]["error_count"], 0)
 
     def validation_pass(self, method, val_func):
-        """ Ensure the method succeeds when it is supposed to. """
+        """Ensure the method succeeds when it is supposed to."""
         try:
             val_func(
                 spark=self.spark,
@@ -110,7 +99,7 @@ class DqCheckUnittest(unittest.TestCase):
             self.fail("Unit test of passing {} failed".format(method))
 
     def validation_fail(self, method, val_func):
-        """ Ensure the method succeeds when it is supposed to. """
+        """Ensure the method succeeds when it is supposed to."""
         msg = "Unit test of failing {} failed".format(method)
         with self.assertRaises(validations.DataQualityException, msg=msg):
             res = val_func(
@@ -158,9 +147,13 @@ class DqCheckUnittest(unittest.TestCase):
             self.fail(fail_msg)
 
         response_expected = get_s3_object(self.expected_path)
-        expected = yaml.load(response_expected, Loader=yaml.FullLoader)[self.tabletype]["df"][testname]
+        expected = yaml.load(response_expected, Loader=yaml.FullLoader)[
+            self.tabletype
+        ]["df"][testname]
         response_stat = get_s3_object(self.conf["s3_stat_path"])
-        written = yaml.load(response_stat, Loader=yaml.FullLoader)[self.tabletype]["df"][testname]
+        written = yaml.load(response_stat, Loader=yaml.FullLoader)[
+            self.tabletype
+        ]["df"][testname]
 
         self.assertEqual(expected, written, msg=fail_msg)
 
@@ -204,11 +197,7 @@ def remove_from_s3(path):
     """
 
     bucket, key = split_path_bucket_key(path)
-    s3_delete(
-        bucket,
-        key,
-        allowed_paths=["unit_test_data/"]
-    )
+    s3_delete(bucket, key, allowed_paths=["unit_test_data/"])
 
 
 def get_unique_id(test_name):
@@ -241,8 +230,7 @@ def make_paths_unique(local_path, test_name):
     with open(local_path, "rb") as f:
         content = f.read()
         unique_content = content.replace(
-            b"UNIQUE_ID",
-            bytes(get_unique_id(test_name), "utf-8")
+            b"UNIQUE_ID", bytes(get_unique_id(test_name), "utf-8")
         )
 
     return unique_content

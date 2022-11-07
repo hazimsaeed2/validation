@@ -1,0 +1,27 @@
+{
+  "segment_id": 10003,
+  "data_sources": [
+    {
+      "name": "category_tenure",
+      "ftype": "parquet",
+      "path": "CUBE",
+      "offer_data": "category",
+      "time_partition": "fiscal_week",
+      "cols": [
+        "MBRSHP_SID",
+        "TENURE",
+        "DUMMY_COL"
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "filter_num": 1,
+      "filter_type": "construct_satisfied",
+      "filter_parameters": {
+        "construct_id": 10003,
+        "slot_num": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+      }
+    }
+  ]
+}

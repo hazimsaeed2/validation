@@ -1,0 +1,11 @@
+MBRSHP_SID,TENURE,DUMMY_COL
+1,50,True
+2,80,False
+3,150,True
+4,300,False
+5,400,True
+6,100,False
+7,0,True
+8,1,False
+9,1000,True
+10,10,False

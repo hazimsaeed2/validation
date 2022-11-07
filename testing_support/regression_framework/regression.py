@@ -17,22 +17,22 @@ from pyspark.sql.functions import max as fmax
 from pyspark.sql.functions import rpad, when
 from pyspark.sql.types import IntegerType, StructField, StructType
 
-from memberdna.pipelines.assignment.lib.assn_io import JobManager
-from memberdna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     deterministic_sample,
     rdd_rank_by_col,
 )
-from memberdna.pipelines.assignment.lib.schemas.campaign_schemas import (
+from pe_memberdna.pipelines.assignment.lib.schemas.campaign_schemas import (
     INPUT_MAIL_FILE_SCHEMA,
 )
-from memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
+from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
     ARTICLE_COUPON_SCHEMA,
     BASKET_COUPON_SCHEMA,
     CAT_COUPON_SCHEMA,
     VERSION_MAP_SCHEMA,
 )
-from memberdna.pipelines.lib.iotools import s3_delete, split_path_bucket_key
-from memberdna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.pipelines.lib.iotools import s3_delete, split_path_bucket_key
+from pe_memberdna.pipelines.lib.spark_util import get_logger
 
 
 class RegressionTest(unittest.TestCase, JobManager, metaclass=ABCMeta):

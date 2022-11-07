@@ -1,0 +1,186 @@
+paths:
+      # ---------- fairly static --------------- #
+      # raw input data -- DNAS and  static input items
+      TRANSACTIONS_PATH: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail'
+      ARTICLE_DNA_PATH: 's3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/ARTICLE_NBR/CATEGORY_DNA_full/PARQUET'
+      AH5_DNA_PATH: 's3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET'
+      AH4_DNA_PATH: 's3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET'
+      ARTICLE_AH4_AH5_MAP: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item'
+      RAW_MEMBER: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended'
+      ITEM_MASTER: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item'
+      SAME_DAY_ZIPCODES: 's3://memberanalytics-data-out-prod/AD_HOC/same_day_delivery_zip_codes/Same Day Zip Codes Covered 8.22.19.csv'
+      # CDSA
+      CDSA_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/'
+      ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
+      LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
+      ### UPDATE PER CAMPAIGN
+      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2019-01-07/customer_cube' # use most recently available date
+      # --------- end of fairly static ------------ #
+      # ---------- campaign specific -------------- #
+      # Model inputs - UPDATE PER CAMPAIGN
+      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/trip_spend_predictions/trip_spend_predictions_2018-12-29.csv' # use most recently available date
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/preds-20190215-combined_ah4_yt_April/PARQUET/'  # CF model predictions with seasonality aligned to campaign in home dates
+      # Member related inputs - UPDATE PER CAMPAIGN
+      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_mail_list' # legacy; Set same as MAIL_LIST
+      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_mail_list' # if MAIL_LIST is not set the engine will use the campaign name format(MMPC14FY21) to generate a path
+      BACKTEST_MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_mail_list'
+      MUHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/MUHH'
+      BBM_SCORED: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/BBM_SCORED'
+      # RAW_MEMBER_LISTS: # raw data files used to create MAIL_LIST, if applicable
+            # - 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY20/BBM8FY20/BBM8_Clearwater_221_No_Canada.dat'
+      # Coupon Inputs - Include path value if applicable - UPDATE PER CAMPAIGN
+      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/article.csv'
+      CATEGORY_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/category.csv'
+      BASKET_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/basket.csv'
+      # CLOSURE_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/cap_closure_coupons.csv'
+      # EXTRA_INFO_CLOSURE_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/cap_closure_lookup.csv"
+      # BBM Only - Include path value if applicable - UPDATE PER CAMPAIGN
+      VERSION_MAP: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_version_map'
+      # COUPON_PRICE_PATH: # Contains min-max retail prices for article coupons
+      # Assignment Outputs - OPTIONAL (calculated by engine, input only if needed)
+      INPUT_ASSIGNMENTS: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/bbm_or_mmpc/test_2018-02-05/assignments'
+      INPUT_CONSTRUCTS: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/bbm_or_mmpc/test_2018-02-05/assignments_allconstructs'
+      INPUT_MAILHOUSE : # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/bbm_or_mmpc/test_2018-02-05/final_mailhouse'
+      # BBM: change to match INPUT_ASSIGNMENTS - MMPC: change to mail_subset - OPTIONAL (calculated by engine, input only if needed)
+      MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output//bbm_or_mmpc/test_2018-02-05/mail_subset'
+      EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
+shared: # This section is shared among all scripts - UPDATE PER RUN
+      experiment: 1 # Maps to experiment_id in cells.csv
+      campaign: 'mmpc_bbm' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'test' # Good for making runs with different configurations within the same campaign
+      run_type: 'test' # accepts 'prod' 'dev' 'test'
+      run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
+      assignment_date: '2018-02-05' # On Final run, should be updated to be near the final updated date
+      sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
+      tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
+coupon_creation: # create_coupons.py
+      coupon_inhome_date: '2018-02-05' # Date in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
+      excluded_coupons_force_back_in:
+      backfill:
+            cpn_exclusion: # A list of coupons that will be excluded from backfill
+                  -
+            substitutable_MCH3_exclusion: # a list of MCH3 that will be limited to 1 coupon max within each AH5 level
+                  - SUNDRIES
+                  - GENERAL MERCHANDISE
+            cpn_force_in: # A list of coupons that will be forced into backfill regardless the exclusion rule above
+                  -
+      coupon_types: # Not relevant for assignment purposes other than only these types are allowed
+            - 'Paper Coupon'
+            - 'Clipless Coupon'
+      excluded_coupons_force_back_in: # List of coupons to force back in that have been excluded by exclusions type below
+      exclusion_types:  # applies to article coupons ONLY. If one of the types is listed below, ALL coupons with any articles listed with exclusions in config are removed from the coupon ETL (no differentiated logic based on the type). The reasons below only explain WHY a given article is flagged for exclusion, but the same "global removal" logic is applied to article offers per type
+            - CONTENT # The article DNA (based on exclusions input) flags these based on what should never be promoted (e.g. Cigarettes)   Default is Excluded
+            - PURCHASE_CYCLE # The article DNA (based on exclusions input) flags these based on very long time between purchases (e.g. tires)   Default is Excluded
+            - INVENTORY # The article DNA (based on exclusions input) flags these if inventory carried equivalently in all clubs (e.g. vacuums)  Default is Excluded
+            # - SEASONAL # The article DNA (based on exclusions input) flags these if purchased in certain months (e.g. "POOL")  Currently not excluded (BBM itself only creates seasonal coupons)
+            # - MEATBALLS # The article DNA (based on exclusions input) flags these if the Category-level offer is too mixed/complicated     Currently not excluded
+            # - SENSITIVE # The article DNA (based on exclusions input)  if the category-level offer should only go to some members (e.g. pet should only go to people who bought pet products) Currently not excluded
+      hero_coupons: #Deprecated
+            -
+      coupon_start_date:  # Deprecated
+      coupon_end_date:  # Deprecated
+assignment: # assign_offers.py
+      replace_with_null: []
+      downsample_coupons:
+            #- cpn_nbr: 211902
+            #  ratio: .2
+            #- cpn_nbr: 211735
+            #  ratio: .01
+      backfill_method: # For each coupon type, what function to use for default backfill.  Found in ingest.py
+            category: 'rank_by_agg_cf'  # accepts 'same' 'random' 'hardest' 'static' 'rank_by_cf' 'rank_by_agg_cf'  -  Do not use 'same','static' without further testing
+            basket: 'hardest' # accepts 'same' 'random' 'hardest' 'static' 'rank_by_cf' -  Do not use 'same','static' without further testing
+            dummy: 'static'  # accepts 'same' 'random' 'hardest' 'static' 'rank_by_cf' -  Do not use 'same','static' without further testing
+            article: 'rank_by_cf' # accepts 'same' 'random' 'hardest' 'static' 'rank_by_cf' 'rank_by_agg_trips' -  Do not use 'same','static' without further testing
+            article_hero: # Deprecated
+      backfill_priority: 'low' # 'high'
+sizing: # backtest_sizing.py
+      min_cpn_start_date: '2018-02-05' # The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
+      max_cpn_end_date: '2018-02-05' # The maximum of the self-funded coupon end dates
+      ### Items below this line typically should not be changed
+      num_days_backwards: 364 # The number of days backwards to backtest - typically 364 to look at prior year
+      article_red_over_qual_rate: 0.37 # Expected redemption over qualified rate for articles - do not change without data
+      article_cann_rate: 0.8 # Cannibalization rate for articles - do not change without data
+      category_red_over_qual_rate: 0.25 # Expected redemption over qualified rate for category coupons - do not change without data
+      category_cann_rate: 0.5 # Cannibalization rate for category coupons - do not change without data
+      basket_red_over_qual_rate: 0.33 # Expected redemption over qualified rate for basket coupons - do not change without data
+      basket_cann_rate: 0.6 # Cannibalization rate for basket coupons - do not change without data
+      basket_sales_lift_per_capita: 1.10 # Sales lift per redemption - do not change without data
+subset: # subsample_population.py and generate_msmt_input.py
+      sample_size: 50000 # When subsampling, every time we subsample a segment (new members, decile 5, etc), how many members to sample. Currently sample 5 segments: Deciles 1-4(together),Decile 5,Decile 6, Decile 7, New members (<150 days excluding trials)
+      force_in_new: TRUE # Whether or not to force in and Sample new members into PC circulation
+      force_in_cells: # A list of cells that will be forced into the mail circulation
+      force_out_cells: # A list of cells that will be forced out of the mail circulation
+      error: 75 # allowable error in circulation in units of people
+      max_decile_6: # Deprecated
+qc: # qc_assignments.py
+      # Pre-configured, custom granularity, optional tabs
+      # One tab per key x groupby combination will be generated
+      pre_configured:
+            # group_by must be column in basedata; warning will be thrown and
+            # that group_by skipped if it isn't.
+            renewal:
+                  include: False
+                  group_by: ['cell_id', 'version', 'cpn_nbr'] # Choose strategically. Each adds ~90 seconds to run time at 20 nodes
+                  slot_nbr: []
+            descriptive:
+                  include: False
+                  group_by: ['cell_id', 'version', 'cpn_nbr']
+                  slot_nbr: []
+            personalized_content:
+                  include: False
+                  group_by: ['cell_id', 'version', 'cpn_nbr']
+                  slot_nbr: [] # only valid when group_by = 'cpn_nbr' , list of integers to filter by slot number(s)
+            savings_content:
+                  include: False
+                  version_letter: ['A'] # version letter(s) associated with savings_content
+                  slot_content_map: # mapping of which slot each content is in
+                        version_slot: 13
+                        savings: 15
+                        trips: 18
+                        gas_trips: 20
+                        top_category: 19
+                        tenure: 21
+                  group_by: [] # A single CPN_NBR column is not present in final mailhouse hence it's exclusion.
+                  slot_nbr: []
+            compare:
+                  group_by: ['cell_id', 'version', 'cpn_nbr', ['cell_id', 'version']] # cell_id is a forced-in key regardless of its mention in the list
+                  slot_nbr: []
+      # These are the parameters to create the tabs in the qc file.  The order that they appear
+      # is the order that they are listed below.
+      aggregation_params:
+      # This is just a label to keep it organized, doesn't matter what the name is as long as its unique
+      - coupon:
+              tab_names: ['cell-cpn-bfill', 'cpn-slot-bfill'] # Names that will appear for the tabs in excel
+              group_by: [['cell_id', 'cpn_type', 'is_backfill'], ['cpn_type', 'slot_nbr', 'is_backfill']] # What you want to group the 'base' table by to give counts.  You can see base table schema here qc_assignments.generate_full_basedata
+              aggs: [['*', 'count']] # This version of pyspark has limited support for the feature I used, so for now this is always the same but in future versions more than 'count' is supported
+      - more_coupon:
+              tab_names: ['cell-backfill', 'cell-slot-backfill']
+              group_by: [['cell_id', 'is_backfill'], ['cell_id', 'slot_nbr', 'is_backfill']]
+              aggs: [['*', 'count']]
+      - full:
+              tab_names: ['full']
+              group_by: [['cell_id', 'cpn_type', 'slot_nbr', 'is_backfill']]
+              aggs: [['*', 'count']]
+regression_test: # regression_test.py  - Not needed for assignment
+      creation:
+            # configuration details about
+            sample_members: 100 # Integer or list of mbrshp_sids to use
+            # sample members: [1, 2, 3]
+            pct_fhh: .2 # Percentage of members who are FHH (Receive 2 mail pieces instead of 1)
+            # Section for configuration of coupon creation
+            article_coupons:
+                  num_coupons: 5 # The number of article coupons to generate
+            basket_coupons:
+                  num_coupons: 5 # The number of basket coupons to generate
+            category_coupons:
+                  num_coupons: 5 # The number of category coupons to generate
+            # Section for cdsa creation
+            csv_rows: # For each csv, how many rows you would like created
+                  campaign.csv: 1
+                  constructs.csv: 1
+                  cells.csv: 1
+                  segments.csv: 1
+                  handshakes.csv: 1
+                  msmt_cells.csv: 1
+            output_partitions: 10 # When creating test data, how many partitions to use
+      execution:

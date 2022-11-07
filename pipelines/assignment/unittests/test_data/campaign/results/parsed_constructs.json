@@ -1,0 +1,180 @@
+[
+  {
+    "groups": [
+      {
+        "frontfill": {
+          "slot_num": 0,
+          "slot_size": 12,
+          "slot_type": "rank_by_col",
+          "offer_data": "article",
+          "slot_parameters": {},
+          "pool_type": "layout",
+          "parent_construct": 10002,
+          "construct_id": "10002",
+          "layout_id": "10002__10022"
+        },
+        "backfill": {
+          "slot_num": 0,
+          "slot_size": 12,
+          "slot_type": "cf_combined",
+          "offer_data": "category",
+          "slot_parameters": {
+            "hs_ind_lambda": 30
+          },
+          "pool_type": "layout",
+          "parent_construct": 10022,
+          "construct_id": "10022",
+          "layout_id": "10002__10022"
+        }
+      }
+    ],
+    "sort": [],
+    "slot_map": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      "11": 11,
+      "12": 12
+    },
+    "is_default_mapping": true
+  },
+  {
+    "groups": [
+      {
+        "frontfill": {
+          "slot_num": 0,
+          "slot_size": 12,
+          "slot_type": "rank_by_col",
+          "offer_data": "article",
+          "slot_parameters": {},
+          "pool_type": "layout",
+          "parent_construct": 10002,
+          "construct_id": "10002",
+          "layout_id": "10002__10002"
+        },
+        "backfill": {
+          "slot_num": 0,
+          "slot_size": 12,
+          "slot_type": "rank_by_cf",
+          "offer_data": "article",
+          "slot_parameters": {},
+          "pool_type": "layout",
+          "parent_construct": 10002,
+          "construct_id": "10002",
+          "layout_id": "10002__10002"
+        }
+      }
+    ],
+    "sort": [],
+    "slot_map": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      "11": 11,
+      "12": 12
+    },
+    "is_default_mapping": true
+  },
+  {
+    "groups": [
+      {
+        "frontfill": {
+          "slot_num": 0,
+          "slot_size": 1,
+          "slot_type": "compose_slots",
+          "offer_data": "category",
+          "slot_parameters": {
+            "slots": [
+              {
+                "slot_parameters": {
+                  "hs_ind_lambda": 10
+                }
+              }
+            ]
+          },
+          "pool_type": "layout",
+          "parent_construct": 10001,
+          "construct_id": "10001_10003",
+          "layout_id": "10001_10003__10001_10003"
+        },
+        "backfill": {
+          "slot_num": 0,
+          "slot_size": 1,
+          "slot_type": "rank_by_agg_cf",
+          "offer_data": "category",
+          "slot_parameters": {
+            "slots": [
+              {
+                "slot_parameters": {
+                  "hs_ind_lambda": 10
+                }
+              }
+            ]
+          },
+          "pool_type": "layout",
+          "parent_construct": 10001,
+          "construct_id": "10001_10003",
+          "layout_id": "10001_10003__10001_10003"
+        }
+      },
+      {
+        "frontfill": {
+          "slot_num": 1,
+          "slot_size": 11,
+          "slot_type": "cf_combined",
+          "offer_data": "category",
+          "slot_parameters": {
+            "hs_ind_lambda": 30
+          },
+          "pool_type": "layout",
+          "parent_construct": 10003,
+          "construct_id": "10001_10003",
+          "layout_id": "10001_10003__10001_10003"
+        },
+        "backfill": {
+          "slot_num": 1,
+          "slot_size": 11,
+          "slot_type": "rank_by_agg_cf",
+          "offer_data": "category",
+          "slot_parameters": {
+            "hs_ind_lambda": 30
+          },
+          "pool_type": "layout",
+          "parent_construct": 10003,
+          "construct_id": "10001_10003",
+          "layout_id": "10001_10003__10001_10003"
+        }
+      }
+    ],
+    "sort": [],
+    "slot_map": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      "11": 11,
+      "12": 12
+    },
+    "is_default_mapping": true
+  }
+]

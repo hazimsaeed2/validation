@@ -46,7 +46,6 @@ data_paths:
     member_history: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_history'
     club: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_with_brand'
     club_square: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand'
-    # item_cost: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item_cost'
     skeleton: 's3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton'
     email: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/email'
     email_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/email_fiscal'
@@ -56,7 +55,6 @@ data_paths:
     awards: 's3://memberanalytics-data-out-prod/pipelined_intermediates/awards'
     awards_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal'
     quotient_id: 's3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id'
-    # coupon_square: 's3://memberanalytics-data-out-prod/pipelined_intermediates/coupons/coupon_square'
 
   dq: 's3://memberanalytics-data-out-prod/dev/STATS/ETL/source_ETL_check_results.csv'
 

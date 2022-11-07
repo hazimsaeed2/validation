@@ -1,0 +1,15 @@
+{
+  "construct_id": 10002,
+  "data_sources": [
+  ],
+  "slots": [
+    {
+      "slot_num": 0,
+      "slot_size": 12,
+      "slot_type": "rank_by_col",
+      "offer_data": "article",
+      "slot_parameters": {
+      }
+    }
+  ]
+}

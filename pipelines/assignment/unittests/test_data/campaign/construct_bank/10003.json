@@ -1,0 +1,28 @@
+{
+  "construct_id": 10003,
+  "data_sources": [
+    {
+      "name": "category_tenure",
+      "ftype": "parquet",
+      "path": "CUBE",
+      "offer_data": "category",
+      "time_partition": "fiscal_week",
+      "cols": [
+        "MBRSHP_SID",
+        "TENURE",
+        "DUMMY_COL"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "slot_num": 0,
+      "slot_size": 11,
+      "slot_type": "cf_combined",
+      "offer_data": "category",
+      "slot_parameters": {
+            "hs_ind_lambda": 30
+      }
+    }
+  ]
+}

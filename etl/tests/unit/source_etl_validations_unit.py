@@ -8,13 +8,13 @@ from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 import xmlrunner
 
-from memberdna.pipelines.lib.iotools import (
+from pe_member_dna.pipelines.lib.iotools import (
     write_text_to_s3,
-    split_path_bucket_key
+    split_path_bucket_key,
 )
 
 import memberdna.source_etl.utils.validations_ETL as validations
-from memberdna.testing_support.lib.utility import *
+from pe_member_dna.testing_support.lib.utility import *
 
 
 parser = ArgumentParser()
@@ -55,7 +55,7 @@ def create_data():
 
 
 class DqCheckUnittestEtl(DqCheckUnittest):
-    """ Parent class for all ETL DQ check unit test classes """
+    """Parent class for all ETL DQ check unit test classes"""
 
     def setUp(self):
         test_name = self.__class__.__name__
@@ -83,8 +83,10 @@ class DqCheckUnittestEtl(DqCheckUnittest):
             "memberdna.lib.data_quality.get_archive_path",
             return_value=ARCHIVE_PATH.format(
                 unique_id,
-                datetime.datetime.strftime(datetime.datetime.today(), "%Y%m%d")
-            )
+                datetime.datetime.strftime(
+                    datetime.datetime.today(), "%Y%m%d"
+                ),
+            ),
         )
         self.get_archive_path = patcher.start()
         self.addCleanup(patcher.stop)
@@ -94,7 +96,7 @@ class DqCheckUnittestEtl(DqCheckUnittest):
 
 
 class TestWrites(DqCheckUnittest):
-    """ Ensure each applicable method correctly writes stats when not present. """
+    """Ensure each applicable method correctly writes stats when not present."""
 
     def setUp(self):
         test_name = self.__class__.__name__
@@ -121,8 +123,10 @@ class TestWrites(DqCheckUnittest):
             "memberdna.lib.data_quality.get_archive_path",
             return_value=ARCHIVE_PATH.format(
                 unique_id,
-                datetime.datetime.strftime(datetime.datetime.today(), "%Y%m%d")
-            )
+                datetime.datetime.strftime(
+                    datetime.datetime.today(), "%Y%m%d"
+                ),
+            ),
         )
         self.get_archive_path = patcher.start()
         self.addCleanup(patcher.stop)
@@ -160,7 +164,7 @@ class TestWrites(DqCheckUnittest):
 
 
 class TestCompareColAggregatesSource(DqCheckUnittestEtl):
-    """ Ensure CompareColAggregatesSource passes and fails on respective data """
+    """Ensure CompareColAggregatesSource passes and fails on respective data"""
 
     def test_compare_col_agg_source_pass(self):
         self.validation_pass(
@@ -187,7 +191,7 @@ class TestCompareColAggregatesSource(DqCheckUnittestEtl):
 
 
 class TestCompareColAggregatesPrior(DqCheckUnittestEtl):
-    """ Ensure CompareColAggregatesPrior passes and fails on respective data """
+    """Ensure CompareColAggregatesPrior passes and fails on respective data"""
 
     def test_compare_col_agg_prior_pass(self):
         self.validation_pass(
@@ -214,7 +218,7 @@ class TestCompareColAggregatesPrior(DqCheckUnittestEtl):
 
 
 class TestCompareColAggregatesBoth(DqCheckUnittestEtl):
-    """ Ensure CompareColAggregatesBoth passes and fails on respective data """
+    """Ensure CompareColAggregatesBoth passes and fails on respective data"""
 
     def test_compare_col_agg_both_pass(self):
         self.validation_pass(
@@ -241,7 +245,7 @@ class TestCompareColAggregatesBoth(DqCheckUnittestEtl):
 
 
 class TestTestOutlierDays(DqCheckUnittestEtl):
-    """ Ensure TestOutlierDays passes and fails on respective data """
+    """Ensure TestOutlierDays passes and fails on respective data"""
 
     def test_outlier_days_pass(self):
         self.validation_pass(
@@ -266,7 +270,7 @@ class TestTestOutlierDays(DqCheckUnittestEtl):
 
 
 class TestTestColNames(DqCheckUnittestEtl):
-    """ Ensure TestColNames passes and fails on respective data """
+    """Ensure TestColNames passes and fails on respective data"""
 
     def test_colname_pass(self):
         self.validation_pass(
@@ -288,7 +292,7 @@ class TestTestColNames(DqCheckUnittestEtl):
 
 
 class TestTestDuplicates(DqCheckUnittestEtl):
-    """ Ensure TestDuplicates passes and fails on respective data """
+    """Ensure TestDuplicates passes and fails on respective data"""
 
     def test_duplicates_pass(self):
         self.validation_pass(
@@ -311,7 +315,7 @@ class TestTestDuplicates(DqCheckUnittestEtl):
 
 
 class TestTestControlTable(DqCheckUnittestEtl):
-    """ Ensure TestControlTable passes and fails on respective data """
+    """Ensure TestControlTable passes and fails on respective data"""
 
     def test_control_table_pass(self):
 

@@ -2,7 +2,7 @@ import argparse
 import os
 import yaml
 
-from memberdna.pipelines.lib.iotools import (
+from pe_member_dna.pipelines.lib.iotools import (
     s3_copy,
     split_path_bucket_key,
     s3_delete,
@@ -21,12 +21,8 @@ if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.abspath(__file__))
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--name", nargs="?"
-    )
-    parser.add_argument(
-        "--test-suite", nargs="?"
-    )
+    parser.add_argument("--name", nargs="?")
+    parser.add_argument("--test-suite", nargs="?")
     args, _ = parser.parse_known_args()
     test_name = args.name
     test_suite = args.test_suite

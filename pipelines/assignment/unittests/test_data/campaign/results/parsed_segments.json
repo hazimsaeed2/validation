@@ -1,0 +1,202 @@
+[
+  {
+    "segment_id": "10002_10003",
+    "filters": [
+      {
+        "filter_num": 1,
+        "filter_type": "construct_satisfied",
+        "filter_parameters": {
+          "construct_id": 10002,
+          "slot_num": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        "segment_id": "10002",
+        "filter_id": "s10002f1"
+      },
+      {
+        "filter_num": 1,
+        "filter_type": "construct_satisfied",
+        "filter_parameters": {
+          "construct_id": 10003,
+          "slot_num": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        "segment_id": "10003",
+        "filter_id": "s10003f1"
+      }
+    ],
+    "data_sources": [
+      {
+        "name": "category_tenure",
+        "ftype": "parquet",
+        "path": "CUBE",
+        "offer_data": "category",
+        "time_partition": "fiscal_week",
+        "cols": [
+          "TENURE",
+          "MBRSHP_SID",
+          "DUMMY_COL"
+        ]
+      }
+    ]
+  },
+  {
+    "segment_id": "10002|10003",
+    "filters": [
+      {
+        "filter_num": 1,
+        "filter_type": "construct_satisfied",
+        "filter_parameters": {
+          "construct_id": 10002,
+          "slot_num": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        "segment_id": "10002",
+        "filter_id": "s10002f1"
+      },
+      {
+        "filter_num": 1,
+        "filter_type": "construct_satisfied",
+        "filter_parameters": {
+          "construct_id": 10003,
+          "slot_num": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        "segment_id": "10003",
+        "filter_id": "s10003f1"
+      }
+    ],
+    "data_sources": [
+      {
+        "name": "category_tenure",
+        "ftype": "parquet",
+        "path": "CUBE",
+        "offer_data": "category",
+        "time_partition": "fiscal_week",
+        "cols": [
+          "MBRSHP_SID",
+          "TENURE",
+          "DUMMY_COL"
+        ]
+      }
+    ]
+  },
+  {
+    "segment_id": "10002",
+    "filters": [
+      {
+        "filter_num": 1,
+        "filter_type": "construct_satisfied",
+        "filter_parameters": {
+          "construct_id": 10002,
+          "slot_num": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        "segment_id": "10002",
+        "filter_id": "s10002f1"
+      }
+    ],
+    "data_sources": []
+  },
+  {
+    "segment_id": "10001",
+    "data_sources": [
+      {
+        "name": "category_tenure",
+        "ftype": "parquet",
+        "path": "CUBE",
+        "offer_data": "category",
+        "time_partition": "fiscal_week",
+        "cols": [
+          "MBRSHP_SID",
+          "TENURE",
+          "DUMMY_COL"
+        ]
+      },
+      {
+        "name": "coupon_info_category",
+        "ftype": "csv",
+        "path": "EXTRA_INFO_COUPON_PATH",
+        "offer_data": "category",
+        "cols": [
+          "cpn_nbr",
+          "enriched"
+        ]
+      }
+    ],
+    "filters": [
+      {
+        "filter_num": 1,
+        "filter_type": "construct_satisfied",
+        "filter_parameters": {
+          "construct_id": 10001,
+          "slot_num": [
+            0
+          ]
+        },
+        "segment_id": "10001",
+        "filter_id": "s10001f1"
+      }
+    ]
+  }
+]

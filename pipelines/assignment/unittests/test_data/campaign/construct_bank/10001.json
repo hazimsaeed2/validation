@@ -1,0 +1,46 @@
+{
+  "construct_id": 10001,
+  "data_sources": [
+    {
+      "name": "category_tenure",
+      "ftype": "parquet",
+      "path": "CUBE",
+      "offer_data": "category",
+      "time_partition": "fiscal_week",
+      "cols": [
+        "MBRSHP_SID",
+        "TENURE",
+        "DUMMY_COL"
+      ]
+    },
+    {
+      "name": "basket_dna",
+      "ftype": "parquet",
+      "path": "CUBE",
+      "offer_data": "basket",
+      "time_partition": "fiscal_week",
+      "cols": [
+        "MBRSHP_SID",
+        "LTWENTY-SIXW_SPEND_IN_STORE",
+        "LAST_TWENTY-SIX_WEEK_TRIPS"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "slot_num": 0,
+      "slot_size": 1,
+      "slot_type": "compose_slots",
+      "offer_data": "category",
+      "slot_parameters": {
+        "slots": [
+          {
+            "slot_parameters": {
+                  "hs_ind_lambda": 10
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

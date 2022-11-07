@@ -1,0 +1,199 @@
+paths:
+      TRANSACTIONS_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/pipelined_intermediates/transaction_fiscal/xsmall_detail
+      ARTICLE_DNA_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/CATEGORY_DNA/PROD/ARTICLE_NBR/CATEGORY_DNA_full/PARQUET
+      AH5_DNA_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET
+      AH4_DNA_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET
+      ARTICLE_AH4_AH5_MAP: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/pipelined_intermediates/master/xsmall_item
+      RAW_MEMBER: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/pipelined_intermediates/master/xsmall_member_extended
+      ITEM_MASTER: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/pipelined_intermediates/master/item
+      SAME_DAY_ZIPCODES: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/AD_HOC/same_day_delivery_zip_codes/Same
+            Day Zip Codes Covered 8.22.19.csv
+      CDSA_LOC: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/cdsa/
+      ASSN_LOC: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/cdsa/assn_output/
+      LOG_LOC: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/logs/
+      CUBE: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/CUBES/customer_cube_2019-01-07/xsmall_customer_cube
+      PROPENSITY: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/MODELDATA/PREDICTIONS/trip_spend_predictions/xsmall_trip_spend_predictions_2018-12-29
+      PRED_LIST: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/MODELDATA/PREDICTIONS/preds-20190215-combined_ah4_yt_April/xsmall_PARQUET
+      FHH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_mail_list_small
+      MAIL_LIST: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_mail_list_small
+      BACKTEST_MAIL_LIST: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/Backtest
+            BBM19 Main_Mail_File_USA_CM2627_dat.csv
+      MUHH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/MUHH
+      BBM_SCORED: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/BBM_SCORED
+      CPG_COUPON_LIST_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_coupon_list/article_small.csv
+      CATEGORY_COUPON_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_coupon_list/category.csv
+      BASKET_COUPON_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_coupon_list/basket.csv
+      VERSION_MAP: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_version_map
+      INPUT_ASSIGNMENTS: ''
+      INPUT_CONSTRUCTS: ''
+      INPUT_MAILHOUSE: ''
+      MAIL_POPULATION_ASSIGNMENT: ''
+      EXCLUSIONS: null
+      EXTRA_INFO_COUPON_PATH: s3://memberanalytics-data-out-prod/REGRESSION_TESTS/assignment/BackToBackRun/ASSIGNMENTS/campaigns/campaign/input_coupon_list/Enriched_flag-PC19.csv
+shared:
+      experiment: 2
+      campaign: mmpc
+      run_name: second_run
+      run_type: test
+      run_size: full
+      assignment_date: '2020-01-11'
+      sampling_weeks_rev_columns: LAST_TWENTY-SIX_WEEK_SPEND
+      tmp_location: s3://memberanalytics-data-out-prod/work/tmp
+coupon_creation:
+      coupon_inhome_date: '2020-01-11'
+      excluded_coupons_force_back_in: null
+      backfill:
+            cpn_exclusion:
+            - 2043702
+            - 2041535
+            - 2040876
+            substitutable_MCH3_exclusion:
+            - SUNDRIES
+            - GENERAL MERCHANDISE
+            cpn_force_in:
+            - null
+      coupon_types:
+      - Paper Coupon
+      - Clipless Coupon
+      exclusion_types:
+      - CONTENT
+      - PURCHASE_CYCLE
+      - INVENTORY
+      hero_coupons:
+      - null
+      coupon_start_date: null
+      coupon_end_date: null
+assignment:
+      replace_with_null: []
+      downsample_coupons: null
+      backfill_method:
+            category: rank_by_agg_cf
+            basket: hardest
+            dummy: static
+            article: rank_by_agg_trips
+            article_hero: null
+      backfill_priority: low
+sizing:
+      min_cpn_start_date: '2019-09-06'
+      max_cpn_end_date: '2019-09-18'
+      num_days_backwards: 364
+      article_red_over_qual_rate: 0.37
+      article_cann_rate: 0.8
+      category_red_over_qual_rate: 0.25
+      category_cann_rate: 0.5
+      basket_red_over_qual_rate: 0.33
+      basket_cann_rate: 0.6
+      basket_sales_lift_per_capita: 1.1
+subset:
+      sample_size: 0
+      force_in_new: false
+      force_in_cells: null
+      force_out_cells: null
+      error: 75
+      max_decile_6: null
+qc:
+      pre_configured:
+            renewal:
+                  include: false
+                  group_by:
+                  - cell_id
+                  - version
+                  - cpn_nbr
+            descriptive:
+                  include: false
+                  group_by:
+                  - cell_id
+                  - version
+                  - cpn_nbr
+            personalized_content:
+                  include: false
+                  group_by:
+                        - cell_id
+                        - version
+                        - cpn_nbr
+                  slot_nbr: []
+            savings_content:
+                  include: false
+                  version_letter:
+                        - A
+                  slot_content_map:
+                        version_slot: 13
+                        savings: 15
+                        trips: 18
+                        gas_trips: 20
+                        top_category: 19
+                        tenure: 21
+                  group_by: []
+                  slot_nbr: []
+            compare:
+                  include: false
+                  group_by:
+                        - cell_id
+                        - version
+                        - cpn_nbr
+                        - - cell_id
+                          - version
+                  slot_nbr: []
+      aggregation_params:
+      -     coupon:
+                  tab_names:
+                  - cell-cpn-bfill
+                  - cpn-slot-bfill
+                  group_by:
+                  -     - cell_id
+                        - cpn_type
+                        - enriched
+                        - is_backfill
+                  -     - cpn_type
+                        - slot_nbr
+                        - enriched
+                        - is_backfill
+                  aggs:
+                  -     - '*'
+                        - count
+      -     more_coupon:
+                  tab_names:
+                  - cell-backfill
+                  - cell-slot-backfill
+                  group_by:
+                  -     - cell_id
+                        - is_backfill
+                        - enriched
+                  -     - cell_id
+                        - slot_nbr
+                        - is_backfill
+                        - enriched
+                  aggs:
+                  -     - '*'
+                        - count
+      -     full:
+                  tab_names:
+                  - full
+                  group_by:
+                  -     - cell_id
+                        - cpn_type
+                        - slot_nbr
+                        - enriched
+                        - is_backfill
+                  aggs:
+                  -     - '*'
+                        - count
+regression_test:
+      creation:
+            sample_members: 500
+            pct_fhh: 0.2
+            article_coupons:
+                  num_coupons: 200
+            basket_coupons:
+                  num_coupons: 10
+            category_coupons:
+                  num_coupons: 100
+            csv_rows:
+                  campaign.csv: 1
+                  constructs.csv: 1
+                  cells.csv: 1
+                  segments.csv: 1
+                  handshakes.csv: 1
+                  msmt_cells.csv: 1
+            output_partitions: 1
+      execution: null

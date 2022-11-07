@@ -5,10 +5,10 @@ import unittest
 import xmlrunner
 import yaml
 
-import memberdna.category_square.category_square.square as square
-import memberdna.lib.misc as misc
+import pe_memberdna.dna.category.lib.square as square
+import pe_memberdna.lib.misc as misc
 
-from memberdna.testing_support.lib.utility import get_unique_id
+from pe_memberdna.testing_support.lib.utility import get_unique_id
 
 
 class TestAutoDate(object):

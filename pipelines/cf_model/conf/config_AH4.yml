@@ -1,0 +1,109 @@
+paths:
+  BASE: "s3://memberanalytics-data-out-prod/MODELDATA/" # Model data folder
+  DATA: "s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/CF_MODEL/" # Dataset folder
+  MODEL: "s3://memberanalytics-data-out-prod/MODELDATA/MODELS/CF_MODEL/" # Model folder (stored as ItemFactors & UserFactors [both parquets])
+  PREDICTIONS_ROOT: "s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/" # Predictions folder
+  RAW_MEMBER: "s3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended"
+  TRANS_INT: "s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail/"
+  ITEM_INT: "s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates/master/item_with_brand"
+  CUBE: "s3://memberanalytics-data-out-prod/CUBES/customer_cube_2019-09-10/customer_cube/"
+  CATEGORY_DNA_AH4: "s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/"
+  CATEGORY_DNA_AH5: "s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/"
+  CATEGORY_DNA_BRAND: "s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/BRAND_CD/CATEGORY_DNA_full/PARQUET/"
+  CLUB_DNA: "s3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand/"
+  PROPENSITY_PREDICTIONS: "s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/trip_spend_predictions/trip_spend_predictions_2018-11-17.csv"
+  BBM14_PAST_CAT_SALES: "s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14b/"
+  BBM14_FUTURE_CAT_SALES: "s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14a/"
+  ETL_LOG: "s3://memberanalytics-data-out-prod/MODELDATA/CF_MODEL/LOGS/cf_etl.csv"
+  TRAIN_LOG: "s3://memberanalytics-data-out-prod/MODELDATA/CF_MODEL/LOGS/als_train.csv"
+  PREDICT_LOG: "s3://memberanalytics-data-out-prod/MODELDATA/CF_MODEL/LOGS/cf_predict.csv"
+  COMBINE_LOG: "s3://memberanalytics-data-out-prod/MODELDATA/CF_MODEL/LOGS/cf_combine_preds.csv"
+  TUNE_LOG: "s3://memberanalytics-data-out-prod/MODELDATA/CF_MODEL/LOGS/als_tune.csv"
+  MODEL_SAVE: "cf_model_"
+  SCALER_SAVE: "cf_scaler_"
+shared:
+  start: "2018-09-29" # Start of training dataset (used by ETL; train and predict will look for these sets)
+  end: "2019-09-29" # End of training dataset (used by ETL; train and predict will look for these sets)
+  f_start: "2019-06-05" # Start of test dataset (used by ETL; validation)
+  f_end: "2019-09-08" # End of test dataset (used by ETL; vlida)
+  test: FALSE
+  data_version: "v10_09-08"
+  model_version: "v10_09-08"
+  category: "AH4" # supports 'AH4', 'AH5', 'BRAND'
+  num_cats: 215 # Will take top X by input_type. There's 200 AH4's, 1000 AH5's, and 6000 brands
+  run_name: "2019-08-01" #The date it is run (YYYY-MM-DD)
+etl:
+  sample: 1
+train:
+  binary: FALSE
+  backtest: FALSE # this is VERY slow on AH5, needs at least 12 node cluster!
+  cat_norm: TRUE # normalize by category purchase frequency
+  member_norm: TRUE # normalize by inputtype
+  size_norm: FALSE # normalize by category size
+  inputtype: "SALES_UNITS" # supports: 'TRIPS' 'SALES_UNITS' 'SALES_AMT' 'RED_RATE' 'REDEMPTIONS'
+  scaler: FALSE
+  evaluate: TRUE
+  eval_col: "TRIPS"
+  rank: 10
+  lambda: 0.1
+  alpha: 1
+  iter: 10
+predict:
+  recommendations: 215 # Will take top recommendations by input_type
+  lambda: # leniency cutoff for stretch eligibility. Defaults: normal=10, strict=0.5, lenient=15
+    - 1
+    - 3
+    - 5
+    - 10
+    - 15
+    - 20
+    - 30
+    - 40
+  cutoff: Null # max number of prior trips for filtering recs
+  scale: FALSE
+  trip_prop_cap: 0.95 # cap of trip propensity, set to None or 1.0 if not wanted
+  cf_reg: 1.5 # weighting factor for prediction_v2, set to None or 0.0 if not wanted
+  rel_lambda: True # inclusion of relative lambda (new lambda)
+  pure_lambda: True # inclusion of pure lambda (old lambda)
+  score_limit: Null # min score limit for filtering recs
+  stretch: FALSE # limit to stretch offers, might break CF
+  hook: FALSE # limit to hook offers, might break CF
+  subset: Null # list of members to limit predictions to
+  rel_weighting:
+    seasonality: 0
+    cycle: 0.0
+    margin: 0
+    exposure: 0
+  pred_date: "2019-08-05" # effective date to make predictions at, used only for business rules (i.e. seasonal)
+combine:
+  type: "prediction"
+  subtype: "preds" # file subtype (if appropriate, e.g. 'matrix') for saving combined data
+  items:
+    - "AH4" #file name of AH4 predict
+    - "AH5" #file name of AH5 predict
+grid_search:
+  binarys:
+    - TRUE
+    - FALSE
+  normalizes:
+    - TRUE
+    - FALSE
+  inputtypes: # supports: 'TRIPS' 'SALES_UNITS' 'SALES_AMT' 'RED_RATE' 'REDEMPTIONS'
+    #- 'SALES_UNITS'
+    - "TRIPS"
+  ranks:
+    - 10
+    - 15
+  lambdas:
+    - 5
+    - 10
+    - 15
+    - 20
+  alphas:
+    - 0.1
+    - 0.5
+    - 1
+    - 5
+  iters:
+    - 10
+    - 15

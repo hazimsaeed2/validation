@@ -18,7 +18,7 @@ raise an error.
 import argparse
 import time
 
-from memberdna.scripts.cluster_scaling.utility import (
+from pe_memberdna.scripts.cluster_scaling.utility import (
     get_emr_client,
     get_ec2_client,
 )
@@ -549,9 +549,13 @@ def main():
     client_emr = get_emr_client()
     client_ec2 = get_ec2_client()
 
-    target_cluster, target_num_nodes, wait_number_mins, api_call_retry_interval, force_terminate = (
-        get_params()
-    )
+    (
+        target_cluster,
+        target_num_nodes,
+        wait_number_mins,
+        api_call_retry_interval,
+        force_terminate,
+    ) = get_params()
 
     rescale_cluster(
         client_emr,

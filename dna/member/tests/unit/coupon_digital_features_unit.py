@@ -6,8 +6,10 @@ import xmlrunner
 
 from pyspark.sql import SparkSession
 
-from memberdna.dna.lib.coupon_digital_features import feature_cpn_channel
-from memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.dna.member.lib.coupon_digital_features import (
+    feature_cpn_channel,
+)
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
 
 
 class CouponDigitalFeaturesTestCase(unittest.TestCase):
@@ -26,7 +28,12 @@ class CouponDigitalFeaturesTestCase(unittest.TestCase):
                 ("1003", "2021-07-03"),
                 ("1004", "2021-07-03"),
             ]
-        ).toDF(["MBRSHP_SID", "FISCAL_WEEK_END",])
+        ).toDF(
+            [
+                "MBRSHP_SID",
+                "FISCAL_WEEK_END",
+            ]
+        )
 
         self.job.data.tables["detail"] = sc.parallelize(
             [
@@ -52,7 +59,13 @@ class CouponDigitalFeaturesTestCase(unittest.TestCase):
                 ("1003", "2021-07-03", "paper"),
                 ("1004", "2021-07-03", "no_cpns"),
             ]
-        ).toDF(["MBRSHP_SID", "FISCAL_WEEK_END", "cpn_channel",])
+        ).toDF(
+            [
+                "MBRSHP_SID",
+                "FISCAL_WEEK_END",
+                "cpn_channel",
+            ]
+        )
         self.dna_expected = dna_expected.toPandas()
         self.dna_expected.reset_index(inplace=True, drop=True)
 

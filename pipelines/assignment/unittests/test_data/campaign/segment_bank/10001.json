@@ -1,0 +1,37 @@
+{
+  "segment_id": 10001,
+  "data_sources": [
+    {
+      "name": "category_tenure",
+      "ftype": "parquet",
+      "path": "CUBE",
+      "offer_data": "category",
+      "time_partition": "fiscal_week",
+      "cols": [
+        "MBRSHP_SID",
+        "TENURE",
+        "DUMMY_COL"
+      ]
+    },
+    {
+      "name": "coupon_info_category",
+      "ftype": "csv",
+      "path": "EXTRA_INFO_COUPON_PATH",
+      "offer_data": "category",
+      "cols": [
+        "cpn_nbr",
+        "enriched"
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "filter_num": 1,
+      "filter_type": "construct_satisfied",
+      "filter_parameters": {
+        "construct_id": 10001,
+        "slot_num": [0]
+      }
+    }
+  ]
+}

@@ -8,8 +8,7 @@ from pyspark.sql import SparkSession
 import xmlrunner
 import yaml
 
-from memberdna.source_etl.run import main, load_config
-from memberdna.testing_support.lib.utility import (
+from pe_memberdna.testing_support.lib.utility import (
     copy_local_to_s3,
     remove_from_s3,
     get_unique_id,

@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 
-from memberdna.lib.data_quality import *
+from pe_memberdna.lib.data_quality import *
 
 
 def get_numeric_columns(df):
