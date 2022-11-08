@@ -4,11 +4,17 @@ transaction_1_prod:
 transaction_1_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_1.py --config configs/config-dev.yaml
 
+transaction_1_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_1.py --config configs/config-stage.yaml
+
 transaction_2_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_2.py
 
 transaction_2_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_2.py --config configs/config-dev.yaml
+
+transaction_2_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_2.py --config configs/config-stage.yaml
 
 transaction_3_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_3.py
@@ -16,11 +22,17 @@ transaction_3_prod:
 transaction_3_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_3.py --config configs/config-dev.yaml
 
+transaction_3_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_transaction_3.py --config configs/config-stage.yaml
+
 coupon_and_digital_1_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_coupon_and_digital_1.py
 
 coupon_and_digital_1_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_coupon_and_digital_1.py --config configs/config-dev.yaml
+
+coupon_and_digital_1_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_coupon_and_digital_1.py --config configs/config-stage.yaml
 
 coupon_and_digital_2_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_coupon_and_digital_2.py
@@ -28,11 +40,17 @@ coupon_and_digital_2_prod:
 coupon_and_digital_2_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_coupon_and_digital_2.py --config configs/config-dev.yaml
 
+coupon_and_digital_2_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_coupon_and_digital_2.py --config configs/config-stage.yaml
+
 member_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_member.py
 
 member_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_member.py --config configs/config-dev.yaml
+
+member_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_member.py --config configs/config-stage.yaml
 
 acquisition_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/integrate_acquisition.py
@@ -40,11 +58,17 @@ acquisition_prod:
 acquisition_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/integrate_acquisition.py --config configs/config-dev.yaml
 
+acquisition_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/integrate_acquisition.py --config configs/config-stage.yaml
+
 most_shopped_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_most_shopped.py
 
 most_shopped_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_most_shopped.py --config configs/config-dev.yaml
+
+most_shopped_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_most_shopped.py --config configs/config-stage.yaml
 
 misc_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_misc.py
@@ -52,17 +76,26 @@ misc_prod:
 misc_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/generate_misc.py --config configs/config-dev.yaml
 
+misc_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/generate_misc.py --config configs/config-stage.yaml
+
 transaction_1_and_2_prod:
 	make transaction_1_prod && make transaction_2_prod
 
 transaction_1_and_2_dev:
 	make transaction_1_dev && make transaction_2_dev
 
+transaction_1_and_2_stage:
+	make transaction_1_stage && make transaction_2_stage
+
 member_and_acquisition_prod:
 	make member_prod && make acquisition_prod
 
 member_and_acquisition_dev:
 	make member_dev && make acquisition_dev
+
+member_and_acquisition_stage:
+	make member_stage && make acquisition_stage
 
 feature_set_1_prod:
 	make transaction_1_and_2_prod & \
@@ -74,17 +107,28 @@ feature_set_1_dev:
 	make member_and_acquisition_dev & \
 	wait
 
+feature_set_1_stage:
+	make transaction_1_and_2_stage & \
+	make member_and_acquisition_stage & \
+	wait
+
 feature_set_2_prod:
 	make feature_set_1_prod && make misc_prod
 
 feature_set_2_dev:
 	make feature_set_1_dev && make misc_dev
 
+feature_set_2_stage:
+	make feature_set_1_stage && make misc_stage
+
 coupon_and_digital_prod:
 	make coupon_and_digital_1_prod && make coupon_and_digital_2_prod
 
 coupon_and_digital_dev:
 	make coupon_and_digital_1_dev && make coupon_and_digital_2_dev
+
+coupon_and_digital_stage:
+	make coupon_and_digital_1_stage && make coupon_and_digital_2_stage
 
 all_features_prod:
 	make feature_set_2_prod & \
@@ -100,11 +144,21 @@ all_features_dev:
 	make most_shopped_dev & \
 	wait
 
+all_features_stage:
+	make feature_set_2_stage & \
+	make coupon_and_digital_stage & \
+	make transaction_3_stage & \
+	make most_shopped_stage & \
+	wait
+
 merge_prod:
 	spark-submit ${SPARK_OPTIONS} scripts/merge.py
 
 merge_dev:
 	spark-submit ${SPARK_OPTIONS} scripts/merge.py --config configs/config-dev.yaml
+
+merge_stage:
+	spark-submit ${SPARK_OPTIONS} scripts/merge.py --config configs/config-stage.yaml
 
 run_member_dna_prod:
 	make all_features_prod && \
@@ -113,6 +167,10 @@ run_member_dna_prod:
 run_member_dna_dev:
 	make all_features_dev && \
 	make merge_dev
+
+run_member_dna_stage:
+	make all_features_stage && \
+	make merge_stage
 
 # TODO: move member_dna to regression tests
 unit_tests:
