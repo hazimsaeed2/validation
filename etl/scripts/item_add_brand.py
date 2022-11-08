@@ -3,7 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.utils.utility import *
+from pe_memberdna.etl.lib.utility import *
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.window import Window
 

@@ -8,7 +8,7 @@ import pe_memberdna.lib.misc as misc
 import pe_memberdna.etl.utils.validations_ETL as validations
 import pyspark.sql.functions as F
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.utils.utility import *
+from pe_memberdna.etl.lib.utility import *
 from pyspark.sql.window import Window as W
 
 

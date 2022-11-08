@@ -4,7 +4,7 @@ import os
 
 import pyspark.sql.functions as sqlf
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.utils.utility import *
+from pe_memberdna.etl.lib.utility import *
 
 
 def main(job, data_paths, config_validation):

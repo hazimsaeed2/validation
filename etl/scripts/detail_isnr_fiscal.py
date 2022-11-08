@@ -4,7 +4,7 @@ import os
 
 import pe_memberdna.etl.utils.validations_ETL as validations
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.utils.utility import *
+from pe_memberdna.etl.lib.utility import *
 
 
 def main(job, data_paths, config_validation):
