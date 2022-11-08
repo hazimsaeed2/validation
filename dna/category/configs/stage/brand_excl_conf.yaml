@@ -1,0 +1,11 @@
+output_prefix: ref
+
+paths:
+    brand: 's3://memberanalytics-data-out-prod/v2/stage/{output_prefix}/pipelined_intermediates/master/brand'
+    item: 's3://memberanalytics-data-out-prod/v2/stage/{output_prefix}/pipelined_intermediates/master/item'
+    cat_dna: 's3://memberanalytics-data-out-prod/v2/stage/{output_prefix}/CATEGORY_DNA/DEV/AH5_CD/CATEGORY_DNA_full/PARQUET/'
+    transactions: 's3://memberanalytics-data-out-prod/v2/stage/{output_prefix}/pipelined_intermediates/transaction_fiscal/detail'
+    exclusions: 's3://memberanalytics-data-out-prod/v2/stage/{output_prefix}/exclusions/input/brand_exclusions_mixed.csv'
+    output: 's3://memberanalytics-data-out-prod/v2/stage/{output_prefix}/exclusions/output/for_dna/brand_exclusions'
+params:
+    threshold: 0.8
