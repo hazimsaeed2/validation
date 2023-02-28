@@ -121,8 +121,8 @@ pipeline {
 import os
 import yaml
 
-config_path_input = "etl/configs/config.yaml"
-config_path_output = "etl/configs/config_stage.yaml"
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -171,8 +171,8 @@ with open(config_path_output, "w") as file:
 import os
 import yaml
 
-config_path_input = "etl/configs/config.yaml"
-config_path_output = "etl/configs/config_stage.yaml"
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -221,8 +221,8 @@ with open(config_path_output, "w") as file:
 import os
 import yaml
 
-config_path_input = "etl/configs/config.yaml"
-config_path_output = "etl/configs/config_stage.yaml"
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
