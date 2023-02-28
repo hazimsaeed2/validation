@@ -40,22 +40,21 @@ pipeline {
         }
         stage("Data sync") {
             agent { node env.node_1 }
-                steps {
-                    script {
-                        sh  '''
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/Master_Data
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/Transaction_Header
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/Transaction_Detail
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/Transaction_Payment
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/Membership
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/Other
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/Email_Events
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ATC
-                            aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/control_files
-                            aws s3 sync --delete s3://memberanalytics-data-out-prod/v2/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/v2/stage/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
-                        '''
-                        echo "Stage data in sync with prod"
-                    }
+            steps {
+                script {
+                    sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/Master_Data
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/Transaction_Header
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/Transaction_Detail
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/Transaction_Payment
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/Membership
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/Other
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/Email_Events
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ATC
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/v2/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/v2/stage/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
+                    '''
+                    echo "Stage data in sync with prod"
                 }
             }
         }
