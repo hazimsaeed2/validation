@@ -9,7 +9,7 @@ import pyspark.sql.functions as sqlf
 import yaml
 
 
-from pe_memberdna.pipelines.lib.iotools import s3_copy, split_path_bucket_key
+from pe_memberdna.lib.iotools import s3_copy, split_path_bucket_key
 
 
 class DataQualityException(Exception):
@@ -22,13 +22,12 @@ class DataQualityException(Exception):
 
 
 def _key_exists(path):
-    """ Verify key exists on s3 """
+    """Verify key exists on s3"""
     try:
         out = subprocess.check_output(["aws", "s3", "ls", path])
         return len(out) > 0
     except subprocess.CalledProcessError:
         return False
-
 
 
 def get_archive_path():

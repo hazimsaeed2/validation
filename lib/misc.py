@@ -11,7 +11,7 @@ Includes:
 import boto3
 import datetime
 
-from pe_memberdna.pipelines.lib.iotools import split_path_bucket_key
+from pe_memberdna.lib.iotools import split_path_bucket_key
 
 
 def get_weekday_abbreviation(str_date):
@@ -163,6 +163,7 @@ def get_max_fiscal_week(path, date_format="%Y-%m-%d"):
         max_date_str = datetime.datetime.strftime(max_date, date_format)
 
     return max_date_str
+
 
 def get_latest_path(config_path):
     """

@@ -11,8 +11,8 @@ import socket
 import sys
 
 import pe_memberdna.dna.member.lib.utils as utils
-import pe_memberdna.pipelines.lib.iotools as iotools
-import pe_memberdna.pipelines.lib.spark_util as spark_util
+import pe_memberdna.lib.iotools as iotools
+import pe_memberdna.lib.spark_util as spark_util
 import yaml
 
 log = spark_util.get_logger("dna")
@@ -91,9 +91,13 @@ def calculate_filepaths(config, config_path):
     bucket = config["paths"]["bucket"]
 
     format_dict = {}
-    if config_path.split(os.sep)[-1].endswith("dev.yaml") or config_path.split(os.sep)[-1].endswith("stage.yaml"):
-        format_dict["output_prefix"] = config["paths"].get("output_prefix", "default")
-    
+    if config_path.split(os.sep)[-1].endswith("dev.yaml") or config_path.split(
+        os.sep
+    )[-1].endswith("stage.yaml"):
+        format_dict["output_prefix"] = config["paths"].get(
+            "output_prefix", "default"
+        )
+
     for path_type in ("input", "output"):
         dir = config["paths"][path_type]["dir"]
         for key, path in config["paths"][path_type].items():
@@ -103,16 +107,24 @@ def calculate_filepaths(config, config_path):
             if path.startswith("s3://"):
                 paths[key] = path.format(**format_dict)
             else:
-                paths[key] = f"s3://{bucket}/{dir}/{path}".format(**format_dict)
+                paths[key] = f"s3://{bucket}/{dir}/{path}".format(
+                    **format_dict
+                )
 
     if not config_path.split(os.sep)[-1].endswith("dev.yaml"):
-        paths["mbr_basic_path"] = utils.get_latest_path(paths["mbr_basic_path"])
+        paths["mbr_basic_path"] = utils.get_latest_path(
+            paths["mbr_basic_path"]
+        )
 
     s3_stat_input = config["paths"]["input"]["s3_stat_path"]
-    paths["s3_stat_input"] = f"s3://{bucket}/{s3_stat_input}".format(**format_dict)
+    paths["s3_stat_input"] = f"s3://{bucket}/{s3_stat_input}".format(
+        **format_dict
+    )
 
     s3_stat_output = config["paths"]["output"]["s3_stat_path"]
-    paths["s3_stat_output"] = f"s3://{bucket}/{s3_stat_output}".format(**format_dict)
+    paths["s3_stat_output"] = f"s3://{bucket}/{s3_stat_output}".format(
+        **format_dict
+    )
 
     del paths["s3_stat_path"]
 

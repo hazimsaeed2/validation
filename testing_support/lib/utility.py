@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 import boto3
 import yaml
 
-from pe_memberdna.pipelines.lib.iotools import (
+from pe_memberdna.lib.iotools import (
     split_path_bucket_key,
     s3_copy,
     s3_delete,

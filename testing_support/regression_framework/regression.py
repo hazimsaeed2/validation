@@ -31,8 +31,8 @@ from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
     CAT_COUPON_SCHEMA,
     VERSION_MAP_SCHEMA,
 )
-from pe_memberdna.pipelines.lib.iotools import s3_delete, split_path_bucket_key
-from pe_memberdna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.lib.iotools import s3_delete, split_path_bucket_key
+from pe_memberdna.lib.spark_util import get_logger
 
 
 class RegressionTest(unittest.TestCase, JobManager, metaclass=ABCMeta):

@@ -22,7 +22,7 @@ from botocore.exceptions import ClientError
 from dateutil import rrule
 import yaml
 
-from pe_memberdna.pipelines.lib.utils import next_fiscal_week_end
+from pe_memberdna.lib.utils import next_fiscal_week_end
 
 ALLOWED_DELETE_PREFIXES = [
     re.compile("USERDATA/[^()]"),
@@ -153,7 +153,7 @@ def filter_time_partition(
 
 # ------ STANDARD API ----- #
 def get_filename(path):
-    """ Extract file name from the given path. """
+    """Extract file name from the given path."""
     return path.split("/")[-1]
 
 
@@ -307,7 +307,11 @@ def s3_copy(bucket, source_key, destination_key):
 
 
 def s3_copy_managed(
-    bucket_src, source_key, destination_key, bucket_dest=None, managed=True,
+    bucket_src,
+    source_key,
+    destination_key,
+    bucket_dest=None,
+    managed=True,
 ):
     """
     Copy a s3 file, or directory recursively, to another location.
