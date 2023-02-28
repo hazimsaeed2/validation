@@ -2,9 +2,9 @@ data_paths:
   source:
     item: 's3://memberanalytics-data-in-prod/Master_Data/kantar_itemmaster_hierarchy_data_SAP_%(curr_date)s.txt'
     brand: 's3://memberanalytics-data-in-prod/Master_Data/Itemmaster_brand_data.txt'
-    header: 's3://memberanalytics-data-in-prod/Transaction_Header/1010_Transaction_Header_*20{16,17,18,19,20,21,22}*.txt'
-    detail: 's3://memberanalytics-data-in-prod/Transaction_Detail/1010_Transaction_Detail_*20{16,17,18,19,20,21,22}*.txt'
-    payment: 's3://memberanalytics-data-in-prod/Transaction_Payment/1010_Transaction_Payment_*20{16,17,18,19,20,21,22}*.txt'
+    header: 's3://memberanalytics-data-in-prod/Transaction_Header/1010_Transaction_Header_*20{16,17,18,19,20,21,22,23}*.txt'
+    detail: 's3://memberanalytics-data-in-prod/Transaction_Detail/1010_Transaction_Detail_*20{16,17,18,19,20,21,22,23}*.txt'
+    payment: 's3://memberanalytics-data-in-prod/Transaction_Payment/1010_Transaction_Payment_*20{16,17,18,19,20,21,22,23}*.txt'
     member: 's3://memberanalytics-data-in-prod/Membership/DataLogix_customer_data_%(curr_date)s.txt'
     member_extended: 's3://memberanalytics-data-in-prod/Membership/BCG_extended_mbrshp_%(curr_date)s.txt'
     member_tract: 's3://memberanalytics-data-in-prod/Other/MEMBER_TRACTS.csv'
