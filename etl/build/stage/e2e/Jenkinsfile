@@ -127,12 +127,12 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].key():
+for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
     )
 
-for k in config_data["data_paths"]["intermediate"].key():
+for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
     )
@@ -177,12 +177,12 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].key():
+for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
     )
 
-for k in config_data["data_paths"]["intermediate"].key():
+for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
     )
@@ -227,12 +227,12 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].key():
+for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
     )
 
-for k in config_data["data_paths"]["intermediate"].key():
+for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
     )
