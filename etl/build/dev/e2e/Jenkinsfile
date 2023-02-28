@@ -1,0 +1,69 @@
+pipeline {
+    agent { node env.Node }
+    stages {
+        stage('Prepare environment') {
+            steps {
+                script {
+                    def content = """
+import os
+import yaml
+
+config_path_input = "etl/configs/config.yaml"
+config_path_input = "etl/configs/config_stage.yaml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
+
+for k in config_data["data_paths"]["source"].key():
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+    )
+
+for k in config_data["data_paths"]["intermediate"].key():
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                    """
+                writeFile file: '_config_step.py', text: content
+                }
+                sh '''
+                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+
+                    python3 -m venv pyspark_venv
+                    source pyspark_venv/bin/activate
+                    pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
+                    python3 -m ensurepip --upgrade
+                    pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
+                    venv-pack -o pyspark_venv.tar.gz
+                    export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
+                    python3 _config_step.py
+                    cd pe_memberdna
+                    make -C etl etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./config/config_dev.yaml"
+                    deactivate
+                '''
+                echo "Ran step-1 cluster-1 scripts"
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
