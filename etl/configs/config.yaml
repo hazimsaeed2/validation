@@ -27,59 +27,65 @@ data_paths:
     quotient_id: 's3://memberanalytics-data-in-prod/ATC/BJs_loyaltyNumber_userCode_mapping_%(curr_date)s.csv'
 
   intermediate:
-    item: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item'
-    item_with_brand: 's3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates/master/item_with_brand'
-    AH5: 's3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/'
-    brand:  's3://memberanalytics-data-out-prod/pipelined_intermediates/master/brand'
-    header: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction/header'
-    detail: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction/detail'
-    payment: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction/payment'
-    fiscal_days: 's3://memberanalytics-data-out-prod/pipelined_intermediates/lookup/fiscal_days'
-    header_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/header'
-    detail_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail'
-    detail_isnr_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail_isnr'
-    detail_gas_nr_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail_gas_nr'
-    payment_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/payment'
-    member: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member'
-    member_extended: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended'
-    census_tract: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/census_tract'
-    member_history: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_history'
-    club: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_with_brand'
-    club_square: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand'
-    skeleton: 's3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton'
-    email: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/email'
-    email_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/email_fiscal'
-    coupon_clip: 's3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip'
-    coupon_clip_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip_fiscal'
-    control_files: 's3://memberanalytics-data-out-prod/pipelined_intermediates/control_files' # uncomment this once the control file starts beign delivered by the IT
-    awards: 's3://memberanalytics-data-out-prod/pipelined_intermediates/awards'
-    awards_fiscal: 's3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal'
-    quotient_id: 's3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id'
+    item: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/item'
+    item_with_brand: 's3://memberanalytics-data-out-prod/v2/AD_HOC/pipelined_intermediates/master/item_with_brand'
+    AH5: 's3://memberanalytics-data-out-prod/v2/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/'
+    brand:  's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/brand'
+    header: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction/header'
+    detail: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction/detail'
+    payment: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction/payment'
+    fiscal_days: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/lookup/fiscal_days'
+    header_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/header'
+    detail_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/detail'
+    detail_isnr_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/detail_isnr'
+    detail_gas_nr_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/detail_gas_nr'
+    payment_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/payment'
+    member: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/member'
+    member_extended: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/member_extended'
+    census_tract: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/census_tract'
+    member_history: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/member_history'
+    club: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/club_with_brand'
+    club_square: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/club_square_with_brand'
+    skeleton: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/skeleton'
+    email: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/email'
+    email_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/email_fiscal'
+    coupon_clip: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/coupon_clip'
+    coupon_clip_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/coupon_clip_fiscal'
+    control_files: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/control_files' # uncomment this once the control file starts beign delivered by the IT
+    awards: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/awards'
+    awards_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/awards_fiscal'
+    quotient_id: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/quotient_id'
 
-  dq: 's3://memberanalytics-data-out-prod/dev/STATS/ETL/source_ETL_check_results.csv'
+  dq: 's3://memberanalytics-data-out-prod/v2/STATS/ETL/source_ETL_check_results.csv'
 
   sampled:
-    header_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/transaction_fiscal/header'
-    detail_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/transaction_fiscal/detail'
-    detail_isnr_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/transaction_fiscal/detail_isnr'
-    payment_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/transaction_fiscal/payment'
-    member: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/master/member'
-    member_extended: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/master/member_extended'
-    census_tract: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/master/census_tract'
-    member_history: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/master/member_history'
-    skeleton: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/skeleton'
-    coupon_clip: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/coupon_clip'
-    coupon_clip_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/coupon_clip_fiscal'
-    email: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/master/email'
-    email_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/master/email_fiscal'
-    awards: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/awards'
-    awards_fiscal: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/sampled/awards_fiscal'
+    header_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/transaction_fiscal/header'
+    detail_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/transaction_fiscal/detail'
+    detail_isnr_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/transaction_fiscal/detail_isnr'
+    payment_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/transaction_fiscal/payment'
+    member: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/master/member'
+    member_extended: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/master/member_extended'
+    census_tract: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/master/census_tract'
+    member_history: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/master/member_history'
+    skeleton: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/skeleton'
+    coupon_clip: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/coupon_clip'
+    coupon_clip_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/coupon_clip_fiscal'
+    email: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/master/email'
+    email_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/master/email_fiscal'
+    awards: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/awards'
+    awards_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/awards_fiscal'
 
-  archived: 's3://memberanalytics-data-out-prod/dev/pipelined_intermediates/archive'
+  archived: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/archive'
 
   fiscal_days:
     start: '2012-01-01'
     end: '2025-12-31'
+
+  recency_lookback_duration:
+    global: 3
+    local:
+      brand: 0
+      AH5: 10
 
 club_square_config:
   # Commented max_date means it will be calculated
@@ -98,7 +104,7 @@ club_square_config:
       threshold: 200
 
 validation:
-  s3_stat_path: 's3://memberanalytics-data-out-prod/dev/STATS/ETL/latest_stats.yaml'
+  s3_stat_path: 's3://memberanalytics-data-out-prod/v2/dev/STATS/ETL/latest_stats.yaml'
   table_params:
 
     source:
