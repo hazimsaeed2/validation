@@ -29,7 +29,7 @@ for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
     )
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "v2/dev/CATEGORY_DNA", "v2/dev/ref/CATEGORY_DNA"
     )
 
