@@ -4,17 +4,7 @@ pipeline {
         stage('Code promotion') {
             steps {
                 sh '''
-                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$WORKSPACE:
-
-                    python3 -m venv pyspark_venv
-                    source pyspark_venv/bin/activate
-                    pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                    python3 -m ensurepip --upgrade
-                    pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
-                    venv-pack -o pyspark_venv.tar.gz
-
-                    aws s3 cp --recursive --delete pe_memberdna s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna/
+                    aws s3 sync --delete pe_memberdna s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna/
                 '''
             }
         }
