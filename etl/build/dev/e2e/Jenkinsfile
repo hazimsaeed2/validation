@@ -9,7 +9,7 @@ import os
 import yaml
 
 config_path_input = "etl/configs/config.yaml"
-config_path_input = "etl/configs/config_dev.yaml"
+config_path_output = "etl/configs/config_dev.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -49,7 +49,6 @@ with open(config_path_output, "w") as file:
                     source pyspark_venv/bin/activate
                     pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
                     python3 -m ensurepip --upgrade
-                    ls
                     pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
                     venv-pack -o pyspark_venv.tar.gz
                     export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
