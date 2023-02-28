@@ -115,10 +115,8 @@ class JobManager(object):
         club_square_config = config["club_square_config"]
         config_validation = config["validation"]
 
-        data_paths["archived"]["archive"] = (
-            data_paths["archived"]["archive"]
-            + "/"
-            + "{:%Y-%m-%d}".format(today_helper())
+        data_paths["archived"] = (
+            data_paths["archived"] + "/" + "{:%Y-%m-%d}".format(today_helper())
         )
         return data_paths, club_square_config, config_validation
 
