@@ -24,7 +24,20 @@ for k in config_data["data_paths"]["intermediate"].keys():
         "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
     )
 
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+    )
+
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
     "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
 )
 

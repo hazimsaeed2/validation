@@ -104,7 +104,7 @@ club_square_config:
       threshold: 200
 
 validation:
-  s3_stat_path: 's3://memberanalytics-data-out-prod/v2/dev/STATS/ETL/latest_stats.yaml'
+  s3_stat_path: 's3://memberanalytics-data-out-prod/v2/STATS/ETL/latest_stats.yaml'
   table_params:
 
     source:
