@@ -1,16 +1,6 @@
 pipeline {
     agent { node env.Node }
     stages {
-        stage('Clone Source') {
-            agent { node env.node_1 }
-            steps {
-                dir('memberdna') {
-                    git branch: env.branch,
-                        credentialsId: 'bitbucket-service-account',
-                        url: 'https://bitbucket.bjs.com/scm/an/memberdna.git'
-                }
-            }
-        }
         stage('Dependency promotion') {
             steps {
                 sh '''
