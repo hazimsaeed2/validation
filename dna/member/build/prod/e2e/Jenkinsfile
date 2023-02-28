@@ -6,7 +6,7 @@ pipeline {
                 agent { node env.node_1 }
                 steps {
                     sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
                         aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
@@ -17,7 +17,7 @@ pipeline {
                 agent { node env.node_2 }
                 steps {
                     sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
                         aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
@@ -28,7 +28,7 @@ pipeline {
                 agent { node env.node_3 }
                 steps {
                     sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
                         aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''

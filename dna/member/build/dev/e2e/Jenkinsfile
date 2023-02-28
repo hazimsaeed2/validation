@@ -1,0 +1,59 @@
+pipeline {
+    agent { node env.Node }
+    stages {
+        stage('Prepare environment') {
+            steps {
+                script {
+                    def content = """
+import os
+import yaml
+
+config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
+config_path_output = "pe_memberdna/dna/member/configs/config_dev.yaml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
+
+config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
+    "v2/pipelined_intermediates", "v2/dev/pipelined_intermediates"
+)
+
+config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
+    "v2/pipelined_intermediates", "v2/dev/pipelined_intermediates"
+)
+
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                    """
+                writeFile file: '_config_step.py', text: content
+                }
+                sh '''
+                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+
+                    python3 -m venv pyspark_venv
+                    source pyspark_venv/bin/activate
+                    pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
+                    python3 -m ensurepip --upgrade
+                    pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
+                    venv-pack -o pyspark_venv.tar.gz
+                    export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
+                    python3 _config_step.py
+                    cd pe_memberdna
+                    make -C etl etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_dev.yaml"
+                    deactivate
+                '''
+                echo "Ran step-1 cluster-1 scripts"
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
