@@ -18,6 +18,12 @@ for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
         "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/dev"
     )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "_%(curr_date)s", ""
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "_*20{16,17,18,19,20,21,22,23}*", ""
+    )
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
