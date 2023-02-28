@@ -15,7 +15,7 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 for k in config_data["data_paths"]["source"].keys():
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["intermediate"][k].replace(
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
         "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/dev"
     )
 
@@ -54,7 +54,7 @@ with open(config_path_output, "w") as file:
                     export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                     python3 _config_step.py
                     cd pe_memberdna
-                    make -C etl etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./config/config_dev.yaml"
+                    make -C etl etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_dev.yaml"
                     deactivate
                 '''
                 echo "Ran step-1 cluster-1 scripts"
