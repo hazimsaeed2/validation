@@ -9,23 +9,23 @@ import os
 import yaml
 
 config_path_input = "etl/configs/config.yaml"
-config_path_input = "etl/configs/config_stage.yaml"
+config_path_input = "etl/configs/config_dev.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 for k in config_data["data_paths"]["source"].key():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/dev"
     )
 
 for k in config_data["data_paths"]["intermediate"].key():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
