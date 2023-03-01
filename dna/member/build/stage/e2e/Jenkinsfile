@@ -110,37 +110,30 @@ pipeline {
 import os
 import yaml
 
-config_path_input = "pe_memberdna/etl/configs/config.yaml"
-config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
+config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
+config_path_output = "pe_memberdna/dna/member/configs/config_stage.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].keys():
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
-    )
-
-for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
-
-for k in config_data["data_paths"]["sampled"].keys():
-    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
-
-config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
+    "v2/pipelined_intermediates", "v2/stage/pipelined_intermediates"
 )
 
-config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/stage/STATS"
 )
 
-config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
+    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/Membership/PE_Membership_Mstr.csv"
+)
+
+config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
+    "v2/CUBES", "v2/stage/CUBES"
+)
+
+config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/stage/STATS"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -151,7 +144,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
                             """
-                        writeFile file: '_config_step_1_cluster_1.py', text: content
+                        writeFile file: '_config_cluster_1.py', text: content
                         }
 
                         sh '''
@@ -159,7 +152,7 @@ with open(config_path_output, "w") as file:
                             export PYTHONPATH=$WORKSPACE:
 
                             source pyspark_venv/bin/activate
-                            python3 _config_step_1_cluster_1
+                            python3 _config_cluster_1
                             deactivate
                         '''
                         echo "Ran config setup cluster-1 scripts"
@@ -179,31 +172,24 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].keys():
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
-    )
-
-for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
-
-for k in config_data["data_paths"]["sampled"].keys():
-    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
-
-config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
+    "v2/pipelined_intermediates", "v2/stage/pipelined_intermediates"
 )
 
-config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/stage/STATS"
 )
 
-config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
+    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/Membership/PE_Membership_Mstr.csv"
+)
+
+config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
+    "v2/CUBES", "v2/stage/CUBES"
+)
+
+config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/stage/STATS"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -242,31 +228,24 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].keys():
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
-    )
-
-for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
-
-for k in config_data["data_paths"]["sampled"].keys():
-    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
-
-config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
+    "v2/pipelined_intermediates", "v2/stage/pipelined_intermediates"
 )
 
-config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/stage/STATS"
 )
 
-config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
+    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/Membership/PE_Membership_Mstr.csv"
+)
+
+config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
+    "v2/CUBES", "v2/stage/CUBES"
+)
+
+config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/stage/STATS"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -307,8 +286,8 @@ with open(config_path_output, "w") as file:
 
                             source pyspark_venv/bin/activate
                             cd pe_memberdna/dna
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_1.py
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_3.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_1.py --config_path ./configs/config_stage.yaml
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_3.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-1 cluster-1 scripts"
                     }
@@ -325,7 +304,7 @@ with open(config_path_output, "w") as file:
 
                             source pyspark_venv/bin/activate
                             cd pe_memberdna/dna
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=18g --executor-memory=18g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_1.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=18g --executor-memory=18g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_1.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-1 cluster-2 script"
                     }
@@ -342,8 +321,8 @@ with open(config_path_output, "w") as file:
 
                             source pyspark_venv/bin/activate
                             cd pe_memberdna/dna
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_member.py
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_most_shopped.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_member.py --config_path ./configs/config_stage.yaml
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_most_shopped.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-1 cluster-3 script"
                     }
@@ -363,7 +342,7 @@ import os
 import yaml
 import datetime
 
-with open('pe_memberdna/source_etl/configs/config.yaml') as config_file:
+with open('pe_memberdna/etl/configs/config.yaml') as config_file:
    config = yaml.load(config_file)
 
 max_date = os.environ['max_date']
@@ -377,11 +356,43 @@ else:
 if os.environ['enable_DQ_checks']=='false':
    config['validation']['table_params']=None
 
-with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
+for k in config_data["data_paths"]["source"].keys():
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+    )
+
+for k in config_data["data_paths"]["intermediate"].keys():
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    )
+
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
    yaml.dump(config, config_file)
 
 """
-                writeFile file: 'pe_memberdna/source_etl/adhoc/config_parameters_source_etl_archiving.py', text: content
+                writeFile file: '_config_etl.py', text: content
                 }
                 sh '''
                 WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
@@ -391,12 +402,11 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                 export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                 source pyspark_venv/bin/activate
                 export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
-                echo $SPARK_OPTIONS
 
                 echo "RUNNING post_source_etl_archiving STARTED"
 
-                python3 ./pe_memberdna/source_etl/adhoc/config_parameters_source_etl_archiving.py
-                make -C ./pe_memberdna/source_etl post_source_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS"
+                python3 _config_etl.py
+                make -C ./pe_memberdna/etl post_source_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
                 echo "RUNNING post_source_etl_archiving FINISHED"
                 '''
             }
@@ -413,8 +423,8 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_2.py
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_misc.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_2.py --config_path ./configs/config_stage.yaml
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_misc.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-2 cluster-1 script"
                     }
@@ -431,8 +441,8 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_2.py
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/integrate_acquisition.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_2.py --config_path ./configs/config_stage.yaml
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/integrate_acquisition.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-2 cluster-3 script"
                     }
@@ -470,7 +480,7 @@ import os
 import yaml
 import datetime
 
-with open('pe_memberdna/source_etl/configs/config.yaml') as config_file:
+with open('pe_memberdna/etl/configs/config.yaml') as config_file:
    config = yaml.load(config_file)
 
 max_date = os.environ['max_date']
@@ -484,11 +494,43 @@ else:
 if os.environ['enable_DQ_checks']=='false':
    config['validation']['table_params']=None
 
-with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
+for k in config_data["data_paths"]["source"].keys():
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+    )
+
+for k in config_data["data_paths"]["intermediate"].keys():
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    )
+
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
+    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
    yaml.dump(config, config_file)
 
 """
-                writeFile file: 'pe_memberdna/source_etl/adhoc/config_parameters_source_etl_sampling.py', text: content
+                writeFile file: '_config_etl.py', text: content
                 }
                 sh '''
                 WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
@@ -498,11 +540,10 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                 export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                 source pyspark_venv/bin/activate
                 export SPARK_OPTIONS=${SPARK_OPTIONS}" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
-                echo $SPARK_OPTIONS
                 echo "RUNNING post_source_etl_archiving STARTED"
 
-                python3 ./pe_memberdna/source_etl/adhoc/config_parameters_source_etl_sampling.py
-                make -C ./pe_memberdna/source_etl post_source_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS"
+                python3 _config_etl.py
+                make -C ./pe_memberdna/source_etl post_source_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
                 echo "RUNNING post_source_etl_sampling FINISHED"
 
                 '''
@@ -520,12 +561,11 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna
-                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-3 cluster-3 script"
                     }
                 }
-
             }
         }
     }

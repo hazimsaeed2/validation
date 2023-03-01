@@ -6,7 +6,7 @@ pipeline {
                 sh '''
                     cd pe_memberdna
                     git reset --hard origin/${env.GIT_BRANCH}
-                    git push origin/sandbox
+                    git push origin --delete sandbox
                 '''
             }
         }
@@ -16,4 +16,4 @@ pipeline {
             cleanWs()
         }
     }
-}s3
+}

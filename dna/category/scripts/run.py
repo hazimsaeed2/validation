@@ -26,7 +26,7 @@ def parse(parser):
         type=str,
         default=os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "../configs/prod/square_AH4.yaml",
+            "../configs/square_AH4.yaml",
         ),
         help=(
             """
@@ -40,7 +40,7 @@ def parse(parser):
         type=str,
         default=os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "../configs/prod/reqs.yaml",
+            "../configs/reqs.yaml",
         ),
         help=(
             """

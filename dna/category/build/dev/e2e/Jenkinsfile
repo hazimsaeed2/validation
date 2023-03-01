@@ -8,52 +8,35 @@ pipeline {
 import os
 import yaml
 
-config_path_input = "pe_memberdna/etl/configs/config.yaml"
-config_path_output = "pe_memberdna/etl/configs/config_dev.yaml"
+config_path_input = "pe_memberdna/dna/category/configs/reqs.yaml"
+config_path_output = "pe_memberdna/dna/category/configs/reqs_dev.yaml"
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for k in config_data["data_paths"]["source"].keys():
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/dev"
-    )
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "_%(curr_date)s", ""
-    )
-    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "_*20{16,17,18,19,20,21,22,23}*", ""
-    )
-
-for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
-    )
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "v2/dev/CATEGORY_DNA", "v2/dev/ref/CATEGORY_DNA"
-    )
-
-for k in config_data["data_paths"]["sampled"].keys():
-    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
-    )
-
-config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+config_data['detail']['path'] = config_data['detail']['path'].replace(
+    'v2/pipelined_intermediates', 'v2/dev/pipelined_intermediates'
+)
+config_data['member']['path'] = config_data['member']['path'].replace(
+    'v2/pipelined_intermediates', 'v2/dev/pipelined_intermediates'
+)
+config_data['item']['path'] = config_data['item']['path'].replace(
+    'v2/pipelined_intermediates', 'v2/dev/pipelined_intermediates'
+)
+config_data['member_extended']['path'] = config_data['member_extended']['path'].replace(
+    'v2/pipelined_intermediates', 'v2/dev/pipelined_intermediates'
+)
+config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
+    'v2/exclusions', 'v2/dev/exclusions'
+)
+config_data['out']['path'] = config_data['out']['path'].replace(
+    'v2/CATEGORY_DNA', 'v2/dev/CATEGORY_DNA'
 )
 
-config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
-)
-
-config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
-)
-
-config_data['data_paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['data_paths']['recency_lookback_duration']:
-    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
-        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+config_data['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['recency_lookback_duration']:
+    for k in config_data['recency_lookback_duration']['local'].keys():
+        config_data['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)

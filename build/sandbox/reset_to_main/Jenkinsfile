@@ -6,7 +6,7 @@ pipeline {
                 sh '''
                     cd pe_memberdna
                     git reset --hard origin/main
-                    git push origin/sandbox
+                    git push origin --delete sandbox
                 '''
             }
         }

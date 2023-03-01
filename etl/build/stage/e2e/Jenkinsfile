@@ -161,7 +161,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
                             """
-                        writeFile file: '_config_step_1_cluster_1.py', text: content
+                        writeFile file: '_config_cluster_1.py', text: content
                         }
 
                         sh '''
@@ -169,7 +169,7 @@ with open(config_path_output, "w") as file:
                             export PYTHONPATH=$WORKSPACE:
 
                             source pyspark_venv/bin/activate
-                            python3 _config_step_1_cluster_1
+                            python3 _config_cluster_1
                             deactivate
                         '''
                         echo "Ran config setup cluster-1 scripts"
