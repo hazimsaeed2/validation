@@ -3,7 +3,7 @@ import argparse
 import logging
 import os
 
-import pe_memberdna.etl.utils.validations_ETL as validations
+import pe_memberdna.etl.lib.validations_ETL as validations
 import pyspark.sql.functions as F
 from pe_memberdna.lib.job_manager import JobManager
 from pyspark.sql.types import *

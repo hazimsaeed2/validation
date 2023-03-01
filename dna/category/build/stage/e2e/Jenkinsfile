@@ -373,7 +373,7 @@ with open(config_path_output, "w") as file:
                         sh '''
                             wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$wrkspce:
-                            python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
                         '''
                         echo "Scaled down cluster-2"
                     }

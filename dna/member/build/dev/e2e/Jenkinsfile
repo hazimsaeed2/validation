@@ -18,10 +18,21 @@ config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].repl
     "v2/pipelined_intermediates", "v2/dev/pipelined_intermediates"
 )
 
-config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
-    "v2/pipelined_intermediates", "v2/dev/pipelined_intermediates"
+config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/dev/STATS"
 )
 
+config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
+    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/Membership/PE_Membership_Mstr.csv"
+)
+
+config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
+    "v2/CUBES", "v2/dev/CUBES"
+)
+
+config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
+    "v2/STATS", "v2/dev/STATS"
+)
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
@@ -44,7 +55,7 @@ with open(config_path_output, "w") as file:
                     export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                     python3 _config_step.py
                     cd pe_memberdna
-                    make -C etl etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_dev.yaml"
+                    make -C dna/member  SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_dev.yaml"
                     deactivate
                 '''
                 echo "Ran step-1 cluster-1 scripts"

@@ -24,21 +24,21 @@ def main(job, data_paths):
             logging.info("Archiving " + item_name)
             parsed_s3_path = urlparse(item_path)
             key = parsed_s3_path.path
-            archive_path = data_paths["archived"]["archive"] + key
+            archive_path = data_paths["archived"] + key
             logging.info(f"Archiving to {archive_path}")
-#             subprocess.check_call(
-#                 [
-#                     "aws",
-#                     "s3",
-#                     "cp",
-#                     item_path,
-#                     archive_path,
-#                     "--recursive",
-#                     "--sse",
-#                     "aws:kms",
-#                 ],
-#                 stderr=subprocess.STDOUT,
-#             )
+            subprocess.check_call(
+                [
+                    "aws",
+                    "s3",
+                    "cp",
+                    item_path,
+                    archive_path,
+                    "--recursive",
+                    "--sse",
+                    "aws:kms",
+                ],
+                stderr=subprocess.STDOUT,
+            )
     else:
         logging.info("Archiving is turned OFF")
 

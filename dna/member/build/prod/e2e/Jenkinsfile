@@ -47,7 +47,7 @@ pipeline {
                                     sh  '''
                                         wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                                         export PYTHONPATH=$wrkspce:
-                                        python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 16 --wait 120
+                                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 16 --wait 120
                                     '''
                                         echo "Scaled up cluster-1"
                             }
@@ -63,7 +63,7 @@ pipeline {
                                     sh '''
                                         wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                                         export PYTHONPATH=$wrkspce:
-                                        python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 32 --wait 120
+                                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 32 --wait 120
                                     '''
                                     echo "Scaled up cluster-2"
                             }
@@ -79,7 +79,7 @@ pipeline {
                                     sh '''
                                         wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                                         export PYTHONPATH=$wrkspce:
-                                        python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 16 --wait 120
+                                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 16 --wait 120
                                         '''
                                     echo "Scaled up cluster-3"
                             }
@@ -101,10 +101,9 @@ pipeline {
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step1_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+                            cd pe_memberdna/dna
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_1.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_3.py
                         '''
                         echo "Ran step-1 cluster-1 scripts"
                     }
@@ -120,10 +119,8 @@ pipeline {
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=18g --driver-memory=18g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step1_cluster2 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+                            cd pe_memberdna/dna
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=18g --executor-memory=18g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_1.py
                         '''
                         echo "Ran step-1 cluster-2 script"
                     }
@@ -139,30 +136,66 @@ pipeline {
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step1_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+                            cd pe_memberdna/dna
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_member.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_most_shopped.py
                         '''
                         echo "Ran step-1 cluster-3 script"
                     }
                 }
+
 		    }
 		}
         stage('Starting 2nd Parallel run') {
             parallel {
-                stage('Scaling down the cluster') {
+                stage('Running source etl archiving') {
                     agent { node env.node_2 }
-                    steps {
-                        echo "Scaling down cluster-2"
-                        sh '''
-                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$wrkspce:
-                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
-                        '''
-                        echo "Scaled down cluster-2"
-                    }
+                        steps {
+                            script {
+                            def content = """
+
+import os
+import yaml
+import datetime
+
+with open('pe_memberdna/source_etl/configs/config.yaml') as config_file:
+   config = yaml.load(config_file)
+
+max_date = os.environ['max_date']
+if max_date == 'automatic':
+   print('max_date calculated automatically')
+else:
+   datetime_object = datetime.datetime.strptime(max_date, '%Y-%m-%d')
+   print('setting max_date to ' + str(datetime_object))
+   config['club_square_config']['max_date'] = max_date
+
+if os.environ['enable_DQ_checks']=='false':
+   config['validation']['table_params']=None
+
+with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
+   yaml.dump(config, config_file)
+
+"""
+                writeFile file: 'pe_memberdna/source_etl/adhoc/config_parameters_source_etl_archiving.py', text: content
                 }
+                sh '''
+                WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$WORKSPACE:
+                cd $WORKSPACE
+                unset SPARK_OPTIONS
+                export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                source pyspark_venv/bin/activate
+                export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
+                echo $SPARK_OPTIONS
+
+                echo "RUNNING post_source_etl_archiving STARTED"
+
+                python3 ./pe_memberdna/source_etl/adhoc/config_parameters_source_etl_archiving.py
+                make -C ./pe_memberdna/source_etl post_source_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS"
+                echo "RUNNING post_source_etl_archiving FINISHED"
+                '''
+            }
+        }
                 stage('Running step-2 on cluster-1') {
                     agent { node env.node_1 }
                     steps {
@@ -173,10 +206,10 @@ pipeline {
                             unset SPARK_OPTIONS
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step2_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+
+                            cd pe_memberdna/dna
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_2.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_misc.py
                         '''
                         echo "Ran step-2 cluster-1 script"
                     }
@@ -191,21 +224,23 @@ pipeline {
                             unset SPARK_OPTIONS
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step2_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+
+                            cd pe_memberdna/dna
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_2.py
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/integrate_acquisition.py
                         '''
                         echo "Ran step-2 cluster-3 script"
                     }
                 }
             }
         }
+
         stage('Starting 3rd Parallel run') {
             parallel {
-                stage('Running step-3 on cluster-1') {
-                    agent { node env.node_1 }
+                stage('Scaling down the cluster-2') {
+                    agent { node env.node_2 }
                     steps {
+                        echo "Scaling down cluster-2"
                         sh '''
                             WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$WORKSPACE:
@@ -213,14 +248,61 @@ pipeline {
                             unset SPARK_OPTIONS
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step3_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                            rm -rf $WORKSPACE/*
                         '''
-                        echo "Ran step-3 cluster-1 script"
+                        echo "Scaled down cluster-2"
                     }
                 }
+                stage('Running source etl sampling on cluster-1') {
+                    agent { node env.node_1 }
+                        steps {
+                            script {
+                            def content = """
+
+import os
+import yaml
+import datetime
+
+with open('pe_memberdna/source_etl/configs/config.yaml') as config_file:
+   config = yaml.load(config_file)
+
+max_date = os.environ['max_date']
+if max_date == 'automatic':
+   print('max_date calculated automatically')
+else:
+   datetime_object = datetime.datetime.strptime(max_date, '%Y-%m-%d')
+   print('setting max_date to ' + str(datetime_object))
+   config['club_square_config']['max_date'] = max_date
+
+if os.environ['enable_DQ_checks']=='false':
+   config['validation']['table_params']=None
+
+with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
+   yaml.dump(config, config_file)
+
+"""
+                writeFile file: 'pe_memberdna/source_etl/adhoc/config_parameters_source_etl_sampling.py', text: content
+                }
+                sh '''
+                WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                export PYTHONPATH=$WORKSPACE:
+                cd $WORKSPACE
+                unset SPARK_OPTIONS
+                export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                source pyspark_venv/bin/activate
+                export SPARK_OPTIONS=${SPARK_OPTIONS}" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
+                echo $SPARK_OPTIONS
+                echo "RUNNING post_source_etl_archiving STARTED"
+
+                python3 ./pe_memberdna/source_etl/adhoc/config_parameters_source_etl_sampling.py
+                make -C ./pe_memberdna/source_etl post_source_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS"
+                echo "RUNNING post_source_etl_sampling FINISHED"
+
+                '''
+            }
+        }
                 stage('Running step-3 on cluster-3') {
                     agent { node env.node_3 }
                     steps {
@@ -231,14 +313,14 @@ pipeline {
                             unset SPARK_OPTIONS
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
-                            export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
-                            make -C etl etl_complete_prod_step3_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
-                            deactivate
+
+                            cd pe_memberdna/dna
+                            spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py
                         '''
                         echo "Ran step-3 cluster-3 script"
                     }
                 }
+
             }
         }
     }

@@ -5,7 +5,7 @@ import os
 import pprint
 
 import pe_memberdna.lib.misc as misc
-import pe_memberdna.etl.utils.validations_ETL as validations
+import pe_memberdna.etl.lib.validations_ETL as validations
 import pyspark.sql.functions as F
 from pe_memberdna.lib.job_manager import JobManager
 from pe_memberdna.etl.lib.utility import *

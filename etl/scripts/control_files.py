@@ -3,7 +3,7 @@ import logging
 import os
 
 import pe_memberdna.lib.misc as misc
-import pe_memberdna.etl.utils.validations_ETL as validations
+import pe_memberdna.etl.lib.validations_ETL as validations
 from pe_memberdna.lib.job_manager import JobManager
 
 

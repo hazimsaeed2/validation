@@ -1,0 +1,19 @@
+pipeline {
+    agent { node env.Node }
+    stages {
+        stage('Reset branch') {
+            steps {
+                sh '''
+                    cd pe_memberdna
+                    git reset --hard origin/main
+                    git push origin/sandbox
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
