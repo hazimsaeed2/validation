@@ -3,9 +3,24 @@ pipeline {
     stages {
         stage('Reset branch') {
             steps {
+                sh 'git config --global credential.helper cache'
+                sh 'git config --global push.default simple'
+
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'sandbox']],
+                    extensions: [
+                        [$class: 'CloneOption', noTags: true, reference: '', shallow: true]
+                    ],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [
+                        [ credentialsId: 'pe-memberdna-test-przemek', url: 'https://bitbucket.bjs.com/scm/an/pe_memberdna.git']
+                    ]
+                ])
                 sh '''
-                    cd pe_memberdna
                     git reset --hard origin/develop
+                    git config --global user.name "****"
+                    git config --global user.email ****
                     git push origin --delete sandbox
                 '''
             }
