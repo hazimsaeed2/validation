@@ -90,7 +90,7 @@ with open(config_path_output, "w") as file:
                     export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                     python3 _config_step.py
                     cd pe_memberdna
-                    make -C dna/category etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" reqs="./configs/reqs_dev.yaml" config_brand_exclusions="./configs/brand_excl_conf_dev.yaml"
+                    make -C dna/category run_all_full_prod SPARK_OPTIONS="$SPARK_OPTIONS" reqs="./configs/reqs_dev.yaml" config_brand_exclusions="./configs/brand_excl_conf_dev.yaml"
                     deactivate
                 '''
                 echo "Ran step-1 cluster-1 scripts"
