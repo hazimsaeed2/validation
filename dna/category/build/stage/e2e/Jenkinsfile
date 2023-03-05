@@ -85,6 +85,8 @@ import yaml
 config_path_input = "pe_memberdna/dna/category/configs/reqs.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/reqs_stage.yaml"
 
+git_branch = os.getenv('GIT_BRANCH')
+
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -101,10 +103,10 @@ config_data['member_extended']['path'] = config_data['member_extended']['path'].
     'v2/pipelined_intermediates', 'v2/stage/pipelined_intermediates'
 )
 config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
-    'v2/exclusions', 'v2/stage/exclusions'
+    'v2/exclusions', 'v2/stage/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'v2/CATEGORY_DNA', 'v2/stage/CATEGORY_DNA'
+    'v2/CATEGORY_DNA', 'v2/stage/{git_branch}CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0
@@ -112,6 +114,35 @@ if 'local' in config_data['recency_lookback_duration']:
     for k in config_data['recency_lookback_duration']['local'].keys():
         config_data['recency_lookback_duration']['local'][k] = 0
 
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+
+config_path_input = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
+config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf_stage.yaml"
+
+git_branch = os.getenv('GIT_BRANCH')
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
+
+config_data['path']['brand'] = config_data['path']['brand'].replace(
+    'v2/AD_HOC', 'v2/stage/ref/AD_HOC'
+)
+config_data['path']['item'] = config_data['path']['item'].replace(
+    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+)
+config_data['path']['cat_dna'] = config_data['path']['cat_dna'].replace(
+    'v2/CATEGORY_DNA', 'v2/stage/ref/CATEGORY_DNA'
+)
+config_data['path']['transactions'] = config_data['path']['transactions'].replace(
+    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+)
+config_data['path']['exclusions'] = config_data['path']['exclusions'].replace(
+    'v2/exclusions', 'v2/stage/ref/exclusions'
+)
+config_data['path']['output'] = config_data['path']['output'].replace(
+    'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
+)
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
                             """
@@ -140,6 +171,8 @@ import yaml
 config_path_input = "pe_memberdna/dna/category/configs/reqs.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/reqs_stage.yaml"
 
+git_branch = os.getenv('GIT_BRANCH')
+
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -156,10 +189,10 @@ config_data['member_extended']['path'] = config_data['member_extended']['path'].
     'v2/pipelined_intermediates', 'v2/stage/pipelined_intermediates'
 )
 config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
-    'v2/exclusions', 'v2/stage/exclusions'
+    'v2/exclusions', 'v2/stage/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'v2/CATEGORY_DNA', 'v2/stage/CATEGORY_DNA'
+    'v2/CATEGORY_DNA', 'v2/stage/{git_branch}CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0
@@ -167,6 +200,35 @@ if 'local' in config_data['recency_lookback_duration']:
     for k in config_data['recency_lookback_duration']['local'].keys():
         config_data['recency_lookback_duration']['local'][k] = 0
 
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+
+config_path_input = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
+config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf_stage.yaml"
+
+git_branch = os.getenv('GIT_BRANCH')
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
+
+config_data['path']['brand'] = config_data['path']['brand'].replace(
+    'v2/AD_HOC', 'v2/stage/ref/AD_HOC'
+)
+config_data['path']['item'] = config_data['path']['item'].replace(
+    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+)
+config_data['path']['cat_dna'] = config_data['path']['cat_dna'].replace(
+    'v2/CATEGORY_DNA', 'v2/stage/ref/CATEGORY_DNA'
+)
+config_data['path']['transactions'] = config_data['path']['transactions'].replace(
+    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+)
+config_data['path']['exclusions'] = config_data['path']['exclusions'].replace(
+    'v2/exclusions', 'v2/stage/ref/exclusions'
+)
+config_data['path']['output'] = config_data['path']['output'].replace(
+    'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
+)
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
                             """
@@ -186,6 +248,26 @@ with open(config_path_output, "w") as file:
                 }
             }
 		}
+        stage('Starting 0th (exclusions) Parallel run') {
+            parallel {
+                stage('Running step-1 on cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        sh '''
+                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$WORKSPACE:
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
+                            export PYSPARK_PYTHON=environment/bin/python
+                            export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+
+                            source pyspark_venv/bin/activate
+                            python3 _config_cluster_1.py
+                            cd pe_memberdna/dna/category
+                            spark-submit ${SPARK_OPTIONS} scripts/brand_exclusions.py --config_path "./configs/brand_excl_conf_stage.yaml" > brand_exclusions_prod.log 2>&1
+                        '''
+                        echo "Ran step-1 cluster-1 script"
+                    }
+                }
         stage('Starting 1st Parallel run') {
             parallel {
                 stage('Running step-1 on cluster-1') {
@@ -233,7 +315,7 @@ for yaml_path in [
                         sh '''
                             WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
@@ -290,7 +372,7 @@ for yaml_path in [
                         sh '''
                             WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
@@ -314,7 +396,7 @@ for yaml_path in [
                             export PYTHONPATH=$WORKSPACE:
                             cd $WORKSPACE
                             unset SPARK_OPTIONS
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna/category

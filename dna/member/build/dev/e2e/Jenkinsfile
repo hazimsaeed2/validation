@@ -25,7 +25,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/ref/Membership/PE_Membership_Mstr.csv"
+    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/Membership/PE_Membership_Mstr.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(

@@ -11,6 +11,8 @@ import yaml
 config_path_input = "pe_memberdna/dna/category/configs/reqs.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/reqs_dev.yaml"
 
+git_branch = os.getenv('GIT_BRANCH')
+
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -27,7 +29,7 @@ config_data['member_extended']['path'] = config_data['member_extended']['path'].
     'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
 )
 config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
-    'v2/exclusions', 'v2/dev/ref/exclusions'
+    'v2/exclusions', 'v2/dev/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
     'v2/CATEGORY_DNA', 'v2/dev/{git_branch}/CATEGORY_DNA'
@@ -38,6 +40,35 @@ if 'local' in config_data['recency_lookback_duration']:
     for k in config_data['recency_lookback_duration']['local'].keys():
         config_data['recency_lookback_duration']['local'][k] = 0
 
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+
+config_path_input = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
+config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf_dev.yaml"
+
+git_branch = os.getenv('GIT_BRANCH')
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
+
+config_data['path']['brand'] = config_data['path']['brand'].replace(
+    'v2/AD_HOC', 'v2/dev/ref/AD_HOC'
+)
+config_data['path']['item'] = config_data['path']['item'].replace(
+    'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
+)
+config_data['path']['cat_dna'] = config_data['path']['cat_dna'].replace(
+    'v2/CATEGORY_DNA', 'v2/dev/ref/CATEGORY_DNA'
+)
+config_data['path']['transactions'] = config_data['path']['transactions'].replace(
+    'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
+)
+config_data['path']['exclusions'] = config_data['path']['exclusions'].replace(
+    'v2/exclusions', 'v2/dev/ref/exclusions'
+)
+config_data['path']['output'] = config_data['path']['output'].replace(
+    'v2/exclusions', f'v2/dev/{git_branch}/exclusions'
+)
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
                     """
@@ -59,7 +90,7 @@ with open(config_path_output, "w") as file:
                     export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                     python3 _config_step.py
                     cd pe_memberdna
-                    make -C dna/category etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_dev.yaml"
+                    make -C dna/category etl_complete SPARK_OPTIONS="$SPARK_OPTIONS" reqs="./configs/reqs_dev.yaml" config_brand_exclusions="./configs/brand_excl_conf_dev.yaml"
                     deactivate
                 '''
                 echo "Ran step-1 cluster-1 scripts"
