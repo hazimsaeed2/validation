@@ -126,7 +126,7 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
-    'v2/AD_HOC', 'v2/stage/ref/AD_HOC'
+    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['item'] = config_data['paths']['item'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
@@ -212,7 +212,7 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
-    'v2/AD_HOC', 'v2/stage/ref/AD_HOC'
+    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['item'] = config_data['paths']['item'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'

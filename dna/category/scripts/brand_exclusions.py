@@ -71,7 +71,7 @@ def load_config():
         type=str,
         default=os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "../configs/prod/brand_excl_conf.yaml",
+            "../configs/brand_excl_conf.yaml",
         ),
         help=(
             """
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     format_dict = {
         "output_prefix": cnf.get("output_prefix", "default"),
     }
-    
+
     for path in paths.keys():
         paths[path] = paths[path].format(**format_dict)
     params = cnf['params']
