@@ -1,3 +1,5 @@
+recency_lookback_duration:
+  global: 3
 detail:
   type: 'intermediate'
   path: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/detail_isnr'
