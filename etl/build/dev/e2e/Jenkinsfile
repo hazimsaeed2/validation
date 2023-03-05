@@ -37,11 +37,10 @@ for k in config_data["data_paths"]["source"].keys():
 git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["intermediate"].keys():
+    if k == "AH5":
+        continue
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
         "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
-    )
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        f"v2/dev//{git_branch}/CATEGORY_DNA", "v2/dev/CATEGORY_DNA"
     )
 
 for k in config_data["data_paths"]["sampled"].keys():
