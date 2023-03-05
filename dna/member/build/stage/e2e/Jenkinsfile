@@ -41,8 +41,8 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/Master_Data
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/ s3://memberanalytics-data-out-prod/v2/stage/pipelined_intermediates
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/ s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates
                     '''
                     echo "Stage data in sync with prod"
                 }

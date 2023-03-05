@@ -49,10 +49,6 @@ post_etl_archiving:
 	spark-submit ${SPARK_OPTIONS} scripts/archive.py --config_path ${CONFIG_PATH} > etl_archiving.log 2>&1
 
 etl_complete:
-	spark-submit ${SPARK_OPTIONS} scripts/coupon_clip.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/coupon_clip_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/awards.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/awards_fiscal.py --config_path ${CONFIG_PATH} && \
 	spark-submit ${SPARK_OPTIONS} scripts/control_files.py --config_path ${CONFIG_PATH} && \
 	spark-submit ${SPARK_OPTIONS} scripts/quotient_id.py --config_path ${CONFIG_PATH} && \
 	spark-submit ${SPARK_OPTIONS} scripts/sampling.py --config_path ${CONFIG_PATH} && \
