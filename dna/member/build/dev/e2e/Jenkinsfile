@@ -49,7 +49,7 @@ with open(config_path_output, "w") as file:
                 sh '''
                     WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                     export PYTHONPATH=$WORKSPACE:
-                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                     export PYSPARK_PYTHON=environment/bin/python
                     export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 

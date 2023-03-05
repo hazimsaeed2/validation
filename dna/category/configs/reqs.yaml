@@ -14,7 +14,7 @@ member_extended:
   path: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/member_extended'
 exclusion:
   type: 'template'
-  path: 's3://memberanalytics-data-out-prod/v2/exclusions/exclusions_with_brand.csv'
+  path: 's3://memberanalytics-data-out-prod/v2/exclusions/output/for_dna/brand_exclusions'
 out:
   type: 'out'
   path: 's3://memberanalytics-data-out-prod/v2/CATEGORY_DNA/PROD/'

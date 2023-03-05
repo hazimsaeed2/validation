@@ -280,12 +280,12 @@ with open(config_path_output, "w") as file:
                         sh '''
                             WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            cd pe_memberdna/dna
+                            cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_1.py --config_path ./configs/config_stage.yaml
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_3.py --config_path ./configs/config_stage.yaml
                         '''
@@ -298,12 +298,12 @@ with open(config_path_output, "w") as file:
                         sh '''
                             WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            cd pe_memberdna/dna
+                            cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=18g --executor-memory=18g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_1.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-1 cluster-2 script"
@@ -315,12 +315,12 @@ with open(config_path_output, "w") as file:
                         sh '''
                             WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                             export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            cd pe_memberdna/dna
+                            cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_member.py --config_path ./configs/config_stage.yaml
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_most_shopped.py --config_path ./configs/config_stage.yaml
                         '''
@@ -419,10 +419,10 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                             export PYTHONPATH=$WORKSPACE:
                             cd $WORKSPACE
                             unset SPARK_OPTIONS
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
 
-                            cd pe_memberdna/dna
+                            cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_transaction_2.py --config_path ./configs/config_stage.yaml
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_misc.py --config_path ./configs/config_stage.yaml
                         '''
@@ -437,10 +437,10 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                             export PYTHONPATH=$WORKSPACE:
                             cd $WORKSPACE
                             unset SPARK_OPTIONS
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
 
-                            cd pe_memberdna/dna
+                            cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/generate_coupon_and_digital_2.py --config_path ./configs/config_stage.yaml
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g scripts/integrate_acquisition.py --config_path ./configs/config_stage.yaml
                         '''
