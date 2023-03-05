@@ -3,6 +3,9 @@ paths:
       # already begin with s3://...
       bucket: "memberanalytics-data-out-prod"
 
+      recency_lookback_duration:
+            global: 3
+
       input:
             # dir is not prepended to s3_stat_path
             s3_stat_path: "v2/STATS/DNA/latest_stats.yaml"

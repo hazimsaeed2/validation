@@ -6,8 +6,8 @@ pipeline {
                 agent { node env.node_1 }
                 steps {
                     sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
                     echo "Ran environemnt setup on cluster-1"
@@ -17,8 +17,8 @@ pipeline {
                 agent { node env.node_2 }
                 steps {
                     sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
                     echo "Ran environemnt setup on cluster-2"
@@ -28,8 +28,8 @@ pipeline {
                 agent { node env.node_3 }
                 steps {
                     sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
                     echo "Ran environemnt setup on cluster-3"
@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/ s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates
                     '''
                     echo "Stage data in sync with prod"
@@ -136,10 +136,10 @@ config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"][
     "v2/STATS", "v2/stage/STATS"
 )
 
-config_data['data_paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['data_paths']['recency_lookback_duration']:
-    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
-        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+config_data['paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['paths']['recency_lookback_duration']:
+    for k in config_data['paths']['recency_lookback_duration']['local'].keys():
+        config_data['paths']['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
@@ -192,10 +192,10 @@ config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"][
     "v2/STATS", "v2/stage/STATS"
 )
 
-config_data['data_paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['data_paths']['recency_lookback_duration']:
-    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
-        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+config_data['paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['paths']['recency_lookback_duration']:
+    for k in config_data['paths']['recency_lookback_duration']['local'].keys():
+        config_data['paths']['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
@@ -248,10 +248,10 @@ config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"][
     "v2/STATS", "v2/stage/STATS"
 )
 
-config_data['data_paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['data_paths']['recency_lookback_duration']:
-    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
-        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+config_data['paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['paths']['recency_lookback_duration']:
+    for k in config_data['paths']['recency_lookback_duration']['local'].keys():
+        config_data['paths']['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)

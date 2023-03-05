@@ -17,7 +17,7 @@ with open(config_path_input) as file:
 git_branch = os.getenv('GIT_BRANCH')
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
-    "v2/pipelined_intermediates", "v2/dev/pipelined_intermediates"
+    "v2/pipelined_intermediates", "v2/dev/ref/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
@@ -36,10 +36,10 @@ config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"][
     "v2/STATS", f"v2/dev/{git_branch}/STATS"
 )
 
-config_data['data_paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['data_paths']['recency_lookback_duration']:
-    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
-        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+config_data['paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['paths']['recency_lookback_duration']:
+    for k in config_data['paths']['recency_lookback_duration']['local'].keys():
+        config_data['paths']['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
