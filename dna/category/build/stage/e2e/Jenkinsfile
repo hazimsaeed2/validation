@@ -125,22 +125,22 @@ git_branch = os.getenv('GIT_BRANCH')
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-config_data['path']['brand'] = config_data['path']['brand'].replace(
+config_data['paths']['brand'] = config_data['paths']['brand'].replace(
     'v2/AD_HOC', 'v2/stage/ref/AD_HOC'
 )
-config_data['path']['item'] = config_data['path']['item'].replace(
+config_data['paths']['item'] = config_data['paths']['item'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
-config_data['path']['cat_dna'] = config_data['path']['cat_dna'].replace(
+config_data['paths']['cat_dna'] = config_data['paths']['cat_dna'].replace(
     'v2/CATEGORY_DNA', 'v2/stage/ref/CATEGORY_DNA'
 )
-config_data['path']['transactions'] = config_data['path']['transactions'].replace(
+config_data['paths']['transactions'] = config_data['paths']['transactions'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
-config_data['path']['exclusions'] = config_data['path']['exclusions'].replace(
+config_data['paths']['exclusions'] = config_data['paths']['exclusions'].replace(
     'v2/exclusions', 'v2/stage/ref/exclusions'
 )
-config_data['path']['output'] = config_data['path']['output'].replace(
+config_data['paths']['output'] = config_data['paths']['output'].replace(
     'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
 )
 with open(config_path_output, "w") as file:
@@ -211,22 +211,22 @@ git_branch = os.getenv('GIT_BRANCH')
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-config_data['path']['brand'] = config_data['path']['brand'].replace(
+config_data['paths']['brand'] = config_data['paths']['brand'].replace(
     'v2/AD_HOC', 'v2/stage/ref/AD_HOC'
 )
-config_data['path']['item'] = config_data['path']['item'].replace(
+config_data['paths']['item'] = config_data['paths']['item'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
-config_data['path']['cat_dna'] = config_data['path']['cat_dna'].replace(
+config_data['paths']['cat_dna'] = config_data['paths']['cat_dna'].replace(
     'v2/CATEGORY_DNA', 'v2/stage/ref/CATEGORY_DNA'
 )
-config_data['path']['transactions'] = config_data['path']['transactions'].replace(
+config_data['paths']['transactions'] = config_data['paths']['transactions'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
-config_data['path']['exclusions'] = config_data['path']['exclusions'].replace(
+config_data['paths']['exclusions'] = config_data['paths']['exclusions'].replace(
     'v2/exclusions', 'v2/stage/ref/exclusions'
 )
-config_data['path']['output'] = config_data['path']['output'].replace(
+config_data['paths']['output'] = config_data['paths']['output'].replace(
     'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
 )
 with open(config_path_output, "w") as file:
