@@ -25,32 +25,40 @@ for k in config_data["data_paths"]["source"].keys():
         "_*20{16,17,18,19,20,21,22,23}*", ""
     )
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "BJs_CRM_*", "BJs_CRM"
+        "BJs_CRM_*", "BJs_CRM.csv"
     )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "bjs_loyaltynumbers_usercodes_*csv", "bjs_loyaltynumbers_usercodes.csv"
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "PE_Member_Award_Certificate_*.csv", "PE_Member_Award_Certificate.csv"
+    )
+
+git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
     )
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "v2/dev/CATEGORY_DNA", "v2/dev/ref/CATEGORY_DNA"
+        f"v2/dev//{git_branch}/CATEGORY_DNA", "v2/dev/CATEGORY_DNA"
     )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/dev"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
