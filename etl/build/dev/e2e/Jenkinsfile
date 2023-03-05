@@ -71,7 +71,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
     for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
         config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
 
-config_data["validation"]["table_params"]["source"]["control_file_table_01"]["TestControlTable"]["toleranceRows"] = 1000
+config_data["validation"]["table_params"]["intermediate"]["control_file_table_01"]["TestControlTable"]["toleranceRows"] = 1000
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
