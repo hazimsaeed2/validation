@@ -3,6 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -14,7 +15,7 @@ def main(job, data_paths, config_validation):
 
     cast_sql = """
     select
-         cast(_c0 as int) as MBRSHP_SID
+         cast(_c0 as long) as MBRSHP_SID
         ,_c1 as MBRSHP_TYPE_ID
         -- remove leading zeros
         ,cast(regexp_replace(trim(_c2), "^0+", "") as decimal(5,2)) as MBRSHP_FEE_INC

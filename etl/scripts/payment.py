@@ -3,6 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -14,8 +15,8 @@ def main(job, data_paths, config_validation):
 
     cast_sql = """
     select
-         cast(MBRSHP_SID as int) as MBRSHP_SID
-        ,cast(PURCH_HDR_ID as int) as PURCH_HDR_ID
+         cast(MBRSHP_SID as long) as MBRSHP_SID
+        ,cast(PURCH_HDR_ID as long) as PURCH_HDR_ID
         ,cast(PURCH_PYMT_SEQ_ID as int) as PURCH_PYMT_SEQ_ID
         ,TENDER_TYPE_CD
         ,CPN_NBR

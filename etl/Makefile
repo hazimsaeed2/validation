@@ -49,27 +49,6 @@ post_etl_archiving:
 	spark-submit ${SPARK_OPTIONS} scripts/archive.py --config_path ${CONFIG_PATH} > etl_archiving.log 2>&1
 
 etl_complete:
-	spark-submit ${SPARK_OPTIONS} scripts/item.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/brand.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/item_add_brand.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/header.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/detail.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/payment.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/fiscal_days.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/header_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/detail_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/detail_isnr_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/detail_gas_nr_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/payment_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/member.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/member_extended.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/census_tract.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/member_history.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/skeleton.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/email_mem.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/email_fiscal.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/club.py --config_path ${CONFIG_PATH} && \
-	spark-submit ${SPARK_OPTIONS} scripts/club_square.py --config_path ${CONFIG_PATH} && \
 	spark-submit ${SPARK_OPTIONS} scripts/coupon_clip.py --config_path ${CONFIG_PATH} && \
 	spark-submit ${SPARK_OPTIONS} scripts/coupon_clip_fiscal.py --config_path ${CONFIG_PATH} && \
 	spark-submit ${SPARK_OPTIONS} scripts/awards.py --config_path ${CONFIG_PATH} && \

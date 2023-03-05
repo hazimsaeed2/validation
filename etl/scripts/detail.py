@@ -4,6 +4,7 @@ import os
 
 import pyspark.sql.functions as sqlf
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -18,7 +19,7 @@ def main(job, data_paths, config_validation):
     # ID:1000001.
     cast_sql = """
     select
-         cast(PURCH_HDR_ID as int) as PURCH_HDR_ID
+         cast(PURCH_HDR_ID as long) as PURCH_HDR_ID
         ,cast(PURCH_DTL_ID as int) as PURCH_DTL_ID
         ,cast(PURCH_DT as date) as PURCH_DT
         ,GTIN_CD

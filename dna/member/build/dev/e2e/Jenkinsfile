@@ -14,24 +14,26 @@ config_path_output = "pe_memberdna/dna/member/configs/config_dev.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
+git_branch = os.getenv('GIT_BRANCH')
+
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
     "v2/pipelined_intermediates", "v2/dev/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/dev/STATS"
+    "v2/STATS", f"v2/dev/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/Membership/PE_Membership_Mstr.csv"
+    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "dev/ref/Membership/PE_Membership_Mstr.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", "v2/dev/CUBES"
+    "v2/CUBES", f"v2/dev/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/dev/STATS"
+    "v2/STATS", f"v2/dev/{git_branch}/STATS"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0

@@ -3,6 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -19,10 +20,21 @@ def main(job, data_paths):
 
     awards_intermediate_path = data_paths["intermediate"].get("awards")
 
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
     if not awards_intermediate_path:
         return
 
     logging.info("Starting processing table awards")
+
+    input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        [
+            "fiscal_days",
+            "awards",
+        ],
+    )
 
     fiscal_days = job.spark.read.parquet(
         data_paths["intermediate"]["fiscal_days"]

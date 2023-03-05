@@ -3,6 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -26,7 +27,7 @@ def main(job, data_paths, config_validation):
 
     cast_sql = """
     select
-        CAST(MBRSHP_SID AS int) as MBRSHP_SID,
+        CAST(MBRSHP_SID AS long) as MBRSHP_SID,
         AWRD_CERT_NBR,
         CAST(AWRD_CERT_AMT as double) as AWRD_CERT_AMT,
         CAST(AWRD_CERT_ISSUE_DT as date) as AWRD_CERT_ISSUE_DT,

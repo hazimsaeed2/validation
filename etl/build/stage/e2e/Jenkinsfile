@@ -43,16 +43,16 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/Master_Data
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/Transaction_Header
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/Transaction_Detail
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/Transaction_Payment
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/Membership
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/Other
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/Email_Events
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ATC
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/control_files
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/v2/CATEGORY_DNA/stage/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/v2/stage/CATEGORY_DNA/stage/AH5_CD/CATEGORY_DNA_full/PARQUET/
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Header
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Detail
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Payment
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/ref/Other
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/ref/Email_Events
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ref/ATC
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/ref/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/prod/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/v2/stage/ref/CATEGORY_DNA/prod/AH5_CD/CATEGORY_DNA_full/PARQUET/
                     '''
                     echo "Stage data in sync with prod"
                 }
@@ -126,31 +126,38 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
+git_branch = os.getenv('GIT_BRANCH')
+
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
+    if k == "AH5":
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/ref"
+        )
+    else:
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
+        )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -189,31 +196,38 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
+git_branch = os.getenv('GIT_BRANCH')
+
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/{git_branch}"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
+    if k == "AH5":
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/ref"
+        )
+    else:
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
+        )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -252,31 +266,38 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
+git_branch = os.getenv('GIT_BRANCH')
+
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/{git_branch}"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
-    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
-    )
+    if k == "AH5":
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/ref"
+        )
+    else:
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
+        )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0

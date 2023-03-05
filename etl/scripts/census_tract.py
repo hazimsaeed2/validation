@@ -4,6 +4,7 @@ import os
 
 import pe_memberdna.etl.lib.validations_ETL as validations
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -38,7 +39,7 @@ def main(job, data_paths, config_validation):
     cast_sql = """
     select
          CENSUS_TRACT
-        ,cast(MBRSHP_SID as int) as MBRSHP_SID
+        ,cast(MBRSHP_SID as long) as MBRSHP_SID
         ,MEMBERID
         ,MEMTYPE
         ,cast(CLUSTER as int) as CLUSTER

@@ -3,6 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
+from pe_memberdna.etl.lib.s3 import input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -15,7 +16,7 @@ def main(job, data_paths, config_validation):
     cast_sql = """
     select
          cast(MBRSHP_NBR as string) as MBRSHP_NBR
-        ,cast(MBRSHP_SID as int) as MBRSHP_SID
+        ,cast(MBRSHP_SID as long) as MBRSHP_SID
         ,cast(MBRSHP_TYPE_ID as int) as MBRSHP_TYPE_ID
         ,cast(MBRSHP_FEE_INC as decimal(10,3)) as MBRSHP_FEE_INC
         ,cast(MBRSHP_SUB_TYPE as string) as MBRSHP_SUB_TYPE

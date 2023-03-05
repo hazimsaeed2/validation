@@ -29,8 +29,8 @@ def main(job, data_paths, config_validation):
 
     cast_sql = """
     select
-        cast(MBRSHP_HIST_SID as int) as MBRSHP_HIST_SID
-        ,cast(MBRSHP_SID as int) as MBRSHP_SID
+        cast(MBRSHP_HIST_SID as long) as MBRSHP_HIST_SID
+        ,cast(MBRSHP_SID as long) as MBRSHP_SID
         ,cast(EFF_DT as date) as EFF_DT
         ,cast(EXP_DT as date) as EXP_DT
         ,MBRSHP_STAT_CD
