@@ -206,6 +206,8 @@ class Loader:
         season_start = Loader.__seasonality_start(end, seasonality)
 
         for key in reqs.keys():
+            if key == "recency_lookback_duration":
+                continue
             value = reqs[key]
             if value["type"] == "intermediate":
                 # at present def frames look back 52 weeks, season 5 years (can be dynamically changed in yaml)
