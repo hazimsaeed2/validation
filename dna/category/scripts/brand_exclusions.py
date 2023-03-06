@@ -272,10 +272,22 @@ def calc_stats_by_brand(branddata, cat_dna):
     is_excluded = col("TOP_CAT_INCL") == "exclude"
     excluded_pct = coalesce(col("exclude"), lit(0)) / col("total")
     included_pct = coalesce(col("include"), lit(0)) / col("total")
-    by_brand = by_brand.withColumn(
-        "INCL_COVG", when(is_excluded, excluded_pct).otherwise(included_pct)
-    )
-    by_brand = by_brand.drop("exclude", "include", "total")
+
+    if "exclude" in by_brand.columns and "include" in by_brand.columns:
+        by_brand = by_brand.withColumn(
+            "INCL_COVG",
+            when(is_excluded, excluded_pct).otherwise(included_pct),
+        ).drop("exclude", "include", "total")
+    elif "exclude" in by_brand.columns:
+        by_brand = by_brand.withColumn(
+            "INCL_COVG", when(is_excluded, excluded_pct).otherwise(lit(0.0))
+        ).drop("exclude", "total")
+    elif "include" in by_brand.columns:
+        by_brand = by_brand.withColumn(
+            "INCL_COVG", when(is_excluded, lit(0.0)).otherwise(included_pct)
+        ).drop("include", "total")
+    else:
+        by_brand = by_brand.withColumn("INCL_COVG", lit(0.0)).drop("total")
 
     return by_brand
 
