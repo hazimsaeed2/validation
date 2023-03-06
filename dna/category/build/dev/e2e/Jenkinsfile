@@ -29,10 +29,10 @@ config_data['member_extended']['path'] = config_data['member_extended']['path'].
     'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
 )
 config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
-    'v2/exclusions', 'v2/dev/{git_branch}/exclusions'
+    'v2/exclusions', f'v2/dev/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'v2/CATEGORY_DNA', 'v2/dev/{git_branch}/CATEGORY_DNA'
+    'v2/CATEGORY_DNA', f'v2/dev/{git_branch}/CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0
