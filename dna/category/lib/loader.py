@@ -204,14 +204,8 @@ class Loader:
         frames = {}
 
         season_start = Loader.__seasonality_start(end, seasonality)
-        format_dict = {
-            "output_prefix": reqs.get("output_prefix", "default"),
-        }
 
         for key in reqs.keys():
-            if key == "output_prefix":
-                continue
-            reqs[key]["path"] = reqs[key]["path"].format(**format_dict)
             value = reqs[key]
             if value["type"] == "intermediate":
                 # at present def frames look back 52 weeks, season 5 years (can be dynamically changed in yaml)
