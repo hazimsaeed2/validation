@@ -97,7 +97,7 @@ config_data['member']['path'] = config_data['member']['path'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
 config_data['item']['path'] = config_data['item']['path'].replace(
-    'v2/ADHOC/pipelined_intermediates', 'v2/stage/ref/ADHOC/pipelined_intermediates'
+    'v2/AD_HOC/pipelined_intermediates', 'v2/stage/ref/AD_HOC/pipelined_intermediates'
 )
 config_data['member_extended']['path'] = config_data['member_extended']['path'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
@@ -183,7 +183,7 @@ config_data['member']['path'] = config_data['member']['path'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
 )
 config_data['item']['path'] = config_data['item']['path'].replace(
-    'v2/ADHOC/pipelined_intermediates', 'v2/stage/ref/ADHOC/pipelined_intermediates'
+    'v2/AD_HOC/pipelined_intermediates', 'v2/stage/ref/AD_HOC/pipelined_intermediates'
 )
 config_data['member_extended']['path'] = config_data['member_extended']['path'].replace(
     'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
