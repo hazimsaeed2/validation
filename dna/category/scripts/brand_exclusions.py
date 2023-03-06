@@ -214,7 +214,7 @@ def calc_stats_by_brand(branddata, cat_dna):
     by_incl = branddata.groupBy('BRAND').pivot('INCLUDE_OR_EXCLUDE') \
                                         .agg(countDistinct('ARTICLE_NBR').alias('count'))
     by_incl = by_incl.fillna(0)
-    by_incl = by_incl.withColumn('total', by_incl.exclude + by_incl.include)
+    by_incl = by_incl.withColumn('total', col('exclude') + col('include'))
     by_brand = by_brand.join(by_incl, 'BRAND', 'left')
     is_excluded = (col('TOP_CAT_INCL') == 'exclude')
     excluded_pct = (col('exclude') / col('total'))
