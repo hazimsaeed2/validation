@@ -55,7 +55,7 @@ config_data['paths']['brand'] = config_data['paths']['brand'].replace(
     'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
 )
 config_data['paths']['item'] = config_data['paths']['item'].replace(
-    'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
+    'v2/ADHOC/pipelined_intermediates', 'v2/dev/ref/ADHOC/pipelined_intermediates'
 )
 config_data['paths']['cat_dna'] = config_data['paths']['cat_dna'].replace(
     'v2/CATEGORY_DNA', 'v2/dev/ref/CATEGORY_DNA'
