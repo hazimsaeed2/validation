@@ -5,13 +5,39 @@ import datetime as dt
 
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
+from pyspark.sql.types import StringType, StructField, LongType, StructType
+
+EXCLUSION_SCHEMA = StructType(
+    [
+        StructField("CATEGORY_TYPE", StringType(), False),
+        StructField("CATEGORY_CD", LongType(), False),
+        StructField("CATEGORY_DESCRIPTION", StringType(), False),
+        StructField("INCLUDE_OR_EXCLUDE", StringType(), False),
+        StructField("EXCLUSION_TYPE", StringType(), False),
+        StructField("EXCLUSION_SUBTYPE", StringType(), False),
+        StructField("SEASON_MONTH_1", LongType(), False),
+        StructField("SEASON_MONTH_2", LongType(), False),
+        StructField("SEASON_MONTH_3", LongType(), False),
+        StructField("SEASON_MONTH_4", LongType(), False),
+        StructField("SEASON_MONTH_5", LongType(), False),
+        StructField("SEASON_MONTH_6", LongType(), False),
+        StructField("SEASON_MONTH_7", LongType(), False),
+        StructField("SEASON_MONTH_8", LongType(), False),
+        StructField("SEASON_MONTH_9", LongType(), False),
+        StructField("SEASON_MONTH_10", LongType(), False),
+        StructField("SEASON_MONTH_11", LongType(), False),
+        StructField("SEASON_MONTH_12", LongType(), False),
+    ]
+)
 
 
 class Loader:
 
     spark = SparkSession.builder.appName("CatSquareBuilder").getOrCreate()
-    spark.conf.set("spark.sql.legacy.timeParserPolicy","LEGACY")
-    spark.conf.set("spark.sql.legacy.parquet.datetimeRebaseModeInWrite","CORRECTED")
+    spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
+    spark.conf.set(
+        "spark.sql.legacy.parquet.datetimeRebaseModeInWrite", "CORRECTED"
+    )
 
     @staticmethod
     def __high_spend_filter(detail, spend_filter):
@@ -120,7 +146,9 @@ class Loader:
         Loads a csv that's updated often
         """
 
-        df = spark.read.csv(filepath, header=True, escape='"')
+        df = spark.read.csv(
+            filepath, header=True, escape='"', schema=EXCLUSION_SCHEMA
+        )
         return df
 
     @staticmethod
