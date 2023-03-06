@@ -248,7 +248,7 @@ def calc_stats_by_brand(branddata, cat_dna):
         .pivot("INCLUDE_OR_EXCLUDE")
         .agg(countDistinct("ARTICLE_NBR").alias("count"))
     )
-    branddata.select("INCLUDE_OR_EXCLUDE").dropDuplicate().show(20, False)
+    branddata.select("INCLUDE_OR_EXCLUDE").dropDuplicates().show(20, False)
     by_incl = by_incl.fillna(0)
     by_incl = by_incl.withColumn(
         "total", coalesce(col("exclude"), 0) + coalesce(col("include"), 0)
