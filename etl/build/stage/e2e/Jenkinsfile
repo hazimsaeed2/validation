@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180614.txt --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180719.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180829.txt
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Header
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Detail
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Payment
