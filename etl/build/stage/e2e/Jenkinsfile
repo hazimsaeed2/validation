@@ -47,7 +47,7 @@ pipeline {
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Header
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Detail
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Payment
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/ref/Other
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/ref/Email_Events
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ref/ATC
