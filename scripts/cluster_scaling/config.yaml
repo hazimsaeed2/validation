@@ -1,0 +1,29 @@
+clusters:
+  gendevEMR(15):
+    id: j-SMUJHZCOSGDZ
+    ip: 10.13.35.15
+    r4_ig_id: ig-1D7ET2F6UQLM1
+  gendevEMR(68):
+      id: j-28444H6BPG1FF
+      ip: 10.13.32.68
+      r4_ig_id: ig-67RGWON61QHP
+  gendevEMR(242):
+      id: j-1LPUH4046O4JB
+      ip: 10.13.35.242
+      r4_ig_id: ig-1NIESUZ26F824
+  gendevEMR(139):
+      id: j-29U8LDF2A2ZB0
+      ip: 10.13.35.139
+      r4_ig_id: ig-311JQRU0HEWB3
+  gendevEMR(5):
+      id: j-2I7AXXMVM0KTA
+      ip: 10.13.32.5
+      r4_ig_id: ig-11HRZ8I5TINVE
+  gendevEMR(202):
+      id: j-TGP48WYKOERU
+      ip: 10.13.32.202
+      r4_ig_id: ig-28FS6DTWWHTMR
+
+params:
+  node_cap: 50
+  region: us-east-1

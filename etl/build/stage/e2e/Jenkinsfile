@@ -9,7 +9,7 @@ pipeline {
                         sh '''
                             aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna pe_memberdna
                             aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                            tar -xf pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-1"
                     }
@@ -20,7 +20,7 @@ pipeline {
                         sh '''
                             aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna pe_memberdna
                             aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                            tar -xf pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-2"
                     }
@@ -31,7 +31,7 @@ pipeline {
                         sh '''
                             aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/code/pe_memberdna pe_memberdna
                             aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                            tar -xf pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-3"
                     }
@@ -47,10 +47,10 @@ pipeline {
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Header
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Detail
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Payment
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/ref/Other
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/ref/Other --exclude Promo* --exclude RFM_July2017_Present.csv --exclude people.txt --exclude kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude kantar_storemaster_hierarchy_data_SAP_20180829.txt
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/ref/Email_Events
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ref/ATC
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ref/ATC --exclude old/*
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/ref/control_files
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/prod/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/v2/stage/ref/CATEGORY_DNA/prod/AH5_CD/CATEGORY_DNA_full/PARQUET/
                     '''
@@ -176,7 +176,7 @@ with open(config_path_output, "w") as file:
                             export PYTHONPATH=$WORKSPACE:
 
                             source pyspark_venv/bin/activate
-                            python3 _config_cluster_1
+                            python3 _config_cluster_1.py
                             deactivate
                         '''
                         echo "Ran config setup cluster-1 scripts"
@@ -410,7 +410,7 @@ with open(config_path_output, "w") as file:
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step2_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
                             deactivate
                         '''
@@ -428,7 +428,7 @@ with open(config_path_output, "w") as file:
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step2_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
                             deactivate
                         '''
@@ -450,7 +450,7 @@ with open(config_path_output, "w") as file:
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step3_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
                             deactivate
                         '''
@@ -468,7 +468,7 @@ with open(config_path_output, "w") as file:
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step3_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
                             deactivate
                         '''

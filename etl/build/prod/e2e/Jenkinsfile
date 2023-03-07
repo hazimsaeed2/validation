@@ -102,7 +102,7 @@ pipeline {
 
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step1_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
@@ -121,7 +121,7 @@ pipeline {
 
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=18g --driver-memory=18g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step1_cluster2 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
@@ -140,7 +140,7 @@ pipeline {
 
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step1_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
@@ -174,7 +174,7 @@ pipeline {
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step2_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
@@ -192,7 +192,7 @@ pipeline {
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step2_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
@@ -214,7 +214,7 @@ pipeline {
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step3_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
@@ -232,7 +232,7 @@ pipeline {
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
-                            cd memberdna
+                            cd pe_memberdna
                             make -C etl etl_complete_prod_step3_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
                             deactivate
                         '''
