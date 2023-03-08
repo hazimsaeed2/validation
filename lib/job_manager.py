@@ -83,21 +83,10 @@ class JobManager(object):
             # file will not have the variable date portion, which is ignored here
             pass
 
-        for data_type in [
-            "source",
-            "intermediate",
-            "sampled",
-        ]:
-            for data_name, data_path in (
-                config["data_paths"].get(data_type, {}).items()
-            ):
-                format_dict = {
-                    "curr_date": end_date_str_no_dashes,
-                    "16,17,18,19,20,21,22,23": "{16,17,18,19,20,21,22,23}",
-                }
-                config["data_paths"][data_type][data_name] = data_path.format(
-                    **format_dict
-                )
+        for data_name, data_path in config["data_paths"]["source"].items():
+            config["data_paths"]["source"][data_name] = data_path % {
+                "curr_date": end_date_str_no_dashes
+            }
 
         return config
 
