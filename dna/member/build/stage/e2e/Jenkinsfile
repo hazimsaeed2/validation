@@ -1,38 +1,40 @@
 pipeline {
     agent none
     stages {
-        parallel {
-            stage('Running environment setup on cluster-1') {
-                agent { node env.node_1 }
-                steps {
-                    sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-1"
+        stage('Environment setup') {
+            parallel {
+                stage('Running environment setup on cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        sh '''
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-1"
+                    }
                 }
-            }
-            stage('Running environment setup on cluster-2') {
-                agent { node env.node_2 }
-                steps {
-                    sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-2"
+                stage('Running environment setup on cluster-2') {
+                    agent { node env.node_2 }
+                    steps {
+                        sh '''
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-2"
+                    }
                 }
-            }
-            stage('Running environment setup on cluster-3') {
-                agent { node env.node_3 }
-                steps {
-                    sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-3"
+                stage('Running environment setup on cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        sh '''
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-3"
+                    }
                 }
             }
         }
@@ -41,8 +43,8 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/ s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/ s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates --exclude archive/*
                     '''
                     echo "Stage data in sync with prod"
                 }

@@ -17,10 +17,11 @@ raise an error.
 
 import argparse
 import time
+from platform import node
 
-from pe_memberdna.scripts.cluster_scaling.utility import (
-    get_emr_client,
+from memberdna.scripts.cluster_scaling.utility import (
     get_ec2_client,
+    get_emr_client,
 )
 
 
@@ -32,9 +33,11 @@ def get_params():
 
     Returns:
         target_cluster (string) - cluster to be upscaled
-        target_num_nodes (int) - desired number of nodes
+        spot_node_cnt (int) - count of spot instance(s) to spin up
+        ondemand_node_cnt (int) - count of on-demand instance(s) to spin up
         wait_number_mins (int) - waiting period in minutes
-
+        api_call_retry_interval (int) - defines the lengths of interval
+            between API call retries. The default is 30 mins
     """
 
     parser = argparse.ArgumentParser(
@@ -47,14 +50,6 @@ def get_params():
         type=str,
         default=None,
         help="Name of the cluster to be scaled i.g. 'Dev-03' ",
-    )
-
-    parser.add_argument(
-        "--num_nodes",
-        required=True,
-        type=int,
-        default=None,
-        help="Requested number of nodes. Must be 0-50. ",
     )
 
     parser.add_argument(
@@ -93,17 +88,37 @@ def get_params():
             """,
     )
 
+    parser.add_argument(
+        "--spot_node_cnt",
+        type=int,
+        default=0,
+        help="""
+                Requested number of spot nodes. Must be 0-50.
+            """,
+    )
+
+    parser.add_argument(
+        "--ondemand_node_cnt",
+        type=int,
+        default=0,
+        help="""
+                Requested number of ondemand nodes. Must be 0-50.
+            """,
+    )
+
     args = parser.parse_args()
 
     target_cluster = args.target_cluster
-    target_num_nodes = args.num_nodes
+    spot_node_cnt = args.spot_node_cnt
+    ondemand_node_cnt = args.ondemand_node_cnt
     wait_number_mins = args.wait
     api_call_retry_interval = args.api_call_retry_interval
     force_terminate = args.force_terminate
 
     return (
         target_cluster,
-        target_num_nodes,
+        spot_node_cnt,
+        ondemand_node_cnt,
         wait_number_mins,
         api_call_retry_interval,
         force_terminate,
@@ -115,7 +130,8 @@ def rescale_cluster_call_api(
     target_cluster_ig_type,
     target_cluster_id,
     target_cluster_node_ig_id,
-    target_num_nodes,
+    spot_node_cnt,
+    ondemand_node_cnt,
 ):
     """
     Calls a boto3 endpoint either modifying the
@@ -127,7 +143,8 @@ def rescale_cluster_call_api(
         target_cluster_id (string)
         target_cluster_node_ig_id (string) - id of the target instance aggregation
             (INSTANCE_FLEET or INSTANCE_GROUP)
-        target_num_nodes (int)
+        spot_node_cnt (int) - count of spot instance(s) to spin up
+        ondemand_node_cnt (int) - count of on-demand instance(s) to spin up
 
     Returns:
 
@@ -140,21 +157,32 @@ def rescale_cluster_call_api(
             InstanceGroups=[
                 {
                     "InstanceGroupId": target_cluster_node_ig_id,
-                    "InstanceCount": target_num_nodes,
+                    "InstanceCount": (spot_node_cnt + ondemand_node_cnt),
                 }
             ],
         )
 
     elif target_cluster_ig_type == "INSTANCE_FLEET":
+        try:
+            client_emr.modify_instance_fleet(
+                ClusterId=target_cluster_id,
+                InstanceFleet={
+                    "InstanceFleetId": target_cluster_node_ig_id,
+                    "TargetOnDemandCapacity": ondemand_node_cnt,
+                    "TargetSpotCapacity": spot_node_cnt,
+                },
+            )
+        except Exception as e:
+            raise Exception(
+                """
+                An exception occurred while trying to
+                invoke modify_instance_fleet API.
+                Exception: {}
+                """.format(
+                    e
+                )
+            )
 
-        client_emr.modify_instance_fleet(
-            ClusterId=target_cluster_id,
-            InstanceFleet={
-                "InstanceFleetId": target_cluster_node_ig_id,
-                "TargetOnDemandCapacity": 0,
-                "TargetSpotCapacity": target_num_nodes,
-            },
-        )
     else:
         raise Exception(
             """
@@ -168,7 +196,8 @@ def rescale_cluster_call_api(
 
 def check_rescaling_status(
     client_emr,
-    target_num_nodes,
+    spot_node_cnt,
+    ondemand_node_cnt,
     target_cluster_id,
     target_cluster_ig_type,
     target_cluster_node_ig_id,
@@ -180,7 +209,8 @@ def check_rescaling_status(
 
     Args:
         client_emr (boto3 emr client_emr class) - boto3 EMR client
-        target_num_nodes (int) - the number of nodes required by the user
+        spot_node_cnt (int) - count of spot instance(s) to spin up
+        ondemand_node_cnt (int) - count of on-demand instance(s) to spin up
         target_cluster_id (string)
         target_cluster_ig_type (string) - type of the instance aggregation
             (INSTANCE_FLEET or INSTANCE_GROUP)
@@ -207,7 +237,9 @@ def check_rescaling_status(
                 )
             )
 
-        node_difference = ig_desc["RunningInstanceCount"] - target_num_nodes
+        node_difference = ig_desc["RunningInstanceCount"] - (
+            spot_node_cnt + ondemand_node_cnt
+        )
 
         finished_rescaling = (node_difference == 0) and (
             ig_desc["Status"]["State"] == "RUNNING"
@@ -237,8 +269,21 @@ def check_rescaling_status(
                     target_cluster_node_ig_id
                 )
             )
-
-        node_difference = ig_desc["ProvisionedSpotCapacity"] - target_num_nodes
+        try:
+            node_difference = (
+                ig_desc["ProvisionedSpotCapacity"] - spot_node_cnt
+            ) + (ig_desc["ProvisionedOnDemandCapacity"] - ondemand_node_cnt)
+        except Exception as e:
+            raise Exception(
+                """
+                An exception occurred while trying to
+                compute node_difference.
+                Kindly chceck the value of spot_node_cnt and ondemand_node_cnt.
+                Exception: {}
+                """.format(
+                    e
+                )
+            )
 
         finished_rescaling = (
             (
@@ -323,7 +368,8 @@ def rescale_cluster(
     client_emr,
     client_ec2,
     target_cluster,
-    target_num_nodes,
+    spot_node_cnt,
+    ondemand_node_cnt,
     api_call_retry_interval=60 * 30,
     wait_number_mins=None,
     force_terminate=False,
@@ -336,7 +382,8 @@ def rescale_cluster(
         client_emr (boto3 emr client_emr class) - EMR client created by Boto3
         client_ec2 (boto3 emr client_emr class) - EC2 client created by Boto3
         target_cluster (string) - cluster to be upscaled
-        target_num_nodes (int) - desired number of nodes
+        spot_node_cnt (int) - count of spot instance(s) to spin up
+        ondemand_node_cnt (int) - count of on-demand instance(s) to spin up
         api_call_retry_interval (int) - defines the lengths of interval
             between API call retries. The default is 30 mins
         wait_number_mins (int) - waiting period in minutes, the defaults
@@ -346,9 +393,9 @@ def rescale_cluster(
         (boolean) result of upscaling operation
     """
 
-    if not 0 <= target_num_nodes <= 50:
+    if not 0 <= (spot_node_cnt + ondemand_node_cnt) <= 50:
         error_msg = "Unacceptable number of nodes."
-        " Contact Kaitlyn/Rong/Adam if scaling 50+ nodes."
+        " Contact Hazim/Prezmek/Shubham if scaling 50+ nodes."
         raise ValueError(error_msg)
 
     resp_active_clusters = client_emr.list_clusters(
@@ -465,7 +512,8 @@ def rescale_cluster(
         target_cluster_ig_type,
         target_cluster_id,
         target_cluster_node_ig_id,
-        target_num_nodes,
+        spot_node_cnt,
+        ondemand_node_cnt,
     )
 
     if not wait_number_mins:
@@ -483,7 +531,8 @@ def rescale_cluster(
 
             finished_rescaling, node_difference = check_rescaling_status(
                 client_emr,
-                target_num_nodes,
+                spot_node_cnt,
+                ondemand_node_cnt,
                 target_cluster_id,
                 target_cluster_ig_type,
                 target_cluster_node_ig_id,
@@ -503,7 +552,8 @@ def rescale_cluster(
                     target_cluster_ig_type,
                     target_cluster_id,
                     target_cluster_node_ig_id,
-                    target_num_nodes,
+                    spot_node_cnt,
+                    ondemand_node_cnt,
                 )
 
             print(
@@ -551,7 +601,8 @@ def main():
 
     (
         target_cluster,
-        target_num_nodes,
+        spot_node_cnt,
+        ondemand_node_cnt,
         wait_number_mins,
         api_call_retry_interval,
         force_terminate,
@@ -561,7 +612,8 @@ def main():
         client_emr,
         client_ec2,
         target_cluster,
-        target_num_nodes,
+        spot_node_cnt,
+        ondemand_node_cnt,
         api_call_retry_interval,
         wait_number_mins,
         force_terminate,
