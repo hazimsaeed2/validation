@@ -32,7 +32,19 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/ s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/bcg_maps
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/control_files s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/coupon_clip
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/coupon_clip_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/lookup
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/master
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/quotient_id
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/sampled s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/sampled
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/skeleton
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/transaction
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/transaction_fiscal
                     '''
                     echo "Stage data in sync with prod"
                 }

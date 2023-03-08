@@ -19,7 +19,7 @@ import argparse
 import time
 from platform import node
 
-from memberdna.scripts.cluster_scaling.utility import (
+from pe_memberdna.scripts.cluster_scaling.utility import (
     get_ec2_client,
     get_emr_client,
 )
