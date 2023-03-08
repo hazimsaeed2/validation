@@ -130,7 +130,7 @@ git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -200,7 +200,7 @@ git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/{git_branch}"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -270,7 +270,7 @@ git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/{git_branch}"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
