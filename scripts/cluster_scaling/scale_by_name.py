@@ -416,6 +416,7 @@ def rescale_cluster(
             print(
                 f"Failed to make DecribeCluster API call - {i} iteration: {e}"
             )
+            time.sleep(3)
 
         cluster_project_tags = [
             tag["Value"]
