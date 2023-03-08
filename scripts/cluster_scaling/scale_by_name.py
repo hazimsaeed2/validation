@@ -408,7 +408,14 @@ def rescale_cluster(
     cluster_list = {}
     for curr_id, curr_name in zip(ids, names):
 
-        cluster_info = client_emr.describe_cluster(ClusterId=curr_id)
+        try:
+            for i in range(10):
+                cluster_info = client_emr.describe_cluster(ClusterId=curr_id)
+                break
+        except Exception as e:
+            print(
+                f"Failed to make DecribeCluster API call - {i} iteration: {e}"
+            )
 
         cluster_project_tags = [
             tag["Value"]
