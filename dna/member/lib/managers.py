@@ -73,13 +73,12 @@ def load_config(conf_path_in=None):
     return cfg, cfg_path
 
 
-def calculate_filepaths(config, config_path):
+def calculate_filepaths(config):
     """
     Calculate additional derived parameters and filepaths.
 
     Parameters:
         config (dict): dictionary of raw config
-        config_path (str): path to the config file
     Returns:
         (dict): dna config params
         (dict): paths used by dna
@@ -90,14 +89,6 @@ def calculate_filepaths(config, config_path):
     paths = {}
     bucket = config["paths"]["bucket"]
 
-    format_dict = {}
-    if config_path.split(os.sep)[-1].endswith("dev.yaml") or config_path.split(
-        os.sep
-    )[-1].endswith("stage.yaml"):
-        format_dict["output_prefix"] = config["paths"].get(
-            "output_prefix", "default"
-        )
-
     for path_type in ("input", "output"):
         dir = config["paths"][path_type]["dir"]
         for key, path in config["paths"][path_type].items():
@@ -105,26 +96,17 @@ def calculate_filepaths(config, config_path):
                 continue
 
             if path.startswith("s3://"):
-                paths[key] = path.format(**format_dict)
+                paths[key] = path
             else:
-                paths[key] = f"s3://{bucket}/{dir}/{path}".format(
-                    **format_dict
-                )
+                paths[key] = f"s3://{bucket}/{dir}/{path}"
 
-    if not config_path.split(os.sep)[-1].endswith("dev.yaml"):
-        paths["mbr_basic_path"] = utils.get_latest_path(
-            paths["mbr_basic_path"]
-        )
+    paths["mbr_basic_path"] = utils.get_latest_path(paths["mbr_basic_path"])
 
     s3_stat_input = config["paths"]["input"]["s3_stat_path"]
-    paths["s3_stat_input"] = f"s3://{bucket}/{s3_stat_input}".format(
-        **format_dict
-    )
+    paths["s3_stat_input"] = f"s3://{bucket}/{s3_stat_input}"
 
     s3_stat_output = config["paths"]["output"]["s3_stat_path"]
-    paths["s3_stat_output"] = f"s3://{bucket}/{s3_stat_output}".format(
-        **format_dict
-    )
+    paths["s3_stat_output"] = f"s3://{bucket}/{s3_stat_output}"
 
     del paths["s3_stat_path"]
 
@@ -137,7 +119,7 @@ def calculate_filepaths(config, config_path):
         archive_path = "{}customer_cube_{}".format(
             archive_path, dt.datetime.now().strftime("%Y-%m-%d")
         )
-        paths["archive_base_path"] = archive_path.format(**format_dict)
+        paths["archive_base_path"] = archive_path
 
     return params, paths
 

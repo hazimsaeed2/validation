@@ -248,6 +248,8 @@ git_branch = os.getenv('GIT_BRANCH')
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
+print(config_data.keys())
+
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
     "v2/pipelined_intermediates", "v2/stage/ref/pipelined_intermediates"
 )
