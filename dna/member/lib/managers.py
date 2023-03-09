@@ -144,7 +144,7 @@ class ConfigManager:
             None
         """
         self.cnf, self.cfg_path = load_config(conf_path_in=conf_path_in)
-        self.params, self.paths = calculate_filepaths(self.cnf, self.cfg_path)
+        self.params, self.paths = calculate_filepaths(self.cnf)
 
 
 class DataManager:
