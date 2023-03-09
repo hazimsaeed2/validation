@@ -168,7 +168,7 @@ with open(config_path_output, "w") as file:
                             export PYTHONPATH=$WORKSPACE:
 
                             source pyspark_venv/bin/activate
-                            python3 _config_cluster_1
+                            python3 _config_cluster_1.py
                             deactivate
                         '''
                         echo "Ran config setup cluster-1 scripts"
@@ -206,7 +206,7 @@ config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
     'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'v2/CATEGORY_DNA', f'v2/stage/{git_branch}CATEGORY_DNA'
+    'v2/CATEGORY_DNA', f'v2/stage/{git_branch}/CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0

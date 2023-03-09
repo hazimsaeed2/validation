@@ -454,9 +454,20 @@ def rescale_cluster(
                 ]
                 ig_ifl_dict = dict(list(zip(ig_ids, ig_names)))
             elif ig_type == "INSTANCE_FLEET":
-                instance_fleets = client_emr.list_instance_fleets(
-                    ClusterId=curr_id
-                )
+                try:
+                    instance_fleets = client_emr.list_instance_fleets(
+                        ClusterId=curr_id
+                    )
+                except Exception as e:
+                    raise Exception(
+                        """
+                        An exception occurred while trying to
+                        invoke modify_instance_fleet API.
+                        Exception: {}
+                        """.format(
+                            e
+                        )
+                    )
                 ifl_names = [
                     ifl["Id"] for ifl in instance_fleets["InstanceFleets"]
                 ]
