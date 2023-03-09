@@ -98,7 +98,7 @@ def load_config():
     args = parser.parse_args()
     cfg_path = args.config_path
     with open(cfg_path, "r") as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+        cfg = yaml.load(ymlfile, Loader=yaml.Loader)
     return cfg
 
 

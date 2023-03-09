@@ -22,7 +22,7 @@ args = parser.parse_args()
 def run_DQ_tests():
 
     with open(args.config) as config_file:
-        config = yaml.load(config_file, Loader=yaml.FullLoader)
+        config = yaml.load(config_file, Loader=yaml.Loader)
 
     out_path = config["data_paths"]["dq"]
 

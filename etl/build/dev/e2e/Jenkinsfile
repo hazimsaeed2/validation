@@ -12,7 +12,7 @@ config_path_input = "pe_memberdna/etl/configs/config.yaml"
 config_path_output = "pe_memberdna/etl/configs/config_dev.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.FullLoader)
+    config_data = yaml.load(file, Loader=yaml.Loader)
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(

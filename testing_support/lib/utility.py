@@ -27,7 +27,7 @@ class DqCheckUnittest(unittest.TestCase):
         Load the unit test config and set s3_stat_path.
         """
         response = get_s3_object(self.conf_path)
-        conf = yaml.load(response, Loader=yaml.FullLoader)
+        conf = yaml.load(response, Loader=yaml.Loader)
 
         self.conf = conf["validation"]
         if self.tmp_stats is not None:
@@ -147,13 +147,13 @@ class DqCheckUnittest(unittest.TestCase):
             self.fail(fail_msg)
 
         response_expected = get_s3_object(self.expected_path)
-        expected = yaml.load(response_expected, Loader=yaml.FullLoader)[
+        expected = yaml.load(response_expected, Loader=yaml.Loader)[
             self.tabletype
         ]["df"][testname]
         response_stat = get_s3_object(self.conf["s3_stat_path"])
-        written = yaml.load(response_stat, Loader=yaml.FullLoader)[
-            self.tabletype
-        ]["df"][testname]
+        written = yaml.load(response_stat, Loader=yaml.Loader)[self.tabletype][
+            "df"
+        ][testname]
 
         self.assertEqual(expected, written, msg=fail_msg)
 

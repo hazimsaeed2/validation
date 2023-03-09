@@ -49,7 +49,7 @@ def prepare_member_dna_data(
     """
 
     with open(unittest_config_path) as config_file:
-        unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
+        unittest_config = yaml.load(config_file, Loader=yaml.Loader)
 
     source_etl_unit.prepare_etl_data(spark_in, unittest_source_etl_config_path)
     source_etl_unit.run_source_etl(simulated_source_etl_config_path)
@@ -94,7 +94,7 @@ def run_member_dna(simulated_config_path):
     """
 
     with open(simulated_config_path) as config_file:
-        config = yaml.load(config_file, Loader=yaml.FullLoader)
+        config = yaml.load(config_file, Loader=yaml.Loader)
 
     sys.argv.extend(["--config", simulated_config_path])
     gen_cpn_and_dig_1.main()
@@ -177,11 +177,10 @@ class TestVectorVsMemberDna(unittest.TestCase):
                 config_file.write(config)
 
         with open(cls.unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
+            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
 
         test_utils.remove_from_s3(
-            unittest_config["root_s3_path"]
-            + "data_out/"
+            unittest_config["root_s3_path"] + "data_out/"
         )
 
         prepare_member_dna_data(
@@ -193,17 +192,14 @@ class TestVectorVsMemberDna(unittest.TestCase):
         run_member_dna(cls.simulated_config_path)
 
         with open(cls.unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
+            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
 
         cls.cube_df = spark.read.parquet(
-            unittest_config["root_s3_path"]
-            + "data_out/customer_cube_full",
+            unittest_config["root_s3_path"] + "data_out/customer_cube_full",
         )
 
         with open(cls.desired_results_path) as config_file:
-            cls.desired_results = yaml.load(
-                config_file, Loader=yaml.FullLoader
-            )
+            cls.desired_results = yaml.load(config_file, Loader=yaml.Loader)
 
     def test_memeber_dna_coupon(self):
         """
@@ -275,17 +271,15 @@ class TestVectorVsMemberDna(unittest.TestCase):
                 os.path.abspath(os.path.dirname(__file__)),
                 "data/dna_columns.txt",
             ),
-            "r"
+            "r",
         )
         expected_columns = expected_columns_input.readlines()
         expected_columns = [
-            column.replace("\n", "")
-            for column in expected_columns
+            column.replace("\n", "") for column in expected_columns
         ]
         current_columns = self.cube_df.columns
 
         self.assertEqual(sorted(expected_columns), sorted(current_columns))
-
 
     @classmethod
     def tearDownClass(cls):
@@ -294,9 +288,11 @@ class TestVectorVsMemberDna(unittest.TestCase):
         """
 
         with open(cls.unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
+            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
 
-        test_utils.remove_from_s3(unittest_config["root_s3_path"] + "data_out/")
+        test_utils.remove_from_s3(
+            unittest_config["root_s3_path"] + "data_out/"
+        )
 
 
 class TestMemberDnaAutoDate(cat_dna_unit.TestAutoDate, unittest.TestCase):
@@ -335,10 +331,10 @@ class TestMemberDnaAutoDate(cat_dna_unit.TestAutoDate, unittest.TestCase):
                 config_file.write(config)
 
         with open(self.simulated_config_path) as config_file:
-            self.config = yaml.load(config_file, Loader=yaml.FullLoader)
+            self.config = yaml.load(config_file, Loader=yaml.Loader)
 
         with open(unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
+            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
 
         for _, paths in unittest_config["additional_files"].items():
             local_path = os.path.join(parent_dir, paths["local_file"])
@@ -351,8 +347,7 @@ class TestMemberDnaAutoDate(cat_dna_unit.TestAutoDate, unittest.TestCase):
                 )
 
         self.job = managers.JobManager(
-            "test_dates",
-            conf_path_in=self.simulated_config_path
+            "test_dates", conf_path_in=self.simulated_config_path
         )
 
     def del_cfg(self, key_in):

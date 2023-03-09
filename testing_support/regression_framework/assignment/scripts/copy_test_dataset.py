@@ -40,7 +40,7 @@ if __name__ == "__main__":
         ),
         "r",
     ) as ymlfile:
-        customizable_backfill = yaml.load(ymlfile, Loader=yaml.FullLoader)
+        customizable_backfill = yaml.load(ymlfile, Loader=yaml.Loader)
 
     with open(
         os.path.join(
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         ),
         "r",
     ) as ymlfile:
-        new_regression_test = yaml.load(ymlfile, Loader=yaml.FullLoader)
+        new_regression_test = yaml.load(ymlfile, Loader=yaml.Loader)
 
     allowed_paths = [
         "REGRESSION_TESTS/assignment/{name}".format(name=test_name)

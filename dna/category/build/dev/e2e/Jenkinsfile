@@ -14,7 +14,7 @@ config_path_output = "pe_memberdna/dna/category/configs/reqs_dev.yaml"
 git_branch = os.getenv('GIT_BRANCH')
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.FullLoader)
+    config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data['detail']['path'] = config_data['detail']['path'].replace(
     'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
@@ -49,7 +49,7 @@ config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf_dev.yaml
 git_branch = os.getenv('GIT_BRANCH')
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.FullLoader)
+    config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
     'v2/pipelined_intermediates', 'v2/dev/ref/pipelined_intermediates'
