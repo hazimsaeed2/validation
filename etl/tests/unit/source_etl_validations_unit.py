@@ -13,7 +13,7 @@ from pe_member_dna.pipelines.lib.iotools import (
     split_path_bucket_key,
 )
 
-import memberdna.source_etl.utils.validations_ETL as validations
+import memberdna.etl.utils.validations_ETL as validations
 from pe_member_dna.testing_support.lib.utility import *
 
 
@@ -23,10 +23,10 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-LOCAL_STATS = "unittests/data/source_etl_validations_unit_stats.yaml"
+LOCAL_STATS = "unittests/data/etl_validations_unit_stats.yaml"
 EXPECTED = (
     "s3://memberanalytics-data-out-prod/STATS/ETL/UNIQUE_ID/"
-    "source_etl_validations_unit_stats.yaml"
+    "etl_validations_unit_stats.yaml"
 )
 S3_CONF_PATH = (
     "s3://memberanalytics-data-out-prod/STATS/ETL/UNIQUE_ID/"

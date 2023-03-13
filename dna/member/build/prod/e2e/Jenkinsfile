@@ -158,7 +158,7 @@ import os
 import yaml
 import datetime
 
-with open('pe_memberdna/source_etl/configs/config.yaml') as config_file:
+with open('pe_memberdna/etl/configs/config.yaml') as config_file:
    config = yaml.load(config_file)
 
 max_date = os.environ['max_date']
@@ -172,11 +172,11 @@ else:
 if os.environ['enable_DQ_checks']=='false':
    config['validation']['table_params']=None
 
-with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
+with open('pe_memberdna/etl/configs/config.yaml','w') as config_file:
    yaml.dump(config, config_file)
 
 """
-                writeFile file: 'pe_memberdna/source_etl/adhoc/config_parameters_source_etl_archiving.py', text: content
+                writeFile file: 'pe_memberdna/etl/adhoc/config_parameters_etl_archiving.py', text: content
                 }
                 sh '''
                 WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
@@ -188,11 +188,11 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                 export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
                 echo $SPARK_OPTIONS
 
-                echo "RUNNING post_source_etl_archiving STARTED"
+                echo "RUNNING post_etl_archiving STARTED"
 
-                python3 ./pe_memberdna/source_etl/adhoc/config_parameters_source_etl_archiving.py
-                make -C ./pe_memberdna/source_etl post_source_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS"
-                echo "RUNNING post_source_etl_archiving FINISHED"
+                python3 ./pe_memberdna/etl/adhoc/config_parameters_etl_archiving.py
+                make -C ./pe_memberdna/etl post_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS"
+                echo "RUNNING post_etl_archiving FINISHED"
                 '''
             }
         }
@@ -265,7 +265,7 @@ import os
 import yaml
 import datetime
 
-with open('pe_memberdna/source_etl/configs/config.yaml') as config_file:
+with open('pe_memberdna/etl/configs/config.yaml') as config_file:
    config = yaml.load(config_file)
 
 max_date = os.environ['max_date']
@@ -279,11 +279,11 @@ else:
 if os.environ['enable_DQ_checks']=='false':
    config['validation']['table_params']=None
 
-with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
+with open('pe_memberdna/etl/configs/config.yaml','w') as config_file:
    yaml.dump(config, config_file)
 
 """
-                writeFile file: 'pe_memberdna/source_etl/adhoc/config_parameters_source_etl_sampling.py', text: content
+                writeFile file: 'pe_memberdna/etl/adhoc/config_parameters_etl_sampling.py', text: content
                 }
                 sh '''
                 WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
@@ -294,11 +294,11 @@ with open('pe_memberdna/source_etl/configs/config.yaml','w') as config_file:
                 source pyspark_venv/bin/activate
                 export SPARK_OPTIONS=${SPARK_OPTIONS}" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
                 echo $SPARK_OPTIONS
-                echo "RUNNING post_source_etl_archiving STARTED"
+                echo "RUNNING post_etl_archiving STARTED"
 
-                python3 ./pe_memberdna/source_etl/adhoc/config_parameters_source_etl_sampling.py
-                make -C ./pe_memberdna/source_etl post_source_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS"
-                echo "RUNNING post_source_etl_sampling FINISHED"
+                python3 ./pe_memberdna/etl/adhoc/config_parameters_etl_sampling.py
+                make -C ./pe_memberdna/etl post_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS"
+                echo "RUNNING post_etl_sampling FINISHED"
 
                 '''
             }

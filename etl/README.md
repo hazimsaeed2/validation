@@ -10,7 +10,7 @@ TBD
 
 To run all ETL jobs for the prod environment, you should execute the following:
 ```bash
-make -C etl source_etl_complete_prod
+make -C etl etl_complete_prod
 ```
 
 ### Staging
@@ -20,7 +20,7 @@ file for `output_prefix`
 
 To run all ETL jobs for the stage environment, you should execute the following:
 ```bash
-make -C etl source_etl_complete_stage
+make -C etl etl_complete_stage
 ```
 
 ### Dev
@@ -30,7 +30,7 @@ file for `output_prefix`
 
 To run all ETL jobs for the dev environment, you should execute the following:
 ```bash
-make -C etl source_etl_complete_dev
+make -C etl etl_complete_dev
 ```
 
 ## Tests

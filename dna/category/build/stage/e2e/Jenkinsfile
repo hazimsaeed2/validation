@@ -32,6 +32,7 @@ pipeline {
             steps {
                 script {
                     sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/v2/stage/ref/AD_HOC/pipelined_intermediates
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards_fiscal
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/bcg_maps
@@ -306,21 +307,7 @@ for yaml_path in [
    with open(yaml_path) as config_file:
       config = yaml.load(config_file)
 
-   end_date = os.environ['end']
-
-   if end_date == 'automatic':
-      print('end_date and start_date calculated automatically')
-   else:
-      datetime_object = datetime.datetime.strptime(end_date, '%Y-%m-%d')
-      start_date = '{:%Y-%m-%d}'.format(
-         datetime_object - datetime.timedelta(365+1)
-      )
-
-      print('setting start_date to ' + start_date)
-      print('setting end_date to ' + end_date)
-
-      config['end'] = end_date
-      config['start'] = start_date
+   print('end_date and start_date calculated automatically')
 
    with open(yaml_path,'w') as config_file:
       yaml.dump(config, config_file)
@@ -338,7 +325,7 @@ for yaml_path in [
                             source pyspark_venv/bin/activate
                             python3 _config_cluster_1.py
                             cd pe_memberdna/dna/category
-                            spark-submit ${SPARK_OPTIONS} --num-executors=56 --conf spark.executor.cores=5 --conf spark.driver.cores=5 --conf spark.executor.memory=37g --conf spark.executor.memoryOverhead=5g --conf spark.driver.memoryOverhead=5g --conf spark.driver.memory=37g --conf spark.driver.extraJavaOptions=-XX:+UseG1GC --conf spark.executor.extraJavaOptions=-XX:+UseG1GC --conf spark.dynamicAllocation.enabled=false --conf spark.sql.adaptive.enabled=true --conf spark.serializer=org.apache.spark.serializer.KryoSerializer category_square/run.py --prod-mode --full-mode --config_path ./configs/square_AH4.yaml --reqs_path ./config/req_stage.yaml > AH4_full_prod.log 2>&1
+                            spark-submit ${SPARK_OPTIONS} --num-executors=56 --conf spark.executor.cores=5 --conf spark.driver.cores=5 --conf spark.executor.memory=37g --conf spark.executor.memoryOverhead=5g --conf spark.driver.memoryOverhead=5g --conf spark.driver.memory=37g --conf spark.driver.extraJavaOptions=-XX:+UseG1GC --conf spark.executor.extraJavaOptions=-XX:+UseG1GC --conf spark.dynamicAllocation.enabled=false --conf spark.sql.adaptive.enabled=true --conf spark.serializer=org.apache.spark.serializer.KryoSerializer scripts/run.py --full-mode --config_path ./configs/square_AH4.yaml --reqs_path ./configs/reqs_stage.yaml
                         '''
                         echo "Ran step-1 cluster-1 script"
                     }
@@ -363,21 +350,7 @@ for yaml_path in [
    with open(yaml_path) as config_file:
       config = yaml.load(config_file)
 
-   end_date = os.environ['end']
-
-   if end_date == 'automatic':
-      print('end_date and start_date calculated automatically')
-   else:
-      datetime_object = datetime.datetime.strptime(end_date, '%Y-%m-%d')
-      start_date = '{:%Y-%m-%d}'.format(
-         datetime_object - datetime.timedelta(365+1)
-      )
-
-      print('setting start_date to ' + start_date)
-      print('setting end_date to ' + end_date)
-
-      config['end'] = end_date
-      config['start'] = start_date
+   print('end_date and start_date calculated automatically')
 
    with open(yaml_path,'w') as config_file:
       yaml.dump(config, config_file)
@@ -393,9 +366,9 @@ for yaml_path in [
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
                             source pyspark_venv/bin/activate
-                            python3 _config_cluster_1.py
+                            python3 _config_cluster_3.py
                             cd pe_memberdna/dna/category
-                            spark-submit ${SPARK_OPTIONS} --num-executors=56 --conf spark.executor.cores=5 --conf spark.driver.cores=5 --conf spark.executor.memory=37g --conf spark.executor.memoryOverhead=5g --conf spark.driver.memoryOverhead=5g --conf spark.driver.memory=37g --conf spark.driver.extraJavaOptions=-XX:+UseG1GC --conf spark.executor.extraJavaOptions=-XX:+UseG1GC --conf spark.dynamicAllocation.enabled=false --conf spark.sql.adaptive.enabled=true --conf spark.serializer=org.apache.spark.serializer.KryoSerializer category_square/run.py --prod-mode --full-mode --config_path configs/square_AH5.yaml --reqs_path ./config/req_stage.yaml > AH5_full_prod.log 2>&1
+                            spark-submit ${SPARK_OPTIONS} --num-executors=56 --conf spark.executor.cores=5 --conf spark.driver.cores=5 --conf spark.executor.memory=37g --conf spark.executor.memoryOverhead=5g --conf spark.driver.memoryOverhead=5g --conf spark.driver.memory=37g --conf spark.driver.extraJavaOptions=-XX:+UseG1GC --conf spark.executor.extraJavaOptions=-XX:+UseG1GC --conf spark.dynamicAllocation.enabled=false --conf spark.sql.adaptive.enabled=true --conf spark.serializer=org.apache.spark.serializer.KryoSerializer scripts/run.py --full-mode --config_path configs/square_AH5.yaml --reqs_path ./configs/reqs_stage.yaml
                         '''
                         echo "Ran step-1 cluster-3 script"
                     }
@@ -416,7 +389,7 @@ for yaml_path in [
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna/category
-                            spark-submit ${SPARK_OPTIONS} --executor-memory=14g --executor-cores=4 category_square/run.py --prod-mode --full-mode --config_path configs/square_article.yaml --reqs_path ./config/req_stage.yaml > article_full_prod.log 2>&1
+                            spark-submit ${SPARK_OPTIONS} --executor-memory=14g --executor-cores=4 scripts/run.py --full-mode --config_path configs/square_article.yaml --reqs_path ./configs/reqs_stage.yaml
                         '''
                         echo "Ran step-3 cluster-1 script"
                     }

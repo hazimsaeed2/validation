@@ -43,6 +43,7 @@ pipeline {
             steps {
                 script {
                     sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/v2/stage/ref/AD_HOC/pipelined_intermediates
                         aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards_fiscal
@@ -137,7 +138,7 @@ config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].repl
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/stage/{git_branch}/STATS"
+    "v2/STATS", f"v2/stage/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -145,11 +146,11 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", "v2/stage/{git_branch}/CUBES"
+    "v2/CUBES", f"v2/stage/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/stage/{git_branch}/STATS"
+    "v2/STATS", f"v2/stage/{git_branch}/STATS"
 )
 
 config_data['paths']['recency_lookback_duration']['global'] = 0
@@ -195,7 +196,7 @@ config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].repl
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/stage/{git_branch}/STATS"
+    "v2/STATS", f"v2/stage/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -203,11 +204,11 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", "v2/stage/{git_branch}/CUBES"
+    "v2/CUBES", f"v2/stage/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/stage/{git_branch}/STATS"
+    "v2/STATS", f"v2/stage/{git_branch}/STATS"
 )
 
 config_data['paths']['recency_lookback_duration']['global'] = 0
@@ -248,14 +249,12 @@ git_branch = os.getenv('GIT_BRANCH')
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
-print(config_data.keys())
-
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
     "v2/pipelined_intermediates", "v2/stage/ref/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/stage/{git_branch}/STATS"
+    "v2/STATS", f"v2/stage/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -263,11 +262,11 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", "v2/stage/{git_branch}/CUBES"
+    "v2/CUBES", f"v2/stage/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", "v2/stage/{git_branch}/STATS"
+    "v2/STATS", f"v2/stage/{git_branch}/STATS"
 )
 
 config_data['paths']['recency_lookback_duration']['global'] = 0
@@ -359,50 +358,40 @@ with open(config_path_output, "w") as file:
                         steps {
                             script {
                             def content = """
-
 import os
 import yaml
 import datetime
 
 with open('pe_memberdna/etl/configs/config.yaml') as config_file:
-   config = yaml.load(config_file)
+   config_data = yaml.load(config_file)
 
-max_date = os.environ['max_date']
-if max_date == 'automatic':
-   print('max_date calculated automatically')
-else:
-   datetime_object = datetime.datetime.strptime(max_date, '%Y-%m-%d')
-   print('setting max_date to ' + str(datetime_object))
-   config['club_square_config']['max_date'] = max_date
-
-if os.environ['enable_DQ_checks']=='false':
-   config['validation']['table_params']=None
+git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage/ref"
     )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -411,8 +400,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
         config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
 
 with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
-   yaml.dump(config, config_file)
-
+   yaml.dump(config_data, config_file)
 """
                 writeFile file: '_config_etl.py', text: content
                 }
@@ -425,11 +413,11 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                 source pyspark_venv/bin/activate
                 export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
 
-                echo "RUNNING post_source_etl_archiving STARTED"
+                echo "RUNNING post_etl_archiving STARTED"
 
                 python3 _config_etl.py
-                make -C ./pe_memberdna/etl post_source_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
-                echo "RUNNING post_source_etl_archiving FINISHED"
+                make -C ./pe_memberdna/etl post_etl_archiving SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
+                echo "RUNNING post_etl_archiving FINISHED"
                 '''
             }
         }
@@ -497,50 +485,40 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                         steps {
                             script {
                             def content = """
-
 import os
 import yaml
 import datetime
 
 with open('pe_memberdna/etl/configs/config.yaml') as config_file:
-   config = yaml.load(config_file)
+   config_data = yaml.load(config_file)
 
-max_date = os.environ['max_date']
-if max_date == 'automatic':
-   print('max_date calculated automatically')
-else:
-   datetime_object = datetime.datetime.strptime(max_date, '%Y-%m-%d')
-   print('setting max_date to ' + str(datetime_object))
-   config['club_square_config']['max_date'] = max_date
-
-if os.environ['enable_DQ_checks']=='false':
-   config['validation']['table_params']=None
+git_branch = os.getenv('GIT_BRANCH')
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage"
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage/ref"
     )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/v2/stage"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -549,8 +527,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
         config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
 
 with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
-   yaml.dump(config, config_file)
-
+   yaml.dump(config_data, config_file)
 """
                 writeFile file: '_config_etl.py', text: content
                 }
@@ -562,11 +539,11 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                 export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                 source pyspark_venv/bin/activate
                 export SPARK_OPTIONS=${SPARK_OPTIONS}" --conf spark.sql.broadcastTimeout=-1 --conf spark.sql.shuffle.partitions=800"
-                echo "RUNNING post_source_etl_archiving STARTED"
+                echo "RUNNING post_etl_archiving STARTED"
 
                 python3 _config_etl.py
-                make -C ./pe_memberdna/source_etl post_source_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
-                echo "RUNNING post_source_etl_sampling FINISHED"
+                make -C ./pe_memberdna/etl post_etl_sampling SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config_stage.yaml"
+                echo "RUNNING post_etl_sampling FINISHED"
 
                 '''
             }
@@ -582,7 +559,7 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                             export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
 
-                            cd pe_memberdna/dna
+                            cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-3 cluster-3 script"

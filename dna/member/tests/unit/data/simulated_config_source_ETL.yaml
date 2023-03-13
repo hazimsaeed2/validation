@@ -1,4 +1,4 @@
-# The structure of this file should match the source_etl config file
+# The structure of this file should match the etl config file
 # only the paths and bucket names should be different
 data_paths:
   source:

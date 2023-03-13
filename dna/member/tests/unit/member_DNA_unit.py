@@ -23,15 +23,15 @@ import memberdna.dna.scripts.generate_misc as gen_misc
 import memberdna.dna.scripts.integrate_acquisition as integrate_acquisition
 import memberdna.dna.scripts.merge as gen_merge
 import memberdna.category_square.unittests.category_DNA_unit as cat_dna_unit
-import memberdna.source_etl.unittests.source_etl_unit as source_etl_unit
+import memberdna.etl.unittests.etl_unit as etl_unit
 import memberdna.testing_support.lib.utility as test_utils
 
 
 def prepare_member_dna_data(
     spark_in,
     unittest_config_path,
-    unittest_source_etl_config_path,
-    simulated_source_etl_config_path,
+    unittest_etl_config_path,
+    simulated_etl_config_path,
 ):
     """
     Copy the supporting text files from local directory to
@@ -41,9 +41,9 @@ def prepare_member_dna_data(
     Parameters:
         spark_in (SparkSession)- spark session object
         unittest_config_path (str) - config file used by the test to setup dna
-        unittest_source_etl_config_path (str) - config file used by the test to
+        unittest_etl_config_path (str) - config file used by the test to
             setup source etl
-        simulated_source_etl_config_path (str) - source etl test config
+        simulated_etl_config_path (str) - source etl test config
     Returns:
         None
     """
@@ -51,8 +51,8 @@ def prepare_member_dna_data(
     with open(unittest_config_path) as config_file:
         unittest_config = yaml.load(config_file, Loader=yaml.Loader)
 
-    source_etl_unit.prepare_etl_data(spark_in, unittest_source_etl_config_path)
-    source_etl_unit.run_source_etl(simulated_source_etl_config_path)
+    etl_unit.prepare_etl_data(spark_in, unittest_etl_config_path)
+    etl_unit.run_etl(simulated_etl_config_path)
 
     for _, paths in unittest_config["additional_files"].items():
         if paths["csv"].startswith(unittest_config["root_s3_path"]):
@@ -124,7 +124,7 @@ class TestVectorVsMemberDna(unittest.TestCase):
         member 100003 - used 1 vector coupons
         member 100004 - used 1 vector + 1 regural coupon
 
-    The text files in the source_ETL folder are artificial but follow 100%
+    The text files in the etl folder are artificial but follow 100%
     the same logic as the real input source files
     """
 
@@ -142,9 +142,9 @@ class TestVectorVsMemberDna(unittest.TestCase):
             "data/simulated_config.yaml.{}".format(unique_id),
         )
 
-        cls.simulated_source_etl_config_path = os.path.join(
+        cls.simulated_etl_config_path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
-            "data/simulated_config_source_ETL.yaml.{}".format(unique_id),
+            "data/simulated_config_etl.yaml.{}".format(unique_id),
         )
 
         cls.unittest_config_path = os.path.join(
@@ -152,9 +152,9 @@ class TestVectorVsMemberDna(unittest.TestCase):
             "data/unittest_config.yaml.{}".format(unique_id),
         )
 
-        cls.unittest_source_etl_config_path = os.path.join(
+        cls.unittest_etl_config_path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
-            "data/unittest_config_source_ETL.yaml.{}".format(unique_id),
+            "data/unittest_config_etl.yaml.{}".format(unique_id),
         )
 
         cls.desired_results_path = os.path.join(
@@ -164,9 +164,9 @@ class TestVectorVsMemberDna(unittest.TestCase):
 
         templates = [
             cls.simulated_config_path,
-            cls.simulated_source_etl_config_path,
+            cls.simulated_etl_config_path,
             cls.unittest_config_path,
-            cls.unittest_source_etl_config_path,
+            cls.unittest_etl_config_path,
         ]
         for template in templates:
             original = template.replace(".{}".format(unique_id), "")
@@ -186,8 +186,8 @@ class TestVectorVsMemberDna(unittest.TestCase):
         prepare_member_dna_data(
             spark,
             cls.unittest_config_path,
-            cls.unittest_source_etl_config_path,
-            cls.simulated_source_etl_config_path,
+            cls.unittest_etl_config_path,
+            cls.simulated_etl_config_path,
         )
         run_member_dna(cls.simulated_config_path)
 

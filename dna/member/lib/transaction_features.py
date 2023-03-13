@@ -1381,7 +1381,7 @@ def __preprocess_payment(payment):
     """
     Aggregate payment file by tender type
     Parameters:
-        payment (pyspark.sql.DataFrame): source_etl payment
+        payment (pyspark.sql.DataFrame): etl payment
 
     Returns:
         (pyspark.sql.DataFrame): spend by tender type
@@ -1869,7 +1869,7 @@ def __trip_days(df):
     the client.
 
     Parameters:
-        df (pyspark.sql.DataFrame): detail_isnr from source_etl
+        df (pyspark.sql.DataFrame): detail_isnr from etl
     Returns:
         (pyspark.sql.DataFrame): filtered detail_isnr
     """
@@ -1884,7 +1884,7 @@ def __intervals(df):
     """
     Calculate the intervals between purchase dates for each member
     Parameters:
-        df (pyspark.sql.DataFrame): filtered detail_isnr from source_etl
+        df (pyspark.sql.DataFrame): filtered detail_isnr from etl
     Returns:
         (pyspark.sql.DataFrame): dataframe with purchase intervals
     """

@@ -17,7 +17,7 @@ from pe_memberdna.testing_support.lib.utility import (
 
 def prepare_etl_data(spark_in, unittest_config_path):
     """
-    Copy the local text files from test_data/source_ETL/
+    Copy the local text files from test_data/ETL/
     to an S3 folder that simulates the memberdna-data-in
     bucket.
 
@@ -51,9 +51,9 @@ def prepare_etl_data(spark_in, unittest_config_path):
     )
 
 
-def run_source_etl(simulated_config_path):
+def run_etl(simulated_config_path):
     """
-    Execute the source ETL, check the functionality of source_etl/run.py
+    Execute the source ETL, check the functionality of etl/run.py
     """
 
     class ArgsClass(object):
@@ -109,11 +109,11 @@ class TestIfSourceEtlRuns(unittest.TestCase):
         prepare_etl_data(spark, cls.unittest_config_path)
 
     # This test is failing because of PYTHONPATH conflict.
-    def test_source_etl_pass(self):
+    def test_etl_pass(self):
         """
         Run the source ETL on the test data
         """
-        run_source_etl(self.simulated_config_path)
+        run_etl(self.simulated_config_path)
 
     @classmethod
     def tearDownClass(cls):

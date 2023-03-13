@@ -1086,7 +1086,7 @@ def main(job, data_paths, club_square_config, config_validation):
         job.spark: SPARK object
         data_paths: dictionary structure carrying the source and intermediate
             paths
-        club_square_config: dictionary structure used to get the source_etl
+        club_square_config: dictionary structure used to get the etl
             max_date
         config_validation: dictionary structure that stores configuration
             associated with data quality checks

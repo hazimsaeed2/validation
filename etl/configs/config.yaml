@@ -56,7 +56,7 @@ data_paths:
     awards_fiscal: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/awards_fiscal'
     quotient_id: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/quotient_id'
 
-  dq: 's3://memberanalytics-data-out-prod/v2/STATS/ETL/source_ETL_check_results.csv'
+  dq: 's3://memberanalytics-data-out-prod/v2/STATS/ETL/ETL_check_results.csv'
 
   sampled:
     header_fiscal: 's3://memberanalytics-data-out-prod/v2/dev/pipelined_intermediates/sampled/transaction_fiscal/header'
