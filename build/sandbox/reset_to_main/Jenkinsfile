@@ -20,8 +20,9 @@ pipeline {
                 sh '''
                     git reset --hard origin/main
                     git config --global user.name "****"
-                    git config --global user.email ****
-                    git push origin --delete sandbox
+                    git config --global user.email "****@bjs.com"
+                    git checkout -b sandbox
+                    git push --force --set-upstream origin sandbox
                 '''
             }
         }
