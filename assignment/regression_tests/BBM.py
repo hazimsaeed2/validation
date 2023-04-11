@@ -1,7 +1,7 @@
 from pyspark.sql.functions import col, lit, when
 from pyspark.sql.types import StringType, StructField, StructType
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class BBM(regression.RegressionTest):

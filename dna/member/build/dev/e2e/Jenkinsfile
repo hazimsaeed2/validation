@@ -36,10 +36,10 @@ config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"][
     "v2/STATS", f"v2/dev/{git_branch}/STATS"
 )
 
-config_data['paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['paths']['recency_lookback_duration']:
-    for k in config_data['paths']['recency_lookback_duration']['local'].keys():
-        config_data['paths']['recency_lookback_duration']['local'][k] = 0
+config_data['params']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['params']['recency_lookback_duration']:
+    for k in config_data['params']['recency_lookback_duration']['local'].keys():
+        config_data['params']['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)

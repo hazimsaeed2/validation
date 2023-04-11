@@ -14,7 +14,7 @@ pipeline {
                     pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
                     venv-pack -o pyspark_venv.tar.gz
 
-                    aws s3 cp pyspark_venv.tar.gz s3://memberanalytics-data-out-prod/v2/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz
+                    aws s3 cp pyspark_venv.tar.gz s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${GIT_BRANCH}/venv/pyspark_venv.tar.gz
                 '''
             }
         }

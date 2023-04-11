@@ -17,7 +17,7 @@ from pe_member_dna.pipelines.assignment.lib.input_checks.cells_check import (
     check_cells_csv,
 )
 from pe_member_dna.pipelines.assignment.lib.input_checks.checker import Check
-import memberdna.pipelines.assignment.lib.input_checks.exceptions as excp
+import pe_memberdna.pipelines.assignment.lib.input_checks.exceptions as excp
 
 from pe_member_dna.pipelines.assignment.lib.input_checks.json_check import (
     check_jsons,
@@ -29,8 +29,8 @@ from pe_member_dna.pipelines.assignment.lib.input_checks.json_check import (
 from pe_member_dna.pipelines.assignment.lib.input_checks.path_check import (
     check_paths,
 )
-import memberdna.pipelines.assignment.lib.validators as validators
-import memberdna.pipelines.assignment.lib.input_checks.longitudinal_design_check as ldc
+import pe_memberdna.pipelines.assignment.lib.validators as validators
+import pe_memberdna.pipelines.assignment.lib.input_checks.longitudinal_design_check as ldc
 
 
 class CampaignCheckTestCase(unittest.TestCase):

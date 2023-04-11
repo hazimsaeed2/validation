@@ -4,7 +4,7 @@ pipeline {
         stage('Code promotion') {
             steps {
                 sh '''
-                    aws s3 sync --delete pe_memberdna s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna/
+                    aws s3 sync --delete pe_memberdna s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna/
                 '''
             }
         }

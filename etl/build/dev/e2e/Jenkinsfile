@@ -42,28 +42,28 @@ git_branch = os.getenv('GIT_BRANCH')
 for k in config_data["data_paths"]["intermediate"].keys():
     if k == "AH5":
         config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/ref"
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/ref"
         )
     else:
         config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
         )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/v2/dev/{git_branch}"
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0

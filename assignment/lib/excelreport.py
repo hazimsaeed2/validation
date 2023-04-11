@@ -7,8 +7,8 @@ import sys
 import boto3
 import pandas as pd
 
-import memberdna.lib.xlsx_helper as xlh
-import memberdna.pipelines.assignment.lib.qc as qc
+import pe_memberdna.lib.xlsx_helper as xlh
+import pe_memberdna.pipelines.assignment.lib.qc as qc
 from pe_member_dna.pipelines.lib.iotools import split_path_bucket_key
 
 # This is required because xmlrunner relys on sys.stdout having the attribule

@@ -2,7 +2,7 @@ import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 
 from pe_member_dna.pipelines.assignment.lib.assn_utils import CONSTRUCT_COLUMN
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class CouponSorting(regression.RegressionTest):

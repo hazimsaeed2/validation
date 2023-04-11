@@ -1,0 +1,127 @@
+pipeline {
+    agent { node env.Node }
+    stages {
+        stage('Prepare environment') {
+            steps {
+                script {
+                    def content = """
+import os
+import yaml
+
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config_dev.yaml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.Loader)
+
+for k in config_data["data_paths"]["source"].keys():
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/dev"
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "_%(curr_date)s", ""
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "_%(curr_date)", ""
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "_*20{16,17,18,19,20,21,22,23}*", ""
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "BJs_CRM_*", "BJs_CRM.csv"
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "bjs_loyaltynumbers_usercodes_*csv", "bjs_loyaltynumbers_usercodes.csv"
+    )
+    config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
+        "PE_Member_Award_Certificate_*.csv", "PE_Member_Award_Certificate.csv"
+    )
+
+git_branch = os.getenv('GIT_BRANCH')
+
+for k in config_data["data_paths"]["intermediate"].keys():
+    if k == "AH5":
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/ref"
+        )
+    else:
+        config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+            "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
+        )
+
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
+    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/dev/{git_branch}"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+for i in range(1, 10):
+    config_data["validation"]["table_params"]["intermediate"][f"control_file_table_0{i}"]["TestControlTable"]["toleranceRows"] = 99999
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                    """
+                writeFile file: '_config_step.py', text: content
+                }
+                sh '''
+                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+
+                    python3 -m venv pyspark_venv
+                    source pyspark_venv/bin/activate
+                    pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
+                    python3 -m ensurepip --upgrade
+                    pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
+                    venv-pack -o pyspark_venv.tar.gz
+                    export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
+                    python3 _config_step.py
+                    cd pe_memberdna
+                    python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_dev.yml
+					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_dev.yml
+					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH5_dev.yml
+
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_dev.yml --future
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_dev.yml --rmse
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_dev.yml --future
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_dev.yml --rmse
+
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4_dev.yml
+
+                    spark-submit ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/QC/top_cat.py --config=conf/config_AH4_dev.yml
+
+                    deactivate
+                '''
+                echo "Ran step-1 cluster-1 scripts"
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

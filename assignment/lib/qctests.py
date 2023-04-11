@@ -11,8 +11,8 @@ from pyspark.sql.functions import max as fmax
 from pyspark.sql.functions import min as fmin
 from pyspark.sql.functions import when
 
-import memberdna.pipelines.assignment.lib.qc as qc
-import memberdna.pipelines.lib.iotools as iotools
+import pe_memberdna.pipelines.assignment.lib.qc as qc
+import pe_memberdna.pipelines.lib.iotools as iotools
 from pe_member_dna.pipelines.assignment.lib.campaign import Campaign
 from pe_member_dna.pipelines.lib.spark_util import get_logger
 

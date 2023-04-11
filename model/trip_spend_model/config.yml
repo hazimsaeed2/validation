@@ -1,0 +1,80 @@
+shared:
+      bucket: 'memberanalytics-data-out-prod'
+      read_only_bucket: 'memberanalytics-data-in-prod'
+      feature_path: 'v2/propensity_model_for_trips/input_files/features_spend_all_numeric_features.csv'
+      cube_path: 'v2/CUBES/customer_cube_2019-12-02/customer_cube'
+      etl_path: 'etl'
+      split_rate: 0.8
+      sample_rate: 0.2
+      base_path: 'v2/MODELDATA'
+      ad_hoc_output_path: 'v2/AD_HOC'
+      model_path: 'v2/MODELS/TRIP_SPEND_MODELS'
+      dataset_path: 'v2/DATASETS/TRIP_SPEND_MODELS'
+      prediction_path: 'v2/PREDICTIONS/TRIP_SPEND_MODELS'
+      high_frequency_visit_threshold: 12
+      low_frequency_visit_threshold: 0
+      run_name: 'dev_12_19'
+etl:
+      start_date: '2018-11-02'
+      end_date: '2019-12-26'
+      bbm_week_window: 3
+      start_week_windows:
+            - 1
+            - 4
+            - 6
+      lookup_path: 'v2/pipelined_intermediates/lookup/fiscal_days'
+      BBM_weeks_path: 'v2/propensity_model_for_trips/input_files/mailer_cm_map.csv'
+      weeks_to_sample: 2
+      outlier_column: 'FW_SPEND_IN_STORE'
+      bbm: FALSE
+spend:
+      number_of_trees: 1000
+      max_depth: 15
+      max_features: 0.5
+      min_sample_leaf: 1000
+      start_window: 1
+      end_window: 3
+      model: 'rf'
+      metrics:
+            - 'median_absolute_error'
+            - 'mean_squared_error'
+            - 'r2_score'
+trip:
+      number_of_trees: 1000
+      start_window: 6
+      end_window: 8
+      model: 'rf'
+      max_depth: 15
+      max_features: 0.5
+      min_sample_leaf: 1000
+      metrics:
+            - 'roc_auc_score'
+            - 'accuracy_score'
+            - 'precision_score'
+            - 'recall_score'
+grid_search:
+      number_of_trees:
+            - 100
+            - 500
+            - 1000
+      max_depths:
+            - 10
+            - 20
+            - 30
+            - 'none'
+      max_features:
+            - 0.2
+            - 0.8
+            - 1.0
+            - 'auto'
+      min_leaf_size:
+            - 100
+            - 1000
+            - 5000
+      model: 'bin'
+      output_path: 'v2/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
+predict:
+      weeks_to_predict:
+            - '2019-11-30'
+      trip_model_date: '20191202'
+      spend_model_date: '20191202'

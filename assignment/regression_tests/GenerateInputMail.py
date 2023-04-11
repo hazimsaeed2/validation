@@ -1,7 +1,7 @@
 import pyspark.sql.functions as sqlf
 
-import memberdna.pipelines.assignment.lib.assn_utils as assn_utils
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.pipelines.assignment.lib.assn_utils as assn_utils
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class GenerateInputMail(regression.RegressionTest):
@@ -24,28 +24,28 @@ class GenerateInputMail(regression.RegressionTest):
         regression.RegressionTest.run_test_scripts_and_prepare_data(self)
 
         bbm_scored = self.spark.read.csv(
-            self.config.paths["BBM_SCORED"],
-            header=True,
-            inferSchema=True
+            self.config.paths["BBM_SCORED"], header=True, inferSchema=True
         )
 
-        muhh = self.spark.read.csv(
-            self.config.paths["MUHH"],
-            header=True,
-            inferSchema=True
-        ).select("MEMBERSHIP_ID").withColumnRenamed(
-            "MEMBERSHIP_ID",
-            "mbrshp_nbr"
+        muhh = (
+            self.spark.read.csv(
+                self.config.paths["MUHH"], header=True, inferSchema=True
+            )
+            .select("MEMBERSHIP_ID")
+            .withColumnRenamed("MEMBERSHIP_ID", "mbrshp_nbr")
         )
 
-        input_sid = muhh.join(
-            bbm_scored.select(["mbrshp_nbr", "mbrshp_sid", "decile", "score"]),
-            ["mbrshp_nbr"],
-            "left"
-        ).withColumnRenamed(
-            "mbrshp_nbr",
-            "MBRSHP_NBR"
-        ).withColumn("FHH_IND", sqlf.lit("N"))
+        input_sid = (
+            muhh.join(
+                bbm_scored.select(
+                    ["mbrshp_nbr", "mbrshp_sid", "decile", "score"]
+                ),
+                ["mbrshp_nbr"],
+                "left",
+            )
+            .withColumnRenamed("mbrshp_nbr", "MBRSHP_NBR")
+            .withColumn("FHH_IND", sqlf.lit("N"))
+        )
 
         input_mail = self.spark.read.csv(
             self.config.paths["MAIL_LIST"],
@@ -58,7 +58,7 @@ class GenerateInputMail(regression.RegressionTest):
             "decile",
             "score",
             "FHH_IND",
-            "mbrshp_sid"
+            "mbrshp_sid",
         }
 
         self.assertTrue(
@@ -67,54 +67,60 @@ class GenerateInputMail(regression.RegressionTest):
         )
 
         self.assertEqual(
-            input_mail.filter(input_mail["decile"] != "10").join(
+            input_mail.filter(input_mail["decile"] != "10")
+            .join(
                 input_sid.filter(input_sid["decile"] != "10"),
                 "mbrshp_nbr",
-                "left"
-            ).count(),
-            input_sid.filter(input_sid["decile"] != "10").count()
+                "left",
+            )
+            .count(),
+            input_sid.filter(input_sid["decile"] != "10").count(),
         )
         self.assertEqual(
             input_mail.filter(input_mail["decile"] != "10").count(), 37
         )
 
         self.assertEqual(
-            input_mail.filter(input_mail["decile"] == "10").join(
+            input_mail.filter(input_mail["decile"] == "10")
+            .join(
                 input_sid.filter(input_sid["decile"] == "10"),
                 "mbrshp_nbr",
-                "left"
-            ).count(),
-            input_sid.filter(input_sid["decile"] == "10").count()
+                "left",
+            )
+            .count(),
+            input_sid.filter(input_sid["decile"] == "10").count(),
         )
         self.assertEqual(
             input_mail.filter(input_mail["decile"] == "10").count(), 3
         )
 
-        assignment = self.spark.read.parquet(
-            self.config.paths["INPUT_CONSTRUCTS"]
-        ).withColumn(
-            "slot_nbr",
-            sqlf.regexp_extract(
-                sqlf.col("construct"), assn_utils.CONSTRUCT_COLUMN, 2
+        assignment = (
+            self.spark.read.parquet(self.config.paths["INPUT_CONSTRUCTS"])
+            .withColumn(
+                "slot_nbr",
+                sqlf.regexp_extract(
+                    sqlf.col("construct"), assn_utils.CONSTRUCT_COLUMN, 2
+                ),
             )
-        ).withColumn(
-            "construct",
-            sqlf.regexp_extract(
-                sqlf.col("construct"), assn_utils.CONSTRUCT_COLUMN, 1
+            .withColumn(
+                "construct",
+                sqlf.regexp_extract(
+                    sqlf.col("construct"), assn_utils.CONSTRUCT_COLUMN, 1
+                ),
             )
         )
 
         # test - each member has the exact slots
         slots_per_member = assignment.groupBy("MBRSHP_SID", "construct").agg(
             sqlf.countDistinct("slot_nbr").alias("unique_slots"),
-            sqlf.count("slot_nbr").alias("total_slots")
+            sqlf.count("slot_nbr").alias("total_slots"),
         )
         self.assertEquals(
             slots_per_member.filter(
                 (slots_per_member["unique_slots"] == self.TOTAL_SLOTS)
                 & (slots_per_member["total_slots"] == self.TOTAL_SLOTS)
             ).count(),
-            self.TOTAL_CONSTRUCTS * self.TOTAL_MEMBERS
+            self.TOTAL_CONSTRUCTS * self.TOTAL_MEMBERS,
         )
 
         # test unique coupons
@@ -125,7 +131,7 @@ class GenerateInputMail(regression.RegressionTest):
             unique_coupons.filter(
                 unique_coupons["unique_cpns"] == self.TOTAL_SLOTS
             ).count(),
-            self.TOTAL_CONSTRUCTS * self.TOTAL_MEMBERS
+            self.TOTAL_CONSTRUCTS * self.TOTAL_MEMBERS,
         )
 
     def execute_assignment_scripts(self):

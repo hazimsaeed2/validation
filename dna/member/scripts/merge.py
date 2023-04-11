@@ -3,6 +3,7 @@ The script which merges all the intermediate files and writes the updated cube
 """
 import pe_memberdna.dna.member.lib.generate_population as gp
 import pe_memberdna.dna.member.lib.managers as managers
+from pe_memberdna.dna.member.lib.s3 import member_dna_input_data_validator
 
 
 def merge(job):
@@ -34,7 +35,9 @@ def merge(job):
             "MBRSHP_SID", "FISCAL_WEEK_END"
         )
         dna = dna.join(
-            features, ["MBRSHP_SID", "FISCAL_WEEK_END"], "left_outer",
+            features,
+            ["MBRSHP_SID", "FISCAL_WEEK_END"],
+            "left_outer",
         )
 
     return dna
@@ -42,7 +45,26 @@ def merge(job):
 
 def main():
     job = managers.JobManager("merge")
-
+    recency_lookback_duration = job.config.params["params"].get(
+        "recency_lookback_duration", {}
+    )
+    member_dna_input_data_validator(
+        job,
+        recency_lookback_duration,
+        [
+            "skeleton_path",
+            "member_extended_path",
+            "transaction_1_path",
+            "transaction_2_path",
+            "transaction_3_path",
+            "coupon_and_digital_1_path",
+            "coupon_and_digital_2_path",
+            "member_features_path",
+            "most_shopped_path",
+            "misc_path",
+            "acquisition_path",
+        ],
+    )
     job.data.read("skeleton", "skeleton_path")
     job.data.read("member_extended", "member_extended_path")
     job.data.read("transaction_1", "transaction_1_path")
@@ -64,7 +86,10 @@ def main():
     )
 
     job.data.write(
-        "dna_full", "dna_path", partitionby="FISCAL_WEEK_END", ftype="parquet",
+        "dna_full",
+        "dna_path",
+        partitionby="FISCAL_WEEK_END",
+        ftype="parquet",
     )
 
     # TODO: confirm if params is set up correctly

@@ -1,7 +1,7 @@
 from pyspark.sql import Window
 from pyspark.sql.functions import col, lit, rank, when
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 from pe_member_dna.pipelines.assignment.lib.assn_utils import (
     read_subset_and_cast,

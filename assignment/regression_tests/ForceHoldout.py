@@ -1,6 +1,6 @@
 import pyspark.sql.functions as sqlf
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class ForceHoldout(regression.RegressionTest):

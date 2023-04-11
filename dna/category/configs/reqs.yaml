@@ -2,19 +2,19 @@ recency_lookback_duration:
   global: 3
 detail:
   type: 'intermediate'
-  path: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/transaction_fiscal/detail_isnr'
+  path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/transaction_fiscal/detail_isnr'
 member:
   type: 'master'
-  path: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/member'
+  path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/master/member'
 item:
   type: 'master'
-  path: 's3://memberanalytics-data-out-prod/v2/AD_HOC/pipelined_intermediates/master/item_with_brand'
+  path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/AD_HOC/pipelined_intermediates/master/item_with_brand'
 member_extended:
   type: 'master'
-  path: 's3://memberanalytics-data-out-prod/v2/pipelined_intermediates/master/member_extended'
+  path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/master/member_extended'
 exclusion:
   type: 'template'
-  path: 's3://memberanalytics-data-out-prod/v2/exclusions/output/for_dna/brand_exclusions'
+  path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/exclusions/output/for_dna/brand_exclusions'
 out:
   type: 'out'
-  path: 's3://memberanalytics-data-out-prod/v2/CATEGORY_DNA/PROD/'
+  path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/CATEGORY_DNA/PROD/'

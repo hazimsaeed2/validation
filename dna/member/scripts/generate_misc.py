@@ -1,6 +1,7 @@
 import pe_memberdna.dna.member.lib.generate_population as gp
 import pe_memberdna.dna.member.lib.managers as managers
 import pe_memberdna.dna.member.lib.misc_features as features
+from pe_memberdna.dna.member.lib.s3 import member_dna_input_data_validator
 
 
 def generate_misc(job):
@@ -8,7 +9,7 @@ def generate_misc(job):
     Generate the miscellaneous variables for the given population
     Parameters:
         job (object): Job Manager object based on the current config file
-    
+
     Returns:
         (pyspark.sql.DataFrame): Miscellaneous data of the given population
     """
@@ -75,7 +76,24 @@ def generate_misc(job):
 
 def main():
     job = managers.JobManager("misc")
-
+    recency_lookback_duration = job.config.params["params"].get(
+        "recency_lookback_duration", {}
+    )
+    member_dna_input_data_validator(
+        job,
+        recency_lookback_duration,
+        [
+            "header_path",
+            "detail_isnr_path",
+            "skeleton_path",
+            "member_extended_path",
+            "segment_path",
+            "transaction_1_path",
+            "transaction_2_path",
+            "member_features_path",
+            "club_path",
+        ],
+    )
     job.data.read("header", "header_path")
     job.data.read("detail_isnr", "detail_isnr_path")
     job.data.read("skeleton", "skeleton_path")

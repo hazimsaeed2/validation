@@ -1,9 +1,9 @@
 import pandas as pd
 import pyspark.sql.functions as sqlf
 
-import memberdna.pipelines.assignment.lib.assn_utils as assn_utils
-import memberdna.pipelines.lib.iotools as iotools
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.pipelines.assignment.lib.assn_utils as assn_utils
+import pe_memberdna.pipelines.lib.iotools as iotools
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class CFBAUDynamicCategoriesMultiCell(regression.RegressionTest):
@@ -31,15 +31,15 @@ class CFBAUDynamicCategoriesMultiCell(regression.RegressionTest):
 
 class CFBAUDynamicCategoriesSingleCell(regression.RegressionTest):
     """
-        The regression test checks the CF BAU slot function using multiple
-        category offers.
+    The regression test checks the CF BAU slot function using multiple
+    category offers.
 
-        The QC is against a multi cell design:
-        1. 12 articles with no backfill + dummy
-        2. 1 category with no backfill + 11 articles without backfill + dummy
-        3. 1 category with backfill + 11 articles without backfill + dummy
-        2. 2 category with no backfill + 10 articles + dummy
-        3. 2 category with backfill + 10 articles + dummy
+    The QC is against a multi cell design:
+    1. 12 articles with no backfill + dummy
+    2. 1 category with no backfill + 11 articles without backfill + dummy
+    3. 1 category with backfill + 11 articles without backfill + dummy
+    2. 2 category with no backfill + 10 articles + dummy
+    3. 2 category with backfill + 10 articles + dummy
     """
 
     CONSTRUCT_SIZE = 13

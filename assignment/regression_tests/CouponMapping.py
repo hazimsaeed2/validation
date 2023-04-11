@@ -1,7 +1,7 @@
 import re
 
 from pe_member_dna.pipelines.assignment.lib.assn_utils import CONSTRUCT_COLUMN
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class CouponMapping(regression.RegressionTest):

@@ -11,6 +11,7 @@ import pe_memberdna.dna.member.lib.coupon_digital_features as features
 import pe_memberdna.dna.member.lib.generate_population as gp
 import pe_memberdna.dna.member.lib.managers as managers
 import pe_memberdna.dna.member.lib.utils as utils
+from pe_memberdna.dna.member.lib.s3 import member_dna_input_data_validator
 
 
 def generate_coupon_and_digital(job):
@@ -111,7 +112,25 @@ def generate_coupon_and_digital(job):
 
 def main():
     job = managers.JobManager("generate_coupon_and_digital_1")
-
+    recency_lookback_duration = job.config.params["params"].get(
+        "recency_lookback_duration", {}
+    )
+    member_dna_input_data_validator(
+        job,
+        recency_lookback_duration,
+        [
+            "skeleton_path",
+            "member_extended_path",
+            "member_history_path",
+            "header_path",
+            "detail_path",
+            "payment_path",
+            "coupon_clip_path",
+            "email_path",
+            "email_fiscal_path",
+            "awards_fiscal_path",
+        ],
+    )
     job.data.read("skeleton", "skeleton_path")
     job.data.read("member_extended", "member_extended_path")
     job.data.read("member_history", "member_history_path")

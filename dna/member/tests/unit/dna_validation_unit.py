@@ -17,9 +17,9 @@ import pyspark
 import pyspark.sql as sql
 import pyspark.sql.functions as sqlf
 
-import memberdna.dna.lib.validations_DNA as validations_DNA
-import memberdna.testing_support.lib.utility as test_utils
-import memberdna.pipelines.lib.iotools as iotools
+import pe_memberdna.dna.lib.validations_DNA as validations_DNA
+import pe_memberdna.testing_support.lib.utility as test_utils
+import pe_memberdna.pipelines.lib.iotools as iotools
 
 
 parser = argparse.ArgumentParser()
@@ -43,7 +43,7 @@ ARCHIVE_PATH = "STATS/DNA/{}/archive/stats_{}"
 
 
 def create_data():
-    """ Create sample test data """
+    """Create sample test data"""
     data = [
         (1, 10, 1.0, "2019-03-02"),
         (1, 10, 2.0, "2019-02-23"),
@@ -61,7 +61,7 @@ def create_data():
 
 
 class DqCheckUnittestDna(test_utils.DqCheckUnittest):
-    """ Parent class for all DNA DQ check unit test classes """
+    """Parent class for all DNA DQ check unit test classes"""
 
     def setUp(self):
         test_name = self.__class__.__name__
@@ -88,8 +88,10 @@ class DqCheckUnittestDna(test_utils.DqCheckUnittest):
             "memberdna.lib.data_quality.get_archive_path",
             return_value=ARCHIVE_PATH.format(
                 unique_id,
-                datetime.datetime.strftime(datetime.datetime.today(), "%Y%m%d")
-            )
+                datetime.datetime.strftime(
+                    datetime.datetime.today(), "%Y%m%d"
+                ),
+            ),
         )
         self.get_archive_path = patcher.start()
         self.addCleanup(patcher.stop)
@@ -99,7 +101,7 @@ class DqCheckUnittestDna(test_utils.DqCheckUnittest):
 
 
 class TestOutlierWeeks(DqCheckUnittestDna):
-    """ Ensure TestOutlierWeeks passes and fails on respective data """
+    """Ensure TestOutlierWeeks passes and fails on respective data"""
 
     def test_pass(self):
         self.df = self.df.select("MBRSHP_SID", "var1", "FISCAL_WEEK_END")
@@ -160,7 +162,7 @@ class TestOldDNAvsNewDNAColAggregates(DqCheckUnittestDna):
 
 
 class TestColNames(DqCheckUnittestDna):
-    """ Ensure TestColNames passes and fails on respective data """
+    """Ensure TestColNames passes and fails on respective data"""
 
     def test_pass(self):
         self.validation_pass(
@@ -181,7 +183,7 @@ class TestColNames(DqCheckUnittestDna):
 
 
 class TestCountsPerFiscalWeekEnd(DqCheckUnittestDna):
-    """ Ensure TestCountsPerFiscalWeekEnd passes and fails on respective data """
+    """Ensure TestCountsPerFiscalWeekEnd passes and fails on respective data"""
 
     def test_pass(self):
         self.validation_pass(
@@ -207,7 +209,7 @@ class TestCountsPerFiscalWeekEnd(DqCheckUnittestDna):
 
 
 class TestCountsPerMbrshpSid(DqCheckUnittestDna):
-    """ Ensure TestCountsPerMbrshpSid passes and fails on respective data """
+    """Ensure TestCountsPerMbrshpSid passes and fails on respective data"""
 
     def test_pass(self):
         self.validation_pass(

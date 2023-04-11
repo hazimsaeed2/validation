@@ -15,7 +15,7 @@ from pyspark.sql.types import (
     StructType,
 )
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class TestRegression(unittest.TestCase):
@@ -27,8 +27,7 @@ class TestRegression(unittest.TestCase):
         ).toDF(["hat"])
         options = ["-1", "-2", "-3"]
         statement = regression.RegressionTest.create_modulo_when_statement(
-            "hat",
-            options
+            "hat", options
         )
 
         result = df.withColumn("sample", statement).collect()

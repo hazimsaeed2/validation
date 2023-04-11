@@ -3,9 +3,6 @@ paths:
       # already begin with s3://...
       bucket: "memberanalytics-data-out-prod"
 
-      recency_lookback_duration:
-            global: 3
-
       input:
             # dir is not prepended to s3_stat_path
             s3_stat_path: "v2/STATS/DNA/latest_stats.yaml"
@@ -39,7 +36,7 @@ paths:
             AH5_custumer_facing_desc_path: 'bcg_maps/AH5_custumer_facing_desc/AH5_custumer_facing_desc.csv'
 
             acq_dna_path: "s3://memberacquisition-data-out-prod/member_dna/recent/"
-            mbr_basic_path: "s3://memberanalytics-data-in-prod/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+            mbr_basic_path: "s3://memberanalytics-data-in-prod/Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 
       output:
             # dir is not prepended to s3_stat_path
@@ -69,5 +66,13 @@ params:
       # start_date: "2018-02-01" # (end_date - start_date) should be ~ 14 months
       # end_date: "2019-04-06"
       archive: True
+
+      recency_lookback_duration:
+            global: 3
+            local:
+                  tender_map_path: 0
+                  AH5_custumer_facing_desc_path: 0
+                  segment_path: 0
+                  acq_dna_path: 40
 
 validation:

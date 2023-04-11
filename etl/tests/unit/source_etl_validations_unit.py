@@ -13,7 +13,7 @@ from pe_member_dna.pipelines.lib.iotools import (
     split_path_bucket_key,
 )
 
-import memberdna.etl.utils.validations_ETL as validations
+import pe_memberdna.etl.utils.validations_ETL as validations
 from pe_member_dna.testing_support.lib.utility import *
 
 

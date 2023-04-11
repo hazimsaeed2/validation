@@ -1,7 +1,7 @@
 import copy
 import subprocess
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class StressTest1(regression.RegressionTest):

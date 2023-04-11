@@ -3,7 +3,7 @@ import xmlrunner
 
 import pyspark.sql.functions as sqlf
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class AnniversaryDynamicContent(regression.RegressionTest):
@@ -20,6 +20,7 @@ class AnniversaryDynamicContent(regression.RegressionTest):
     It should assign 7 dummy slots, 1 category and 11 articles. Dummy slots
     should allow duplicates while the others should not.
     """
+
     TOTAL_MEMBERS = 40
     TOTAL_SLOTS = 19
 
@@ -51,7 +52,7 @@ class AnniversaryDynamicContent(regression.RegressionTest):
                 (slots_per_member["unique_slots"] == self.TOTAL_SLOTS)
                 & (slots_per_member["total_slots"] == self.TOTAL_SLOTS)
             ).count(),
-            self.TOTAL_MEMBERS
+            self.TOTAL_MEMBERS,
         )
         same = input_assignments.join(prev, input_assignments.columns, "inner")
 
@@ -59,10 +60,7 @@ class AnniversaryDynamicContent(regression.RegressionTest):
 
     def execute_assignment_scripts(self):
         super(AnniversaryDynamicContent, self).execute_assignment_scripts(
-            _scripts=[
-                "create_coupons.py",
-                "assign_offers.py"
-            ]
+            _scripts=["create_coupons.py", "assign_offers.py"]
         )
 
 

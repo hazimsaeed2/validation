@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from urllib.parse import urlparse
 
 import boto3
-import memberdna.etl.utils.validations_ETL as validations
+import pe_memberdna.etl.utils.validations_ETL as validations
 import yaml
 from pyspark.sql.types import *
 
