@@ -146,19 +146,19 @@ for config_type in ["AH4", "AH5"]:
 
     for path in config_data["paths"].keys():
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/MODELDATA", f"v2/stage/{git_branch}/MODELDATA"
+            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/pipelined_intermediates", f"v2/stage/ref/pipelined_intermediates"
+            "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/AD_HOC", f"v2/stage/ref/AD_HOC"
+            "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/stage/ref/AD_HOC"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/CATEGORY_DNA", f"v2/stage/ref/CATEGORY_DNA"
+            "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/stage/ref/CATEGORY_DNA"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/CUBES", f"v2/stage/ref/CUBES"
+            "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/ref/CUBES"
         )
 
     with open(config_path_output, "w") as file:
@@ -194,19 +194,19 @@ for config_type in ["AH4", "AH5"]:
 
     for path in config_data["paths"].keys():
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/MODELDATA", f"v2/stage/{git_branch}/MODELDATA"
+            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/pipelined_intermediates", f"v2/stage/ref/pipelined_intermediates"
+            "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/AD_HOC", f"v2/stage/ref/AD_HOC"
+            "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/stage/ref/AD_HOC"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/CATEGORY_DNA", f"v2/stage/ref/CATEGORY_DNA"
+            "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/stage/ref/CATEGORY_DNA"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/CUBES", f"v2/stage/ref/CUBES"
+            "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/ref/CUBES"
         )
 
     with open(config_path_output, "w") as file:
@@ -245,19 +245,19 @@ for config_type in ["AH4", "AH5"]:
 
     for path in config_data["paths"].keys():
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/MODELDATA", f"v2/stage/{git_branch}/MODELDATA"
+            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/pipelined_intermediates", f"v2/stage/ref/pipelined_intermediates"
+            "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/AD_HOC", f"v2/stage/ref/AD_HOC"
+            "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/stage/ref/AD_HOC"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/CATEGORY_DNA", f"v2/stage/ref/CATEGORY_DNA"
+            "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/stage/ref/CATEGORY_DNA"
         )
         config_data["paths"][path][] = config_data["paths"][path].replace(
-            "v2/CUBES", f"v2/stage/ref/CUBES"
+            "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/ref/CUBES"
         )
 
     with open(config_path_output, "w") as file:

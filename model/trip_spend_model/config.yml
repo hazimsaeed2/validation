@@ -1,16 +1,16 @@
 shared:
       bucket: 'memberanalytics-data-out-prod'
       read_only_bucket: 'memberanalytics-data-in-prod'
-      feature_path: 'v2/propensity_model_for_trips/input_files/features_spend_all_numeric_features.csv'
-      cube_path: 'v2/CUBES/customer_cube_2019-12-02/customer_cube'
+      feature_path: 'Code_and_Data_repo/propensity_model_for_trips/input_files/features_spend_all_numeric_features.csv'
+      cube_path: 'Code_and_Data_repo/CUBES/customer_cube_2019-12-02/customer_cube'
       etl_path: 'etl'
       split_rate: 0.8
       sample_rate: 0.2
-      base_path: 'v2/MODELDATA'
-      ad_hoc_output_path: 'v2/AD_HOC'
-      model_path: 'v2/MODELS/TRIP_SPEND_MODELS'
-      dataset_path: 'v2/DATASETS/TRIP_SPEND_MODELS'
-      prediction_path: 'v2/PREDICTIONS/TRIP_SPEND_MODELS'
+      base_path: 'Code_and_Data_repo/MODELDATA'
+      ad_hoc_output_path: 'Code_and_Data_repo/AD_HOC'
+      model_path: 'Code_and_Data_repo/MODELS/TRIP_SPEND_MODELS'
+      dataset_path: 'Code_and_Data_repo/DATASETS/TRIP_SPEND_MODELS'
+      prediction_path: 'Code_and_Data_repo/PREDICTIONS/TRIP_SPEND_MODELS'
       high_frequency_visit_threshold: 12
       low_frequency_visit_threshold: 0
       run_name: 'dev_12_19'
@@ -22,8 +22,8 @@ etl:
             - 1
             - 4
             - 6
-      lookup_path: 'v2/pipelined_intermediates/lookup/fiscal_days'
-      BBM_weeks_path: 'v2/propensity_model_for_trips/input_files/mailer_cm_map.csv'
+      lookup_path: 'Code_and_Data_repo/pipelined_intermediates/lookup/fiscal_days'
+      BBM_weeks_path: 'Code_and_Data_repo/propensity_model_for_trips/input_files/mailer_cm_map.csv'
       weeks_to_sample: 2
       outlier_column: 'FW_SPEND_IN_STORE'
       bbm: FALSE
@@ -72,7 +72,7 @@ grid_search:
             - 1000
             - 5000
       model: 'bin'
-      output_path: 'v2/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
+      output_path: 'Code_and_Data_repo/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
 predict:
       weeks_to_predict:
             - '2019-11-30'

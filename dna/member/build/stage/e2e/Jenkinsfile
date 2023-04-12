@@ -134,11 +134,11 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
-    "v2/pipelined_intermediates", "v2/stage/ref/pipelined_intermediates"
+    "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/stage/ref/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/stage/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/stage/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -146,11 +146,11 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", f"v2/stage/{git_branch}/CUBES"
+    "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/stage/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/stage/{git_branch}/STATS"
 )
 
 config_data['params']['recency_lookback_duration']['global'] = 0
@@ -192,11 +192,11 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
-    "v2/pipelined_intermediates", "v2/stage/ref/pipelined_intermediates"
+    "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/stage/ref/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/stage/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/stage/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -204,11 +204,11 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", f"v2/stage/{git_branch}/CUBES"
+    "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/stage/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/stage/{git_branch}/STATS"
 )
 
 config_data['params']['recency_lookback_duration']['global'] = 0
@@ -250,11 +250,11 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
-    "v2/pipelined_intermediates", "v2/stage/ref/pipelined_intermediates"
+    "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/stage/ref/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/stage/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/stage/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -262,11 +262,11 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", f"v2/stage/{git_branch}/CUBES"
+    "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/stage/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/stage/{git_branch}/STATS"
 )
 
 config_data['params']['recency_lookback_duration']['global'] = 0
@@ -374,24 +374,24 @@ for k in config_data["data_paths"]["source"].keys():
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref"
+        "memberanalytics-data-out-prod/Code_and_Data_repo", "memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0
@@ -501,24 +501,24 @@ for k in config_data["data_paths"]["source"].keys():
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
-        "memberanalytics-data-out-prod/v2", "memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref"
+        "memberanalytics-data-out-prod/Code_and_Data_repo", "memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["sampled"].keys():
     config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
-        "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
     )
 
 config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
 )
 
 config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
 )
 
 config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
-    "memberanalytics-data-out-prod/v2", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/stage/{git_branch}"
 )
 
 config_data['data_paths']['recency_lookback_duration']['global'] = 0

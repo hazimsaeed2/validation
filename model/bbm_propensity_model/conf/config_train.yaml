@@ -70,7 +70,7 @@ params:
   train: 'True'
   run_name: 'prod_{last_fiscal_week_end}' # Dynamically change it
   bucket: 'memberanalytics-data-out-prod'
-  base_path: 'v2/USERS/cling/MODELDATA/BBM_PROPENSITY_MODEL'
-  assignment_prefix: 'v2/ASSIGNMENTS/cdsa/assn_output/PROD/'
+  base_path: 'Code_and_Data_repo/USERS/cling/MODELDATA/BBM_PROPENSITY_MODEL'
+  assignment_prefix: 'Code_and_Data_repo/ASSIGNMENTS/cdsa/assn_output/PROD/'
   assignment_lead_time: 6
   weeks_to_sample: 2

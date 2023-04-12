@@ -87,7 +87,7 @@ for AH_type in ["AH4", "AH5"]:
     if args.prop_path == "automatic":
         prop_path = get_latest_prop_path(
             "memberanalytics-data-out-prod",
-            "v2/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/",
+            "Code_and_Data_repo/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/",
             run_type=args.run_type,
         )
         config["paths"]["PROPENSITY_PREDICTIONS"] = (
