@@ -16,7 +16,7 @@ with open(config_path_input) as file:
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/dev"
+        "memberanalytics-data-in-prod", "memberanalytics-data-in-prod/Code_and_Data_repo/dev"
     )
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
         "_%(curr_date)s", ""
