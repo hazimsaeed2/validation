@@ -17,11 +17,11 @@ with open(config_path_input) as file:
 git_branch = os.getenv('GIT_BRANCH')
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
-    "v2/pipelined_intermediates", "v2/dev/ref/pipelined_intermediates"
+    "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/dev/ref/pipelined_intermediates"
 )
 
 config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/dev/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/dev/{git_branch}/STATS"
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
@@ -29,17 +29,17 @@ config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"][
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
-    "v2/CUBES", f"v2/dev/{git_branch}/CUBES"
+    "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/dev/{git_branch}/CUBES"
 )
 
 config_data["paths"]["output"]["s3_stat_path"] = config_data["paths"]["output"]["s3_stat_path"].replace(
-    "v2/STATS", f"v2/dev/{git_branch}/STATS"
+    "Code_and_Data_repo/STATS", f"Code_and_Data_repo/dev/{git_branch}/STATS"
 )
 
-config_data['paths']['recency_lookback_duration']['global'] = 0
-if 'local' in config_data['paths']['recency_lookback_duration']:
-    for k in config_data['paths']['recency_lookback_duration']['local'].keys():
-        config_data['paths']['recency_lookback_duration']['local'][k] = 0
+config_data['params']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['params']['recency_lookback_duration']:
+    for k in config_data['params']['recency_lookback_duration']['local'].keys():
+        config_data['params']['recency_lookback_duration']['local'][k] = 0
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)

@@ -1,6 +1,6 @@
 from pyspark.sql.functions import col, lit, when
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class AdjustedTrips(regression.RegressionTest):
@@ -54,9 +54,9 @@ class AdjustedTrips(regression.RegressionTest):
         ).dropna(subset=["category"])
 
         # subset the INPUT_CONSTRUCTS for that test_mbrshp_sid
-        test_construct = INPUT_CONSTRUCTS.where(col("mbrshp_sid") == test_sid).select(
-            ["mbrshp_sid", "cpn_nbr", "is_backfill"]
-        )
+        test_construct = INPUT_CONSTRUCTS.where(
+            col("mbrshp_sid") == test_sid
+        ).select(["mbrshp_sid", "cpn_nbr", "is_backfill"])
 
         # join construct with CPG to match 'Article Number'
         test_construct_article = test_construct.join(
@@ -64,19 +64,13 @@ class AdjustedTrips(regression.RegressionTest):
         ).withColumnRenamed("Article Number", "ARTICLE_NBR")
 
         # join construct with CAT to match both "cpn_ah4_cd" and "cpn_ah5_cd"
-        test_construct_category_ah4 = (
-            test_construct.join(
-                CAT.select(["cpn_nbr", "cpn_ah4_cd"]), "cpn_nbr", "inner"
-            )
-            .withColumnRenamed("cpn_ah4_cd", "category")
-        )
+        test_construct_category_ah4 = test_construct.join(
+            CAT.select(["cpn_nbr", "cpn_ah4_cd"]), "cpn_nbr", "inner"
+        ).withColumnRenamed("cpn_ah4_cd", "category")
 
-        test_construct_category_ah5 = (
-            test_construct.join(
-                CAT.select(["cpn_nbr", "cpn_ah5_cd"]), "cpn_nbr", "inner"
-            )
-            .withColumnRenamed("cpn_ah5_cd", "category")
-        )
+        test_construct_category_ah5 = test_construct.join(
+            CAT.select(["cpn_nbr", "cpn_ah5_cd"]), "cpn_nbr", "inner"
+        ).withColumnRenamed("cpn_ah5_cd", "category")
 
         test_construct_category = test_construct_category_ah4.union(
             test_construct_category_ah5
@@ -91,17 +85,19 @@ class AdjustedTrips(regression.RegressionTest):
             test_construct_article,
             test_transactions_article,
             coupons,
-            "ARTICLE_NBR"
+            "ARTICLE_NBR",
         )
 
         self.run_adjusted_trips(
             test_construct_category,
             test_transactions_category,
             coupons,
-            "category"
+            "category",
         )
 
-    def run_adjusted_trips(self, test_construct, test_transactions, coupons, column):
+    def run_adjusted_trips(
+        self, test_construct, test_transactions, coupons, column
+    ):
         """
         This will execute the actual Adjusted trip test on the test_construct
         produced which now can be either based on Article or Category data.

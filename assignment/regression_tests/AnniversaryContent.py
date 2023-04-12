@@ -3,26 +3,26 @@ import xmlrunner
 
 import pyspark.sql.functions as sqlf
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class AnniversaryContent(regression.RegressionTest):
     """
-        The regression test checks anniverasry slot function:
-        1. in combination with waterfall slot function:
-            It uses slot 13 to assign gas(B), non gas(A) and, as a third option
-            C for members with trips in the last 3 months or D for members
-            wihtout trips in the last 3 months.
-        2. using multiple renewable dates:
-            It uses slot 13 to assign gas(B), non gas(A).
+    The regression test checks anniverasry slot function:
+    1. in combination with waterfall slot function:
+        It uses slot 13 to assign gas(B), non gas(A) and, as a third option
+        C for members with trips in the last 3 months or D for members
+        wihtout trips in the last 3 months.
+    2. using multiple renewable dates:
+        It uses slot 13 to assign gas(B), non gas(A).
 
-        The campaign uses 2 cell with multi constructs:
-        1. (1 category + 11 articles 1 + dummy(waterfall(anniversary)))
-            + default backfill
-        2. (1 category + 11 articles 1 + dummy(anniversary))
-            + default backfill
+    The campaign uses 2 cell with multi constructs:
+    1. (1 category + 11 articles 1 + dummy(waterfall(anniversary)))
+        + default backfill
+    2. (1 category + 11 articles 1 + dummy(anniversary))
+        + default backfill
 
-        Cell 2 uses construct satisfied filter to force members in.
+    Cell 2 uses construct satisfied filter to force members in.
     """
 
     def __init__(self, methodName):
@@ -49,10 +49,7 @@ class AnniversaryContent(regression.RegressionTest):
 
     def execute_assignment_scripts(self):
         super(AnniversaryContent, self).execute_assignment_scripts(
-            _scripts=[
-                "create_coupons.py",
-                "assign_offers.py"
-            ]
+            _scripts=["create_coupons.py", "assign_offers.py"]
         )
 
 

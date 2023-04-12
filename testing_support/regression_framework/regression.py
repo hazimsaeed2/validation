@@ -143,41 +143,41 @@ class RegressionTest(unittest.TestCase, JobManager, metaclass=ABCMeta):
                 # sure that the syntax and errors are correctly caught
                 # and recorded by the TestCase class
                 # see PR #267 for context
-                import memberdna.pipelines.assignment.scripts.create_coupons as create_coupons
+                import pe_memberdna.pipelines.assignment.scripts.create_coupons as create_coupons
 
                 create_coupons.main(self.config_file_path)
             elif script == "assign_offers.py":
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.assign_offers as assign_offers
+                import pe_memberdna.pipelines.assignment.scripts.assign_offers as assign_offers
 
                 assign_offers.main(self.config_file_path)
             elif script == "subsample_population.py":
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.subsample_population as subsample_population
+                import pe_memberdna.pipelines.assignment.scripts.subsample_population as subsample_population
 
                 subsample_population.main(self.config_file_path)
             elif script == "backtest_sizing.py":
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.backtest_sizing as backtest_sizing
+                import pe_memberdna.pipelines.assignment.scripts.backtest_sizing as backtest_sizing
 
                 backtest_sizing.main(self.config_file_path)
             elif script == "qc_assignments.py":
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.qc_assignments as qc_assignments
+                import pe_memberdna.pipelines.assignment.scripts.qc_assignments as qc_assignments
 
                 qc_assignments.main(self.config_file_path)
             elif script == "generate_output_file.py":
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.generate_output_file as generate_output_file
+                import pe_memberdna.pipelines.assignment.scripts.generate_output_file as generate_output_file
 
                 generate_output_file.main(self.config_file_path)
             elif script == "generate_input_mail.py":
-                import memberdna.pipelines.assignment.scripts.generate_input_mail as generate_input_mail
+                import pe_memberdna.pipelines.assignment.scripts.generate_input_mail as generate_input_mail
 
                 generate_input_mail.main(self.config_file_path)
             elif script.startswith("assign_closure.py"):
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.assign_closure as assign_closure
+                import pe_memberdna.pipelines.assignment.scripts.assign_closure as assign_closure
 
                 cells, iterate, seed, ahcd_dedup = script.split(" ")[1:]
                 cells = int(cells)
@@ -188,7 +188,7 @@ class RegressionTest(unittest.TestCase, JobManager, metaclass=ABCMeta):
                 assign_closure.main(self, cells, iterate, seed, ahcd_dedup)
             elif script == "generate_msmt_input.py":
                 # see comment for case create_coupons.py
-                import memberdna.pipelines.assignment.scripts.generate_msmt_input as generate_msmt_input
+                import pe_memberdna.pipelines.assignment.scripts.generate_msmt_input as generate_msmt_input
 
                 generate_msmt_input.main(self.config_file_path)
             else:

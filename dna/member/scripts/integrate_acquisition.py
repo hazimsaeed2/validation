@@ -1,5 +1,6 @@
 import pe_memberdna.dna.member.lib.managers as managers
 import pe_memberdna.dna.member.lib.acquisition_features as features
+from pe_memberdna.dna.member.lib.s3 import member_dna_input_data_validator
 
 
 def integrate_acquisition(job):
@@ -7,9 +8,9 @@ def integrate_acquisition(job):
     Integrate acquisition variables for the given population
     Parameters:
         job (object): Job Manager object based on the current config file
-    
+
     Returns:
-        dna (pyspark.sql.DataFrame): Acquisition variable added to the given 
+        dna (pyspark.sql.DataFrame): Acquisition variable added to the given
                                      population
     """
 
@@ -31,7 +32,18 @@ def integrate_acquisition(job):
 
 def main():
     job = managers.JobManager("acquisition")
-
+    recency_lookback_duration = job.config.params["params"].get(
+        "recency_lookback_duration", {}
+    )
+    member_dna_input_data_validator(
+        job,
+        recency_lookback_duration,
+        [
+            "member_features_path",
+            "acq_dna_path",
+            "mbr_basic_path",
+        ],
+    )
     job.data.read("population", "member_features_path")
     job.data.read("acq_dna", "acq_dna_path")
     job.data.read("mbr_basic", "mbr_basic_path", filetype="csv")

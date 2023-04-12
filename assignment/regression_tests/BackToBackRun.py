@@ -1,8 +1,8 @@
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-import memberdna.pipelines.assignment.lib.assn_utils as assn_utils
-import memberdna.pipelines.lib.iotools as iotools
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.pipelines.assignment.lib.assn_utils as assn_utils
+import pe_memberdna.pipelines.lib.iotools as iotools
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class BackToBackFirstRun(regression.RegressionTest):
@@ -14,6 +14,7 @@ class BackToBackFirstRun(regression.RegressionTest):
     For more details please check and the CDSA.
 
     """
+
     def __init__(self, methodName):
         regression.RegressionTest.__init__(self, methodName)
 
@@ -86,31 +87,26 @@ class BackToBackSecondRun(regression.RegressionTest):
     the third run) to assign coupons which were not assigned in the other 2
     runs. It uses a 35 day exclusion around its inhome date.
     """
+
     def __init__(self, methodName):
         regression.RegressionTest.__init__(self, methodName)
 
     def test_regression(self):
         regression.RegressionTest.run_test_scripts_and_prepare_data(self)
         past_assignments = assn_utils.read_subset_and_cast(
-            self.config.paths["CDSA_ASSGN"],
-            "parquet"
+            self.config.paths["CDSA_ASSGN"], "parquet"
         )
 
-        current_assignment = self.spark.read.option("header", "true").csv(
-            self.config.paths["INPUT_ASSIGNMENTS"]
-        ).filter(sqlf.col("bf_construct") == "-")
+        current_assignment = (
+            self.spark.read.option("header", "true")
+            .csv(self.config.paths["INPUT_ASSIGNMENTS"])
+            .filter(sqlf.col("bf_construct") == "-")
+        )
 
-        common_coupons = past_assignments.select(
-            "mbrshp_sid",
-            "cpn_nbr",
-            "experiment_id"
-        ).withColumnRenamed(
-            "experiment_id",
-            "prev_exp_id"
-        ).join(
-            current_assignment,
-            ["mbrshp_sid", "cpn_nbr"],
-            "inner"
+        common_coupons = (
+            past_assignments.select("mbrshp_sid", "cpn_nbr", "experiment_id")
+            .withColumnRenamed("experiment_id", "prev_exp_id")
+            .join(current_assignment, ["mbrshp_sid", "cpn_nbr"], "inner")
         )
 
         self.assertTrue(past_assignments.count() > 0)
@@ -142,25 +138,24 @@ class BackToBackThirdRun(regression.RegressionTest):
 
     def tearDown(self):
         self.print_results()
-        
+
     def test_regression(self):
         regression.RegressionTest.run_test_scripts_and_prepare_data(self)
 
         past_assignments = assn_utils.read_subset_and_cast(
-            self.config.paths["CDSA_ASSGN"],
-            "parquet"
+            self.config.paths["CDSA_ASSGN"], "parquet"
         )
         first_assignment = past_assignments.filter(
-            sqlf.col('experiment_id') == 1
+            sqlf.col("experiment_id") == 1
         )
-        current_assignment = self.spark.read.option("header", "true").csv(
-            self.config.paths["INPUT_ASSIGNMENTS"]
-        ).filter(sqlf.col("bf_construct") == "-")
+        current_assignment = (
+            self.spark.read.option("header", "true")
+            .csv(self.config.paths["INPUT_ASSIGNMENTS"])
+            .filter(sqlf.col("bf_construct") == "-")
+        )
 
         common_coupons = first_assignment.select("mbrshp_sid", "cpn_nbr").join(
-            current_assignment,
-            ["mbrshp_sid", "cpn_nbr"],
-            "inner"
+            current_assignment, ["mbrshp_sid", "cpn_nbr"], "inner"
         )
 
         self.assertTrue(first_assignment.count() > 0)
@@ -184,4 +179,3 @@ if __name__ == "__main__":
     BackToBackFirstRun.execute_test()
     BackToBackThirdRun.execute_test()
     BackToBackSecondRun.execute_test()
-

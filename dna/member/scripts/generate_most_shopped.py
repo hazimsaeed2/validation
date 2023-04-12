@@ -1,15 +1,16 @@
 import pe_memberdna.dna.member.lib.generate_population as gp
 import pe_memberdna.dna.member.lib.managers as managers
 import pe_memberdna.dna.member.lib.most_shopped_features as features
+from pe_memberdna.dna.member.lib.s3 import member_dna_input_data_validator
 
 
 def generate_most_shopped(job):
     """
-    Generate first and second most shopped category for each memberber in the 
+    Generate first and second most shopped category for each memberber in the
     given population
     Parameters:
         job (object): Job Manager object based on the current config file
-    
+
     Returns:
         (pyspark.sql.DataFrame): Transaction data of the given population
     """
@@ -33,7 +34,19 @@ def generate_most_shopped(job):
 
 def main():
     job = managers.JobManager("most_shopped")
-
+    recency_lookback_duration = job.config.params["params"].get(
+        "recency_lookback_duration", {}
+    )
+    member_dna_input_data_validator(
+        job,
+        recency_lookback_duration,
+        [
+            "detail_path",
+            "member_extended_path",
+            "skeleton_path",
+            "AH5_custumer_facing_desc_path",
+        ],
+    )
     job.data.read("detail", "detail_path")
     job.data.read("member_extended", "member_extended_path")
     job.data.read("skeleton", "skeleton_path")

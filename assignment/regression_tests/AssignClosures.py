@@ -9,7 +9,7 @@ from pe_member_dna.pipelines.assignment.scripts.assign_closure import (
     ClosureMethod,
 )
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class AssignClosures(regression.RegressionTest):

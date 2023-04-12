@@ -1,6 +1,7 @@
 import pe_memberdna.dna.member.lib.generate_population as gp
 import pe_memberdna.dna.member.lib.managers as managers
 import pe_memberdna.dna.member.lib.transaction_features as features
+from pe_memberdna.dna.member.lib.s3 import member_dna_input_data_validator
 
 
 def generate_transaction(job):
@@ -55,6 +56,20 @@ def generate_transaction(job):
 
 def main():
     job = managers.JobManager("transaction_1")
+    recency_lookback_duration = job.config.params["params"].get(
+        "recency_lookback_duration", {}
+    )
+    member_dna_input_data_validator(
+        job,
+        recency_lookback_duration,
+        [
+            "header_path",
+            "detail_path",
+            "detail_isnr_path",
+            "skeleton_path",
+            "member_extended_path",
+        ],
+    )
 
     job.data.read("header", "header_path")
     job.data.read("detail", "detail_path")

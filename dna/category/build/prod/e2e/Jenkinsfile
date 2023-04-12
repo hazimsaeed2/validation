@@ -6,8 +6,8 @@ pipeline {
                 agent { node env.node_1 }
                 steps {
                     sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
                     echo "Ran environemnt setup on cluster-1"
@@ -17,8 +17,8 @@ pipeline {
                 agent { node env.node_2 }
                 steps {
                     sh '''
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/v2/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                         tar -xf pyspark_venv.tar.gz
                     '''
                     echo "Ran environemnt setup on cluster-2"

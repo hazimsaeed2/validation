@@ -1,0 +1,76 @@
+paths:
+  bbms_history_dates:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/USERS/cling/MODELDATA/BBM_PROPENSITY_MODEL/lookup/bbms_history_dates.csv'
+    format: 'csv'
+    cols:
+
+  fiscal_days_lookup:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/lookup/fiscal_days/'
+    format: 'parquet'
+    cols:
+
+  mbr_dna:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/CUBES/customer_cube_full/'
+    format: 'parquet'
+    cols:
+
+  fetures_path:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/USERS/cling/MODELDATA/BBM_PROPENSITY_MODEL/lookup/features.csv'
+    format: 'csv'
+    cols:
+
+  coups:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/USERS/cling/MODELDATA/BBM_PROPENSITY_MODEL/lookup/coups.csv'
+    format: 'csv'
+    cols:
+
+  purch_detail:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/transaction_fiscal/detail/'
+    format: 'parquet'
+    cols:
+      - 'MBRSHP_SID'
+      - 'PURCH_DT'
+      - 'PURCH_HDR_ID'
+      - 'DISCOUNT_TYPE_CD'
+      - 'ARTICLE_NBR'
+      - 'SALES_CTGRY_CD'
+      - 'MCH3_CD'
+
+  purch_detail_raw:
+    path: 's3://bjs-enterprise-data-lake/EDL/transaction_detail/'
+    format: 'parquet'
+    cols:
+      - 'purch_hdr_id'
+      - 'sales_channel_id'
+
+  payment:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/transaction_fiscal/payment'
+    format: 'parquet'
+    cols:
+      - 'MBRSHP_SID'
+      - 'PURCH_HDR_ID'
+      - 'TENDER_TYPE_CD'
+      - 'PURCH_DT'
+      - 'CPN_NBR'
+      - 'SALES_PYMT_AMT'
+
+  mbr_ext:
+    path: 's3://memberanalytics-data-out-prod/Code_and_Data_repo/pipelined_intermediates/master/member_extended/'
+    format: 'parquet'
+    cols:
+      - 'MBRSHP_NBR'
+      - 'MBRSHP_SID'
+
+  ETL_output:
+      path: "s3://{bucket}/{base_path}/ETL/{train_inference}/{run_name}"
+      format: "parquet"
+      cols:
+
+params:
+  train: 'True'
+  run_name: 'prod_{last_fiscal_week_end}' # Dynamically change it
+  bucket: 'memberanalytics-data-out-prod'
+  base_path: 'Code_and_Data_repo/USERS/cling/MODELDATA/BBM_PROPENSITY_MODEL'
+  assignment_prefix: 'Code_and_Data_repo/ASSIGNMENTS/cdsa/assn_output/PROD/'
+  assignment_lead_time: 6
+  weeks_to_sample: 2

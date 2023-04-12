@@ -1,5 +1,5 @@
 import pyspark.sql.functions as sqlf
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class RewardsContent(regression.RegressionTest):
@@ -21,85 +21,75 @@ class RewardsContent(regression.RegressionTest):
     def test_regression(self):
         regression.RegressionTest.run_test_scripts_and_prepare_data(self)
 
-        input_assignments = self.spark.read.option("header", "true").csv(
-            self.config.paths["INPUT_ASSIGNMENTS"]
-        ).filter(sqlf.col("slot_nbr") == 13)
-
-        self.assertEqual(
-            input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 110)
-                & (sqlf.col("cpn_nbr") == "A")
-            ).count(),
-            1
+        input_assignments = (
+            self.spark.read.option("header", "true")
+            .csv(self.config.paths["INPUT_ASSIGNMENTS"])
+            .filter(sqlf.col("slot_nbr") == 13)
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 601)
-                & (sqlf.col("cpn_nbr") == "A")
+                (sqlf.col("MBRSHP_SID") == 110) & (sqlf.col("cpn_nbr") == "A")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 1978)
-                & (sqlf.col("cpn_nbr") == "B")
+                (sqlf.col("MBRSHP_SID") == 601) & (sqlf.col("cpn_nbr") == "A")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 2110)
-                & (sqlf.col("cpn_nbr") == "B")
+                (sqlf.col("MBRSHP_SID") == 1978) & (sqlf.col("cpn_nbr") == "B")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 69)
-                & (sqlf.col("cpn_nbr") == "C")
+                (sqlf.col("MBRSHP_SID") == 2110) & (sqlf.col("cpn_nbr") == "B")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 1840)
-                & (sqlf.col("cpn_nbr") == "C")
+                (sqlf.col("MBRSHP_SID") == 69) & (sqlf.col("cpn_nbr") == "C")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 3620)
-                & (sqlf.col("cpn_nbr") == "D")
+                (sqlf.col("MBRSHP_SID") == 1840) & (sqlf.col("cpn_nbr") == "C")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
             input_assignments.filter(
-                (sqlf.col("MBRSHP_SID") == 183)
-                & (sqlf.col("cpn_nbr") == "E")
+                (sqlf.col("MBRSHP_SID") == 3620) & (sqlf.col("cpn_nbr") == "D")
             ).count(),
-            1
+            1,
         )
 
         self.assertEqual(
-            input_assignments.filter(sqlf.col("cpn_nbr") == "E").count(),
-            33
+            input_assignments.filter(
+                (sqlf.col("MBRSHP_SID") == 183) & (sqlf.col("cpn_nbr") == "E")
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            input_assignments.filter(sqlf.col("cpn_nbr") == "E").count(), 33
         )
 
     def execute_assignment_scripts(self):
         super(RewardsContent, self).execute_assignment_scripts(
-            _scripts=[
-                "create_coupons.py",
-                "assign_offers.py"
-            ]
+            _scripts=["create_coupons.py", "assign_offers.py"]
         )
 
 

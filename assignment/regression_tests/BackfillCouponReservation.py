@@ -1,7 +1,7 @@
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 from pe_member_dna.pipelines.assignment.lib.assn_io import ConfigManager
 from pe_member_dna.pipelines.assignment.lib.campaign import Campaign

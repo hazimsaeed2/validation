@@ -1,8 +1,8 @@
 import pyspark.sql.functions as sqlf
 
-import memberdna.pipelines.assignment.lib.filters as filters
+import pe_memberdna.pipelines.assignment.lib.filters as filters
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class MultiSegments(regression.RegressionTest):
@@ -40,98 +40,82 @@ class MultiSegments(regression.RegressionTest):
             "MBRSHP_SID",
             "L_FIFTY-TWOW_GAS_TRIPS",
             "PREFERRED_CLUB_HAS_GAS",
-            "TENURE"
+            "TENURE",
         )
 
         cell_assignment = input_assignments.select(
-            "MBRSHP_SID",
-            "cell_id"
+            "MBRSHP_SID", "cell_id"
         ).distinct()
 
         cell_assignment = cell_assignment.join(
             mail_list, "MBRSHP_SID", "inner"
         )
-        cell_assignment = cell_assignment.join(cube,  "MBRSHP_SID", "inner")
+        cell_assignment = cell_assignment.join(cube, "MBRSHP_SID", "inner")
         cell_assignment = filters.new(cell_assignment, "new_member")
         cell_assignment = filters.gas(
             cell_assignment,
             "has_gas_purchase",
-            ["PREFERRED_CLUB_HAS_GAS", "L_FIFTY-TWOW_GAS_TRIPS"]
+            ["PREFERRED_CLUB_HAS_GAS", "L_FIFTY-TWOW_GAS_TRIPS"],
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 0).count(),
-            cell_assignment.filter(
-                (sqlf.col("cell_id") == 0)
-            ).filter(
-                (
-                    (sqlf.col("october") == 1)
-                    & (sqlf.col("new_member") == 1)
-                )
+            cell_assignment.filter((sqlf.col("cell_id") == 0))
+            .filter(
+                ((sqlf.col("october") == 1) & (sqlf.col("new_member") == 1))
                 | (sqlf.col("has_gas_purchase") == 1)
-            ).count()
+            )
+            .count(),
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 1).count(),
-            cell_assignment.filter(
-                (sqlf.col("cell_id") == 1)
-            ).filter(
+            cell_assignment.filter((sqlf.col("cell_id") == 1))
+            .filter(
                 (sqlf.col("november") == 1)
                 & (sqlf.col("has_gas_purchase") == 1)
-            ).count()
+            )
+            .count(),
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 2).count(),
             cell_assignment.filter(
-                (sqlf.col("cell_id") == 2)
-                & (sqlf.col("september") == 1)
-            ).count()
+                (sqlf.col("cell_id") == 2) & (sqlf.col("september") == 1)
+            ).count(),
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 3).count(),
             cell_assignment.filter(
-                (sqlf.col("cell_id") == 3)
-                & (sqlf.col("october") == 1)
-            ).count()
+                (sqlf.col("cell_id") == 3) & (sqlf.col("october") == 1)
+            ).count(),
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 4).count(),
             cell_assignment.filter(
-                (sqlf.col("cell_id") == 4)
-                & (sqlf.col("november") == 1)
-            ).count()
+                (sqlf.col("cell_id") == 4) & (sqlf.col("november") == 1)
+            ).count(),
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 5).count(),
-            cell_assignment.filter(
-                (sqlf.col("cell_id") == 5)
-            ).filter(
-                (sqlf.col("september") == 1)
-                | (sqlf.col("october") == 1)
-            ).count()
+            cell_assignment.filter((sqlf.col("cell_id") == 5))
+            .filter((sqlf.col("september") == 1) | (sqlf.col("october") == 1))
+            .count(),
         )
 
         self.assertEqual(
             cell_assignment.filter(sqlf.col("cell_id") == 6).count(),
-            cell_assignment.filter(
-                (sqlf.col("cell_id") == 6)
-            ).filter(
-                (sqlf.col("october") == 1)
-                | (sqlf.col("november") == 1)
-            ).count()
+            cell_assignment.filter((sqlf.col("cell_id") == 6))
+            .filter((sqlf.col("october") == 1) | (sqlf.col("november") == 1))
+            .count(),
         )
 
     def execute_assignment_scripts(self):
         super(MultiSegments, self).execute_assignment_scripts(
-            _scripts=[
-                "create_coupons.py",
-                "assign_offers.py"
-            ]
+            _scripts=["create_coupons.py", "assign_offers.py"]
         )
 
 

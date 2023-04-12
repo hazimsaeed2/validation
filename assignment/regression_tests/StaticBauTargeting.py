@@ -1,8 +1,7 @@
 import pyspark.sql.functions as sqlf
 
-import memberdna.pipelines.assignment.lib.assn_utils as assn_utils
-import memberdna.testing_support.regression_framework.regression as regression
-
+import pe_memberdna.pipelines.assignment.lib.assn_utils as assn_utils
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class StaticBauTargeting(regression.RegressionTest):
@@ -35,36 +34,34 @@ class StaticBauTargeting(regression.RegressionTest):
     def test_regression(self):
         regression.RegressionTest.run_test_scripts_and_prepare_data(self)
 
-        coupon_bank = assn_utils.read_subset_and_cast(
-            self.config.paths["COUPON_BANK"], "csv"
-        ).select("cpn_nbr", "cpn_type").distinct()
+        coupon_bank = (
+            assn_utils.read_subset_and_cast(
+                self.config.paths["COUPON_BANK"], "csv"
+            )
+            .select("cpn_nbr", "cpn_type")
+            .distinct()
+        )
 
         input_assignments = self.spark.read.csv(
             self.config.paths["INPUT_ASSIGNMENTS"],
             header=True,
-            inferSchema=True
+            inferSchema=True,
         )
 
         assignment = input_assignments.withColumn(
             "is_backfill",
-            sqlf.when(sqlf.col("bf_construct") == "-", 0).otherwise(1)
-        ).join(
-            coupon_bank,
-            "cpn_nbr",
-            "left"
-        )
+            sqlf.when(sqlf.col("bf_construct") == "-", 0).otherwise(1),
+        ).join(coupon_bank, "cpn_nbr", "left")
 
-        assignment = assignment.fillna(
-            {"cpn_type": "None"}
-        )
+        assignment = assignment.fillna({"cpn_type": "None"})
 
         self.assertEquals(
             assignment.filter(sqlf.col("cpn_nbr") == self.BASKET_CPN).count(),
-            4
+            4,
         )
         self.assertEquals(
             assignment.filter(sqlf.col("cpn_nbr") == self.ARTICLE_CPN).count(),
-            13
+            13,
         )
 
         slots_per_member = assignment.groupBy("MBRSHP_SID").agg(
@@ -76,7 +73,7 @@ class StaticBauTargeting(regression.RegressionTest):
                 (slots_per_member["unique_slots"] == self.TOTAL_SLOTS)
                 & (slots_per_member["total_slots"] == self.TOTAL_SLOTS)
             ).count(),
-            self.TOTAL_MEMBERS
+            self.TOTAL_MEMBERS,
         )
 
         unique_coupons = assignment.groupBy("MBRSHP_SID").agg(
@@ -86,7 +83,7 @@ class StaticBauTargeting(regression.RegressionTest):
             unique_coupons.filter(
                 unique_coupons["unique_cpns"] == self.TOTAL_SLOTS
             ).count(),
-            self.TOTAL_MEMBERS
+            self.TOTAL_MEMBERS,
         )
 
         coupons = assignment.groupBy("MBRSHP_SID").agg(
@@ -98,18 +95,23 @@ class StaticBauTargeting(regression.RegressionTest):
         )
         self.assertEquals(
             disjunct_static_offer.filter(
-                sqlf.array_contains(
-                    sqlf.col("cpn_list"), self.ARTICLE_CPN
-                ) == True
+                sqlf.array_contains(sqlf.col("cpn_list"), self.ARTICLE_CPN)
+                == True
             ).count(),
-            0
+            0,
         )
 
-        priority = assignment.filter(
-            sqlf.col("cpn_nbr").isin(
-                [sqlf.lit(self.BASKET_CPN), sqlf.lit(self.ARTICLE_CPN)]
+        priority = (
+            assignment.filter(
+                sqlf.col("cpn_nbr").isin(
+                    [sqlf.lit(self.BASKET_CPN), sqlf.lit(self.ARTICLE_CPN)]
+                )
             )
-        ).select("slot_nbr").distinct().toPandas().slot_nbr.tolist()
+            .select("slot_nbr")
+            .distinct()
+            .toPandas()
+            .slot_nbr.tolist()
+        )
 
         self.assertEquals([1], priority)
 
@@ -123,11 +125,9 @@ class StaticBauTargeting(regression.RegressionTest):
 
     def execute_assignment_scripts(self):
         super(StaticBauTargeting, self).execute_assignment_scripts(
-            _scripts=[
-                "create_coupons.py",
-                "assign_offers.py"
-            ]
+            _scripts=["create_coupons.py", "assign_offers.py"]
         )
+
 
 if __name__ == "__main__":
     StaticBauTargeting.execute_test()

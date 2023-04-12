@@ -10,21 +10,21 @@ import pyspark.sql.functions as sqlf
 import xmlrunner
 import yaml
 
-import memberdna.dna.lib.utils as utils
-import memberdna.dna.lib.managers as managers
-import memberdna.dna.scripts.generate_coupon_and_digital_1 as gen_cpn_and_dig_1
-import memberdna.dna.scripts.generate_coupon_and_digital_2 as gen_cpn_and_dig_2
-import memberdna.dna.scripts.generate_member as gen_member
-import memberdna.dna.scripts.generate_most_shopped as gen_most_shopped
-import memberdna.dna.scripts.generate_transaction_1 as gen_trans_1
-import memberdna.dna.scripts.generate_transaction_2 as gen_trans_2
-import memberdna.dna.scripts.generate_transaction_3 as gen_trans_3
-import memberdna.dna.scripts.generate_misc as gen_misc
-import memberdna.dna.scripts.integrate_acquisition as integrate_acquisition
-import memberdna.dna.scripts.merge as gen_merge
-import memberdna.category_square.unittests.category_DNA_unit as cat_dna_unit
-import memberdna.etl.unittests.etl_unit as etl_unit
-import memberdna.testing_support.lib.utility as test_utils
+import pe_memberdna.dna.lib.utils as utils
+import pe_memberdna.dna.lib.managers as managers
+import pe_memberdna.dna.scripts.generate_coupon_and_digital_1 as gen_cpn_and_dig_1
+import pe_memberdna.dna.scripts.generate_coupon_and_digital_2 as gen_cpn_and_dig_2
+import pe_memberdna.dna.scripts.generate_member as gen_member
+import pe_memberdna.dna.scripts.generate_most_shopped as gen_most_shopped
+import pe_memberdna.dna.scripts.generate_transaction_1 as gen_trans_1
+import pe_memberdna.dna.scripts.generate_transaction_2 as gen_trans_2
+import pe_memberdna.dna.scripts.generate_transaction_3 as gen_trans_3
+import pe_memberdna.dna.scripts.generate_misc as gen_misc
+import pe_memberdna.dna.scripts.integrate_acquisition as integrate_acquisition
+import pe_memberdna.dna.scripts.merge as gen_merge
+import pe_memberdna.category_square.unittests.category_DNA_unit as cat_dna_unit
+import pe_memberdna.etl.unittests.etl_unit as etl_unit
+import pe_memberdna.testing_support.lib.utility as test_utils
 
 
 def prepare_member_dna_data(

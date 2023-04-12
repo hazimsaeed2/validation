@@ -12,7 +12,7 @@ from pe_member_dna.pipelines.assignment.scripts.assign_closure import (
     CAT_LIST,
 )
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class AssignClosuresWithDedup(regression.RegressionTest):

@@ -15,7 +15,7 @@ import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 from pyspark.sql.window import Window
 
-import memberdna.pipelines.assignment.lib.checks as checks
+import pe_memberdna.pipelines.assignment.lib.checks as checks
 from pe_member_dna.pipelines.lib.iotools import read_s3_to_local
 from pe_member_dna.pipelines.lib.spark_util import get_logger
 from pe_member_dna.pipelines.lib.utils import (

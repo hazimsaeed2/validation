@@ -22,8 +22,8 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as sqlf
 from pyspark.sql.window import Window as W
 
-import memberdna.pipelines.assignment.lib.checks as checks
-import memberdna.pipelines.assignment.lib.ingest as ig
+import pe_memberdna.pipelines.assignment.lib.checks as checks
+import pe_memberdna.pipelines.assignment.lib.ingest as ig
 from pe_member_dna.pipelines.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN_EXT,
     CONSTRUCT_COLUMN_EXT_BACKFILL,
@@ -48,7 +48,7 @@ from pe_member_dna.pipelines.assignment.lib.ingest import (
     broadcast_filter,
     join_category_agnostic,
 )
-import memberdna.pipelines.assignment.lib.schemas.cdsa_schemas as cdsa_schemas
+import pe_memberdna.pipelines.assignment.lib.schemas.cdsa_schemas as cdsa_schemas
 from pe_member_dna.pipelines.assignment.lib.slots import (
     fill_slot,
     offer_data_to_list,

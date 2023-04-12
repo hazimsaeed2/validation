@@ -7,8 +7,8 @@ pipeline {
                     agent { node env.node_1 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-1"
@@ -18,8 +18,8 @@ pipeline {
                     agent { node env.node_2 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/v2/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-2"
@@ -32,20 +32,20 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/v2/stage/ref/AD_HOC/pipelined_intermediates
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/awards_fiscal
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/bcg_maps
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/control_files s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/control_files
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/coupon_clip
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/coupon_clip_fiscal
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/lookup
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/master
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/quotient_id
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/sampled s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/sampled
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/skeleton
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/transaction
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal s3://memberanalytics-data-out-prod/v2/stage/ref/pipelined_intermediates/transaction_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/bcg_maps
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/control_files s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/coupon_clip
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/coupon_clip_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/lookup
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/quotient_id
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/sampled s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/sampled
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/skeleton
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction_fiscal
                     '''
                     echo "Stage data in sync with prod"
                 }
@@ -106,22 +106,22 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data['detail']['path'] = config_data['detail']['path'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['member']['path'] = config_data['member']['path'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['item']['path'] = config_data['item']['path'].replace(
-    'v2/AD_HOC/pipelined_intermediates', 'v2/stage/ref/AD_HOC/pipelined_intermediates'
+    'Code_and_Data_repo/AD_HOC/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates'
 )
 config_data['member_extended']['path'] = config_data['member_extended']['path'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
-    'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
+    'Code_and_Data_repo/exclusions', f'Code_and_Data_repo/stage/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'v2/CATEGORY_DNA', f'v2/stage/{git_branch}CATEGORY_DNA'
+    'Code_and_Data_repo/CATEGORY_DNA', f'Code_and_Data_repo/stage/{git_branch}CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0
@@ -141,22 +141,22 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['item'] = config_data['paths']['item'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['cat_dna'] = config_data['paths']['cat_dna'].replace(
-    'v2/CATEGORY_DNA', 'v2/stage/ref/CATEGORY_DNA'
+    'Code_and_Data_repo/CATEGORY_DNA', 'Code_and_Data_repo/stage/ref/CATEGORY_DNA'
 )
 config_data['paths']['transactions'] = config_data['paths']['transactions'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['exclusions'] = config_data['paths']['exclusions'].replace(
-    'v2/exclusions', 'v2/stage/ref/exclusions'
+    'Code_and_Data_repo/exclusions', 'Code_and_Data_repo/stage/ref/exclusions'
 )
 config_data['paths']['output'] = config_data['paths']['output'].replace(
-    'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
+    'Code_and_Data_repo/exclusions', f'Code_and_Data_repo/stage/{git_branch}/exclusions'
 )
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
@@ -192,22 +192,22 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data['detail']['path'] = config_data['detail']['path'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['member']['path'] = config_data['member']['path'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['item']['path'] = config_data['item']['path'].replace(
-    'v2/AD_HOC/pipelined_intermediates', 'v2/stage/ref/AD_HOC/pipelined_intermediates'
+    'Code_and_Data_repo/AD_HOC/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates'
 )
 config_data['member_extended']['path'] = config_data['member_extended']['path'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
-    'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
+    'Code_and_Data_repo/exclusions', f'Code_and_Data_repo/stage/{git_branch}/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'v2/CATEGORY_DNA', f'v2/stage/{git_branch}/CATEGORY_DNA'
+    'Code_and_Data_repo/CATEGORY_DNA', f'Code_and_Data_repo/stage/{git_branch}/CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0
@@ -227,22 +227,22 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['item'] = config_data['paths']['item'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['cat_dna'] = config_data['paths']['cat_dna'].replace(
-    'v2/CATEGORY_DNA', 'v2/stage/ref/CATEGORY_DNA'
+    'Code_and_Data_repo/CATEGORY_DNA', 'Code_and_Data_repo/stage/ref/CATEGORY_DNA'
 )
 config_data['paths']['transactions'] = config_data['paths']['transactions'].replace(
-    'v2/pipelined_intermediates', 'v2/stage/ref/pipelined_intermediates'
+    'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/stage/ref/pipelined_intermediates'
 )
 config_data['paths']['exclusions'] = config_data['paths']['exclusions'].replace(
-    'v2/exclusions', 'v2/stage/ref/exclusions'
+    'Code_and_Data_repo/exclusions', 'Code_and_Data_repo/stage/ref/exclusions'
 )
 config_data['paths']['output'] = config_data['paths']['output'].replace(
-    'v2/exclusions', f'v2/stage/{git_branch}/exclusions'
+    'Code_and_Data_repo/exclusions', f'Code_and_Data_repo/stage/{git_branch}/exclusions'
 )
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)

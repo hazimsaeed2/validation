@@ -3,7 +3,7 @@ from pyspark.sql.functions import desc
 from pe_member_dna.pipelines.assignment.lib.ingest import (
     join_category_agnostic,
 )
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class SingleCF(regression.RegressionTest):

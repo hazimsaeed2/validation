@@ -1,6 +1,6 @@
 from pyspark.sql.functions import col
 
-import memberdna.testing_support.regression_framework.regression as regression
+import pe_memberdna.testing_support.regression_framework.regression as regression
 
 
 class ForceBackIn(regression.RegressionTest):

@@ -1,7 +1,7 @@
 import pyspark.sql.functions as sqlf
 
-import memberdna.pipelines.assignment.lib.assn_io as assn_io
-import memberdna.pipelines.assignment.lib.checks as checks
+import pe_memberdna.pipelines.assignment.lib.assn_io as assn_io
+import pe_memberdna.pipelines.assignment.lib.checks as checks
 
 
 def main(conf_path_in=None):
@@ -23,32 +23,32 @@ def main(conf_path_in=None):
         ]
         checks.check_execution_overwrite(paths_to_check)
 
-    job.log.info('reading input files...')
+    job.log.info("reading input files...")
 
-    job.data.read('bbm_scored', 'BBM_SCORED', filetype='csv')
-    job.data.read('muhh', 'MUHH', filetype='csv')
+    job.data.read("bbm_scored", "BBM_SCORED", filetype="csv")
+    job.data.read("muhh", "MUHH", filetype="csv")
 
-    bbm_scored = job.data.tables['bbm_scored']
-    muhh = job.data.tables['muhh']
+    bbm_scored = job.data.tables["bbm_scored"]
+    muhh = job.data.tables["muhh"]
 
-    job.log.info('joining two tables...')
+    job.log.info("joining two tables...")
     muhh = muhh.select("MEMBERSHIP_ID").withColumnRenamed(
-        "MEMBERSHIP_ID",
-        "mbrshp_nbr"
+        "MEMBERSHIP_ID", "mbrshp_nbr"
     )
 
-    input_sid = muhh.join(
-        bbm_scored.select(["mbrshp_sid", "mbrshp_nbr", "decile", "score"]),
-        ["mbrshp_nbr"],
-        "inner"
-    ).withColumnRenamed(
-        "mbrshp_nbr",
-        "MBRSHP_NBR"
-    ).withColumn("FHH_IND", sqlf.lit("N"))
+    input_sid = (
+        muhh.join(
+            bbm_scored.select(["mbrshp_sid", "mbrshp_nbr", "decile", "score"]),
+            ["mbrshp_nbr"],
+            "inner",
+        )
+        .withColumnRenamed("mbrshp_nbr", "MBRSHP_NBR")
+        .withColumn("FHH_IND", sqlf.lit("N"))
+    )
 
-    job.log.info('writing the combined file...')
+    job.log.info("writing the combined file...")
 
-    job.data.add('input_sid', input_sid)
+    job.data.add("input_sid", input_sid)
 
     job.data.write(
         "input_sid",
@@ -58,7 +58,7 @@ def main(conf_path_in=None):
         ftype="csv",
     )
 
-    job.log.info('done')
+    job.log.info("done")
 
 
 if __name__ == "__main__":
