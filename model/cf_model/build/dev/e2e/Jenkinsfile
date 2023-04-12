@@ -37,7 +37,7 @@ for k in config_data["data_paths"]["source"].keys():
         "PE_Member_Award_Certificate_*.csv", "PE_Member_Award_Certificate.csv"
     )
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["intermediate"].keys():
     if k == "AH5":

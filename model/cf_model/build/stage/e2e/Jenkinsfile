@@ -139,7 +139,7 @@ for config_type in ["AH4", "AH5"]:
     config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
 
-    git_branch = os.getenv('GIT_BRANCH')
+    git_branch = os.getenv('GIT_BRANCH').replace("origin/", "")
 
     with open(config_path_input) as file:
         config_data = yaml.load(file, Loader=yaml.Loader)
@@ -187,7 +187,7 @@ for config_type in ["AH4", "AH5"]:
     config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
 
-    git_branch = os.getenv('GIT_BRANCH')
+    git_branch = os.getenv('GIT_BRANCH').replace("origin/", "")
 
     with open(config_path_input) as file:
         config_data = yaml.load(file, Loader=yaml.Loader)
@@ -238,7 +238,7 @@ for config_type in ["AH4", "AH5"]:
     config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
 
-    git_branch = os.getenv('GIT_BRANCH')
+    git_branch = os.getenv('GIT_BRANCH').replace("origin/", "")
 
     with open(config_path_input) as file:
         config_data = yaml.load(file, Loader=yaml.Loader)
