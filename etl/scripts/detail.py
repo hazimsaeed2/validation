@@ -4,7 +4,6 @@ import os
 
 import pyspark.sql.functions as sqlf
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.lib.s3 import update_most_recent_input_paths
 from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
@@ -15,7 +14,6 @@ def main(job, data_paths, config_validation):
 
     source_path = data_paths["source"]["detail"]
     recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
-    update_most_recent_input_paths("source", data_paths, ["detail"])
     etl_input_data_validator(
         "source",
         recency_lookback_duration,
