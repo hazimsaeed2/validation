@@ -12,7 +12,7 @@ def main(job, data_paths, config_validation):
     logging.info("Starting processing table item")
 
     recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
-    source_path = data_paths["source"]["item_cost"]
+    source_path = data_paths["source"]["item"]
     etl_input_data_validator(
         "source",
         recency_lookback_duration,
