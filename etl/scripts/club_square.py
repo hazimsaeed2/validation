@@ -8,7 +8,7 @@ import pe_memberdna.lib.misc as misc
 import pe_memberdna.etl.lib.validations_ETL as validations
 import pyspark.sql.functions as F
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 from pyspark.sql.window import Window as W
 
@@ -27,6 +27,17 @@ def load_paths(job, data_paths):
         "COMP_STTS",
         "FIRST_FW_HAS_GAS",
     }
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        [
+            "detail_fiscal",
+            "item_with_brand",
+            "club",
+        ],
+    )
 
     detail = job.spark.read.load(data_paths["intermediate"]["detail_fiscal"])
     item_with_brand = job.spark.read.load(

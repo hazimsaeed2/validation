@@ -6,7 +6,7 @@ import os
 import pe_memberdna.etl.lib.validations_ETL as validations
 import pyspark.sql.functions as F
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pyspark.sql.types import *
 
 email_schema = StructType(
@@ -85,6 +85,14 @@ def load_email_data(job, path, schema, config_validation):
 def main(job, data_paths, config_validation):
 
     logging.info("Starting processing table email")
+
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        ["member_extended"],
+    )
 
     source_path = data_paths["source"]["email"]
     email = load_email_data(job, source_path, email_schema, config_validation)

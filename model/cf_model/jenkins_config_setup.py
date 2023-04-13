@@ -26,20 +26,34 @@ parser.add_argument(
 parser.add_argument(
     "run_type", action="store", help="The run type for this execution"
 )
+parser.add_argument("env", action="store", help="Environment type")
+parser.add_argument("git_branch", action="store", help="Git branch")
 args = parser.parse_args()
 
 curr_dir = os.path.abspath(os.path.dirname(__file__))
 
+env = args.env
+git_branch = "branch/" + args.git_branch.replace("origin/", "")
+config_suffix = ""
+s3_input_prefix = ""
+s3_output_prefix = ""
+
+if env == "stage" or env == "dev":
+    config_suffix = f"_{env}"
+    s3_input_prefix = f"{env}/ref/"
+    s3_output_prefix = f"{env}/{git_branch}/"
+
 for AH_type in ["AH4", "AH5"]:
 
-    yaml_path = curr_dir + "/conf/config_" + AH_type + ".yml"
+    yaml_path = curr_dir + f"/conf/config_{AH_type}{config_suffix}.yml"
 
     with open(yaml_path) as config_file:
         config = yaml.load(config_file, Loader=yaml.Loader)
 
     if args.in_home_date == "automatic":
         last_cube_date_str = get_max_file_date(
-            "memberanalytics-data-out-prod", "CUBES/"
+            "memberanalytics-data-out-prod",
+            f"Code_and_Data_repo/{s3_input_prefix}/CUBES/",
         )
         last_cube_date = datetime.datetime.strptime(
             last_cube_date_str, "%Y-%m-%d"
@@ -53,7 +67,9 @@ for AH_type in ["AH4", "AH5"]:
             - datetime.timedelta(6 * 7)
         ).strftime("%Y-%m-%d")
         last_cube_date_str = get_next_file_date(
-            "memberanalytics-data-out-prod", "CUBES/", last_date
+            "memberanalytics-data-out-prod",
+            f"Code_and_Data_repo/{s3_input_prefix}/CUBES/",
+            last_date,
         )
         if not last_cube_date_str:
             print(
@@ -61,7 +77,8 @@ for AH_type in ["AH4", "AH5"]:
                 Using the latest data file instead."
             )
             last_cube_date_str = get_max_file_date(
-                "memberanalytics-data-out-prod", "CUBES/"
+                "memberanalytics-data-out-prod",
+                f"Code_and_Data_repo/{s3_input_prefix}/CUBES/",
             )
         config["predict"]["pred_date"] = args.in_home_date
         last_cube_date = datetime.datetime.strptime(
@@ -87,7 +104,7 @@ for AH_type in ["AH4", "AH5"]:
     if args.prop_path == "automatic":
         prop_path = get_latest_prop_path(
             "memberanalytics-data-out-prod",
-            "Code_and_Data_repo/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/",
+            f"Code_and_Data_repo/{s3_input_prefix}/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/",
             run_type=args.run_type,
         )
         config["paths"]["PROPENSITY_PREDICTIONS"] = (
@@ -99,19 +116,19 @@ for AH_type in ["AH4", "AH5"]:
     config["paths"]["CUBE"] = args.cube_path
     config["paths"][
         "ETL_LOG"
-    ] = "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/LOGS/cf_etl.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/cf_etl.csv"
     config["paths"][
         "TRAIN_LOG"
-    ] = "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/LOGS/als_train.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/als_train.csv"
     config["paths"][
         "PREDICT_LOG"
-    ] = "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/LOGS/cf_predict.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/cf_predict.csv"
     config["paths"][
         "COMBINE_LOG"
-    ] = "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/LOGS/cf_combine_preds.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/cf_combine_preds.csv"
     config["paths"][
         "TUNE_LOG"
-    ] = "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/LOGS/als_tune.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/als_tune.csv"
 
     lambdas = args.lambdas.split(",")
     config["predict"]["lambda"] = []

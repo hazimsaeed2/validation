@@ -3,7 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -26,7 +26,7 @@ def main(job, data_paths):
 
     logging.info("Starting processing table awards")
 
-    input_data_validator(
+    etl_input_data_validator(
         "intermediate",
         recency_lookback_duration,
         data_paths,

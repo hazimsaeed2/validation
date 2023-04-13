@@ -3,7 +3,8 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.lib.s3 import update_most_recent_input_paths
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -11,7 +12,15 @@ def main(job, data_paths, config_validation):
 
     logging.info("Starting processing table payment")
 
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
     source_path = data_paths["source"]["payment"]
+    update_most_recent_input_paths("source", data_paths, ["payment"])
+    etl_input_data_validator(
+        "source",
+        recency_lookback_duration,
+        data_paths,
+        ["payment"],
+    )
 
     cast_sql = """
     select

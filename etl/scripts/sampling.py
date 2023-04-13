@@ -3,12 +3,19 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
 def selectSampledMembers(job, data_paths):
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
     out_path = data_paths["sampled"]["member"]
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        ["member"],
+    )
 
     member = job.spark.read.parquet(data_paths["intermediate"]["member"])
     print("member count: ", member.count())
@@ -23,6 +30,13 @@ def selectSampledMembers(job, data_paths):
 
 
 def readSampledMemberIDs(job, data_paths):
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "sampled",
+        recency_lookback_duration,
+        data_paths,
+        ["member"],
+    )
     sampled_member = job.spark.read.parquet(data_paths["sampled"]["member"])
     sampled_member = sampled_member.select("MBRSHP_SID")
     sampled_member.cache()
@@ -30,6 +44,13 @@ def readSampledMemberIDs(job, data_paths):
 
 
 def sampleIntermediate(job, intermediate_name, sampled_member, data_paths):
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        [intermediate_name],
+    )
     df = job.spark.read.parquet(data_paths["intermediate"][intermediate_name])
     sampled_df = df.join(sampled_member, "MBRSHP_SID")
     print(intermediate_name, df.count(), sampled_df.count())

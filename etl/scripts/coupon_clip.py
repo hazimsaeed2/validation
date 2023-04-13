@@ -5,7 +5,6 @@ import os
 import pyspark.sql.functions as F
 from pyspark.sql.types import *
 
-from pe_memberdna.etl.lib.s3 import input_data_validator
 import pe_memberdna.etl.lib.validations_ETL as validations
 from pe_memberdna.lib.job_manager import JobManager
 
