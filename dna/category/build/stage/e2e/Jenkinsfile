@@ -7,8 +7,8 @@ pipeline {
                     agent { node env.node_1 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-1"
@@ -18,8 +18,8 @@ pipeline {
                     agent { node env.node_2 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-2"
