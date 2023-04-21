@@ -6,9 +6,10 @@ pipeline {
                 agent { node env.node_1 }
                 steps {
                     sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
+                        curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                     '''
                     echo "Ran environemnt setup on cluster-1"
                 }
@@ -17,9 +18,10 @@ pipeline {
                 agent { node env.node_2 }
                 steps {
                     sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
+                        curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                     '''
                     echo "Ran environemnt setup on cluster-2"
                 }
@@ -28,9 +30,10 @@ pipeline {
                 agent { node env.node_3 }
                 steps {
                     sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
+                        curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                     '''
                     echo "Ran environemnt setup on cluster-3"
                 }
@@ -42,7 +45,7 @@ pipeline {
                 sh '''
                     wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                     export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
                 '''
             }
 
@@ -54,7 +57,7 @@ pipeline {
                 sh '''
                     wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                     export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
                 '''
             }
         }
@@ -65,7 +68,7 @@ pipeline {
                 sh '''
                     wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                     export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
                 '''
             }
         }

@@ -92,10 +92,10 @@ with open(config_path_output, "w") as file:
                     python3 -m ensurepip --upgrade
                     pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
                     venv-pack -o pyspark_venv.tar.gz
-                    export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                     python3 _config_step.py
                     cd pe_memberdna
-                    python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                    python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} dev ${GIT_BRANCH}
+
 					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_dev.yml
 					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_dev.yml
 					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH5_dev.yml
