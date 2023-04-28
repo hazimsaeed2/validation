@@ -26,22 +26,21 @@ parser.add_argument(
 parser.add_argument(
     "run_type", action="store", help="The run type for this execution"
 )
-parser.add_argument("env", action="store", help="Environment type")
 parser.add_argument("git_branch", action="store", help="Git branch")
 args = parser.parse_args()
 
 curr_dir = os.path.abspath(os.path.dirname(__file__))
 
-env = args.env
+run_type = args.run_type
 git_branch = "branch/" + args.git_branch.replace("origin/", "")
 config_suffix = ""
 s3_input_prefix = ""
 s3_output_prefix = ""
 
-if env == "stage" or env == "dev":
-    config_suffix = f"_{env}"
-    s3_input_prefix = f"{env}/ref/"
-    s3_output_prefix = f"{env}/{git_branch}/"
+if run_type == "stage" or run_type == "dev":
+    config_suffix = f"_{run_type}"
+    s3_input_prefix = f"{run_type}/ref/"
+    s3_output_prefix = f"{run_type}/{git_branch}/"
 
 for AH_type in ["AH4", "AH5"]:
 
@@ -135,7 +134,10 @@ for AH_type in ["AH4", "AH5"]:
     for l in lambdas:
         config["predict"]["lambda"].append(l)
 
-    config["paths"]["PREDICTIONS_ROOT"] = args.pred_root
+    if run_type in ["dev", "stage"]
+    config["paths"]["PREDICTIONS_ROOT"] = args.pred_root.replace(
+        f"{run_type}/ref/", f"{run_type}/{git_branch}/"
+    )
 
     with open(yaml_path, "w") as config_file:
         yaml.dump(config, config_file)
