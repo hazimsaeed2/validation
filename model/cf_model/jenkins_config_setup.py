@@ -5,11 +5,11 @@ import os
 import yaml
 
 import pe_memberdna.lib.misc as misc
-from pe_memberdna.cube.utils.utility import (
+from pe_memberdna.lib.utility import (
     get_max_file_date,
     get_next_file_date,
 )
-from pe_memberdna.pipelines.cf_model.lib.cf_utils import get_latest_prop_path
+from pe_memberdna.model.cf_model.lib.cf_utils import get_latest_prop_path
 
 parser = argparse.ArgumentParser(description="Update config file.")
 parser.add_argument("in_home_date", action="store", help="In Home Date")
