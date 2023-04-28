@@ -15,19 +15,19 @@ for config_type in ["AH4", "AH5"]:
         config_data = yaml.load(file, Loader=yaml.Loader)
 
     for path in config_data["paths"].keys():
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/dev/{git_branch}/MODELDATA"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/dev/ref/pipelined_intermediates"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/dev/ref/AD_HOC"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/dev/ref/CATEGORY_DNA"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/dev/ref/CUBES"
         )
 
