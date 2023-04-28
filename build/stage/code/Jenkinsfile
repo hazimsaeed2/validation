@@ -4,7 +4,8 @@ pipeline {
         stage('Code promotion') {
             steps {
                 sh '''
-                    aws s3 sync --delete pe_memberdna s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${GIT_BRANCH}/code/pe_memberdna/
+                    curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                    aws s3 sync --delete pe_memberdna s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna/
                 '''
             }
         }
