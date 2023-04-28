@@ -47,7 +47,7 @@ pipeline {
                 script {
                     sh  '''
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards_fiscal
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/bcg_maps
@@ -145,7 +145,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+    "Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv", "Code_and_Data_repo/stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
@@ -203,7 +203,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+    "Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv", "Code_and_Data_repo/stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
@@ -261,7 +261,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+    "Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv", "Code_and_Data_repo/stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(

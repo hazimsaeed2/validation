@@ -46,15 +46,15 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180614.txt --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180719.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180829.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Header
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Detail
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Payment
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/ref/Other --exclude Promo* --exclude RFM_July2017_Present.csv --exclude people.txt --exclude kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude kantar_storemaster_hierarchy_data_SAP_20180829.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/ref/Email_Events
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ref/ATC --exclude old/*
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/ref/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180614.txt --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180719.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180829.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Header
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Detail
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Payment
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Other --exclude Promo* --exclude RFM_July2017_Present.csv --exclude people.txt --exclude kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude kantar_storemaster_hierarchy_data_SAP_20180829.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Email_Events
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/ATC --exclude old/*
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/control_files
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
                     '''
                     echo "Stage data in sync with prod"
@@ -133,7 +133,7 @@ git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -203,7 +203,7 @@ git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -273,7 +273,7 @@ git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
