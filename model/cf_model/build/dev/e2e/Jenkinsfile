@@ -5,6 +5,9 @@ pipeline {
             steps {
                 script {
                     def content = """
+import os
+import yaml
+
 for config_type in ["AH4", "AH5"]:
     config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_dev.yaml"
