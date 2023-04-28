@@ -134,10 +134,10 @@ for AH_type in ["AH4", "AH5"]:
     for l in lambdas:
         config["predict"]["lambda"].append(l)
 
-    if run_type in ["dev", "stage"]
-    config["paths"]["PREDICTIONS_ROOT"] = args.pred_root.replace(
-        f"{run_type}/ref/", f"{run_type}/{git_branch}/"
-    )
+    if run_type in ["dev", "stage"]:
+        config["paths"]["PREDICTIONS_ROOT"] = args.pred_root.replace(
+            f"{run_type}/ref/", f"{run_type}/{git_branch}/"
+        )
 
     with open(yaml_path, "w") as config_file:
         yaml.dump(config, config_file)
