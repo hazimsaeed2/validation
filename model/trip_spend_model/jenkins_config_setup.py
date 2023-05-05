@@ -14,22 +14,34 @@ parser.add_argument(
 parser.add_argument(
     "run_type", action="store", help="The run type for this execution"
 )
+parser.add_argument("git_branch", action="store", help="Git branch")
 args = parser.parse_args()
 
 curr_dir = os.path.abspath(os.path.dirname(__file__))
 
-yaml_path = curr_dir + "/config.yml"
+run_type = args.run_type
+git_branch = "branch/" + args.git_branch.replace("origin/", "")
+config_suffix = ""
+s3_input_prefix = ""
+s3_output_prefix = ""
+
+if run_type == "dev" or run_type == "stage":
+    config_suffix = f"_{run_type}"
+    s3_input_prefix = f"{run_type}/ref/"
+    s3_output_prefix = f"{run_type}/{git_branch}/"
+
+yaml_path = curr_dir + f"/conf/config{config_suffix}.yml"
 
 with open(yaml_path) as config_file:
     config = yaml.load(config_file, Loader=yaml.FullLoader)
 
 config["shared"]["run_name"] = "{}_{}".format(
-    args.run_type, datetime.date.today().strftime("%Y_%m_%d")
+    run_type, datetime.date.today().strftime("%Y_%m_%d")
 )
 
 if args.in_home_date == "automatic":
     last_cube_date_str = get_max_file_date(
-        "memberanalytics-data-out-prod", "CUBES/"
+        "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/"
     )
 else:
     last_date = (
@@ -37,7 +49,7 @@ else:
         - datetime.timedelta(6 * 7)
     ).strftime("%Y-%m-%d")
     last_cube_date_str = get_next_file_date(
-        "memberanalytics-data-out-prod", "CUBES/", last_date
+        "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/", last_date
     )
     if not last_cube_date_str:
         print(
@@ -45,7 +57,7 @@ else:
             Using the latest data file instead."
         )
         last_cube_date_str = get_max_file_date(
-            "memberanalytics-data-out-prod", "CUBES/"
+            "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/"
         )
 
 last_cube_date = datetime.datetime.strptime(last_cube_date_str, "%Y-%m-%d")

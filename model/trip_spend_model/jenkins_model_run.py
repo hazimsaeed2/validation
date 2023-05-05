@@ -1,8 +1,14 @@
 import os
 import subprocess
 import urllib.parse
-
+import argparse
 import boto3
+
+parser = argparse.ArgumentParser(description="Model run.")
+parser.add_argument("config_path", action="store", help="Config path")
+args = parser.parse_args()
+
+config_path = args.config_path
 
 ssh_cert = os.environ["ssh_key_file"]
 ssh_username = os.environ["ssh_username"]
@@ -66,8 +72,8 @@ cmd = [
     "-i",
     "bi-emr2.pem",
     "-r",
-    "memberdna/",
-    "ec2-user" + "@" + host_ip + ":memberdna/",
+    "pe_memberdna/",
+    "ec2-user" + "@" + host_ip + ":pe_memberdna/",
 ]
 result = subprocess.check_output(cmd)
 print(result)
@@ -78,7 +84,7 @@ cmd = [
     "-i",
     "bi-emr2.pem",
     "ec2-user" + "@" + host_ip,
-    "cd memberdna/pipelines/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict > models_predict.txt ",
+    f"cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict config={config_path} > models_predict.txt ",
 ]
 
 try:
@@ -94,7 +100,7 @@ cmd = [
     "-i",
     "bi-emr2.pem",
     "ec2-user" + "@" + host_ip,
-    "cat memberdna/pipelines/trip_spend_model/models_predict.txt ",
+    "cat pe_memberdna/model/trip_spend_model/models_predict.txt ",
 ]
 
 result = subprocess.check_output(cmd)

@@ -1,7 +1,7 @@
 # 1. Setup
 .PHONY: list etl create_rf_spend_model create_rf_trip_model grid-search_trip grid-search_spend create_models predict
 
-config = config.yml
+config?=./conf/config.yml
 
 list:
 	@grep '^[^#[:space:]].*:' Makefile
