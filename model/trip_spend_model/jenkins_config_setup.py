@@ -40,9 +40,9 @@ config["shared"]["run_name"] = "{}_{}".format(
 )
 
 if args.in_home_date == "automatic":
-    print("AAAA" + f"{s3_input_prefix}CUBES/")
     last_cube_date_str = get_max_file_date(
-        "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/"
+        "memberanalytics-data-out-prod",
+        f"Code_and_Data_repo/{s3_input_prefix}CUBES/",
     )
 else:
     last_date = (
@@ -50,7 +50,9 @@ else:
         - datetime.timedelta(6 * 7)
     ).strftime("%Y-%m-%d")
     last_cube_date_str = get_next_file_date(
-        "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/", last_date
+        "memberanalytics-data-out-prod",
+        f"Code_and_Data_repo/{s3_input_prefix}CUBES/",
+        last_date,
     )
     if not last_cube_date_str:
         print(
@@ -58,7 +60,8 @@ else:
             Using the latest data file instead."
         )
         last_cube_date_str = get_max_file_date(
-            "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/"
+            "memberanalytics-data-out-prod",
+            f"Code_and_Data_repo/{s3_input_prefix}CUBES/",
         )
 
 last_cube_date = datetime.datetime.strptime(last_cube_date_str, "%Y-%m-%d")

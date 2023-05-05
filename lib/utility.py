@@ -41,8 +41,6 @@ def get_max_file_date(bucket, prefix, format="%Y-%m-%d", hist_date=0):
     client = boto3.client("s3")
     objs = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter="/")
 
-    print(prefix)
-    print(objs)
     max_dt = dt.strptime("2000-01-01", "%Y-%m-%d")
     max_dt_minus_1 = max_dt
 
