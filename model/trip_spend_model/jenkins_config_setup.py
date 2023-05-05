@@ -40,6 +40,7 @@ config["shared"]["run_name"] = "{}_{}".format(
 )
 
 if args.in_home_date == "automatic":
+    print("AAAA" + f"{s3_input_prefix}CUBES/")
     last_cube_date_str = get_max_file_date(
         "memberanalytics-data-out-prod", f"{s3_input_prefix}CUBES/"
     )

@@ -59,29 +59,25 @@ with open(config_path_output, "w") as file:
         }
         stage('Setup Config') {
             steps {
-                node (env.node) {
-                    sh '''
-                        export PYTHONPATH=$WORKSPACE:
-                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} dev
-                        cat $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_dev.yaml
-                        d = b
-                    '''
-                }
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} dev ${GIT_BRANCH}
+                    cat $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_dev.yaml
+                    d = b
+                '''
             }
         }
         stage('Propensity Model ETL') {
             steps {
-                node(env.node) {
-                    echo "RUNNING PROPENSITY MODEL ETL"
-                    sh '''
-                        export PYTHONPATH=$WORKSPACE:
-                        export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
-                        export PYSPARK_PYTHON=environment/bin/python
-                        export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
-                        spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/config_dev.yml
-                    '''
-                    echo "PROPENSITY MODEL ETL FINISHED"
-                }
+                echo "RUNNING PROPENSITY MODEL ETL"
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+                    spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/config_dev.yml
+                '''
+                echo "PROPENSITY MODEL ETL FINISHED"
             }
         }
         stage('Setup EC2') {
@@ -100,26 +96,24 @@ with open(config_path_output, "w") as file:
         }
         stage('Run Trip Propensity') {
             steps {
-                node(env.node) {
-                    withCredentials([
-                        sshUserPrivateKey(
-                          credentialsId: 'SSH-PROD-hadoop',
-                          keyFileVariable: 'ssh_key_file',
-                          passphraseVariable: 'ssh_pass',
-                          usernameVariable: 'ssh_username'),
-                        usernamePassword(credentialsId: 'bitbucket-service-account',
-                          usernameVariable: 'bitbucket_username',
-                          passwordVariable: 'bitbucket_pass')
-                        ])
-                    {
-                        echo "$ssh_username"
-                        echo "RUNNING PROPENSITY MODEL"
-                        sh '''
-                            export PYTHONPATH=$WORKSPACE:
-                            python3 $WORKSPACE/memberdna/pipelines/trip_spend_model/jenkins_model_run.py ./conf/config_path.yaml
-                        '''
-                        echo "PROPENSITY MODEL FINISHED"
-                    }
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'SSH-PROD-hadoop',
+                        keyFileVariable: 'ssh_key_file',
+                        passphraseVariable: 'ssh_pass',
+                        usernameVariable: 'ssh_username'),
+                    usernamePassword(credentialsId: 'bitbucket-service-account',
+                        usernameVariable: 'bitbucket_username',
+                        passwordVariable: 'bitbucket_pass')
+                    ])
+                {
+                    echo "$ssh_username"
+                    echo "RUNNING PROPENSITY MODEL"
+                    sh '''
+                        export PYTHONPATH=$WORKSPACE:
+                        python3 $WORKSPACE/memberdna/pipelines/trip_spend_model/jenkins_model_run.py ./conf/config_path.yaml
+                    '''
+                    echo "PROPENSITY MODEL FINISHED"
                 }
             }
             post {
@@ -135,14 +129,12 @@ with open(config_path_output, "w") as file:
         }
 		stage('Propensity Model QC') {
             steps {
-                node(env.node) {
-                    echo "RUNNING PROPENSITY MODEL QC"
-                    sh '''
-                        export PYTHONPATH=$WORKSPACE:
-                        python3  $WORKSPACE/memberdna/pipelines/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/memberdna/pipelines/trip_spend_model/config_dev.yml ${qc_save}
-                    '''
-                    echo "PROPENSITY MODEL QC FINISHED"
-                }
+                echo "RUNNING PROPENSITY MODEL QC"
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    python3  $WORKSPACE/memberdna/pipelines/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/memberdna/pipelines/trip_spend_model/config_dev.yml ${qc_save}
+                '''
+                echo "PROPENSITY MODEL QC FINISHED"
             }
         }
     }
