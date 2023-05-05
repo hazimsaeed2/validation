@@ -62,10 +62,6 @@ with open(config_path_output, "w") as file:
                 sh '''
                     export PYTHONPATH=$WORKSPACE:
                     python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} dev ${GIT_BRANCH}
-                    ls $WORKSPACE/pe_memberdna/model/trip_spend_model
-                    ls $WORKSPACE/pe_memberdna/model/trip_spend_model/conf
-                    cat $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_dev.yaml
-                    d = b
                 '''
             }
         }
@@ -113,7 +109,7 @@ with open(config_path_output, "w") as file:
                     echo "RUNNING PROPENSITY MODEL"
                     sh '''
                         export PYTHONPATH=$WORKSPACE:
-                        python3 $WORKSPACE/memberdna/pipelines/trip_spend_model/jenkins_model_run.py ./conf/config_path.yaml
+                        python3 $WORKSPACE/memberdna/pipelines/trip_spend_model/jenkins_model_run.py ./conf/config_dev.yml
                     '''
                     echo "PROPENSITY MODEL FINISHED"
                 }
