@@ -73,7 +73,7 @@ with open(config_path_output, "w") as file:
                     export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
                     export PYSPARK_PYTHON=environment/bin/python
                     export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
-                    spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/config_dev.yml
+                    spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_dev.yml
                 '''
                 echo "PROPENSITY MODEL ETL FINISHED"
             }
