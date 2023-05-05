@@ -52,7 +52,7 @@ for AH_type in ["AH4", "AH5"]:
     if args.in_home_date == "automatic":
         last_cube_date_str = get_max_file_date(
             "memberanalytics-data-out-prod",
-            f"Code_and_Data_repo/{s3_input_prefix}/CUBES/",
+            f"Code_and_Data_repo/{s3_input_prefix}CUBES/",
         )
         last_cube_date = datetime.datetime.strptime(
             last_cube_date_str, "%Y-%m-%d"
@@ -67,7 +67,7 @@ for AH_type in ["AH4", "AH5"]:
         ).strftime("%Y-%m-%d")
         last_cube_date_str = get_next_file_date(
             "memberanalytics-data-out-prod",
-            f"Code_and_Data_repo/{s3_input_prefix}/CUBES/",
+            f"Code_and_Data_repo/{s3_input_prefix}CUBES/",
             last_date,
         )
         if not last_cube_date_str:
@@ -77,7 +77,7 @@ for AH_type in ["AH4", "AH5"]:
             )
             last_cube_date_str = get_max_file_date(
                 "memberanalytics-data-out-prod",
-                f"Code_and_Data_repo/{s3_input_prefix}/CUBES/",
+                f"Code_and_Data_repo/{s3_input_prefix}CUBES/",
             )
         config["predict"]["pred_date"] = args.in_home_date
         last_cube_date = datetime.datetime.strptime(
@@ -103,7 +103,7 @@ for AH_type in ["AH4", "AH5"]:
     if args.prop_path == "automatic":
         prop_path = get_latest_prop_path(
             "memberanalytics-data-out-prod",
-            f"Code_and_Data_repo/{s3_input_prefix}/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/",
+            f"Code_and_Data_repo/{s3_input_prefix}MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/",
             run_type=args.run_type,
         )
         config["paths"]["PROPENSITY_PREDICTIONS"] = (
@@ -115,19 +115,19 @@ for AH_type in ["AH4", "AH5"]:
     config["paths"]["CUBE"] = args.cube_path
     config["paths"][
         "ETL_LOG"
-    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/cf_etl.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}MODELDATA/LOGS/cf_etl.csv"
     config["paths"][
         "TRAIN_LOG"
-    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/als_train.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}MODELDATA/LOGS/als_train.csv"
     config["paths"][
         "PREDICT_LOG"
-    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/cf_predict.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}MODELDATA/LOGS/cf_predict.csv"
     config["paths"][
         "COMBINE_LOG"
-    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/cf_combine_preds.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}MODELDATA/LOGS/cf_combine_preds.csv"
     config["paths"][
         "TUNE_LOG"
-    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}/MODELDATA/LOGS/als_tune.csv"
+    ] = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/{s3_output_prefix}MODELDATA/LOGS/als_tune.csv"
 
     lambdas = args.lambdas.split(",")
     config["predict"]["lambda"] = []
