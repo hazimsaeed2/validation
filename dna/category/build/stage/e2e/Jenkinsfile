@@ -411,5 +411,21 @@ for yaml_path in [
                 }
             }
         }
+        stage('Starting 3rd Parallel run') {
+            parallel {
+                stage('Scaling down cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        echo "Scaling down cluster-1"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-1"
+                    }
+                }
+            }
+        }
     }
 }

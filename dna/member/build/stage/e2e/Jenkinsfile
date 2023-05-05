@@ -559,13 +559,41 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                             export PYTHONPATH=$WORKSPACE:
                             cd $WORKSPACE
                             unset SPARK_OPTIONS
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-3 cluster-3 script"
+                    }
+                }
+            }
+        }
+        stage('Starting 4th Parallel run') {
+            parallel {
+                stage('Scaling down cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        echo "Scaling down cluster-1"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-1"
+                    }
+                }
+                stage('Scaling down cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        echo "Scaling down cluster-3"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-3"
                     }
                 }
             }
