@@ -21,25 +21,20 @@ for path in config_data["shared"].keys():
         config_data["shared"][path] = config_data["shared"][path].replace(
             "Code_and_Data_repo", f"Code_and_Data_repo/dev/ref"
         )
-    else:
+    else if path in ["base_path", "ad_hoc_output_path", "model_path", "dataset_path", "prediction_path"]:
         config_data["shared"][path] = config_data["shared"][path].replace(
             "Code_and_Data_repo", f"Code_and_Data_repo/dev/{git_branch}"
         )
 
 for path in config_data["etl"].keys():
-    if path == "BBM_weeks_path":
-        config_data["shared"][path] = config_data["shared"][path].replace(
+    if path in ["BBM_weeks_path", "lookup_path"]:
+        config_data["etl"][path] = config_data["etl"][path].replace(
             "Code_and_Data_repo", f"Code_and_Data_repo/dev/ref"
         )
-    else:
-        config_data["shared"][path] = config_data["shared"][path].replace(
-            "Code_and_Data_repo", f"Code_and_Data_repo/dev/{git_branch}"
-        )
 
-for path in config_data["grid_search"].keys():
-    config_data["shared"][path] = config_data["shared"][path].replace(
-        "Code_and_Data_repo", f"Code_and_Data_repo/dev/{git_branch}"
-    )
+config_data["grid_search"]["output_path"] = config_data["grid_search"]["output_path"].replace(
+    "Code_and_Data_repo", f"Code_and_Data_repo/dev/{git_branch}"
+)
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
