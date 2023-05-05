@@ -6,9 +6,17 @@ import boto3
 
 parser = argparse.ArgumentParser(description="Model run.")
 parser.add_argument("config_path", action="store", help="Config path")
+parser.add_argument(
+    "run_type", action="store", help="The run type for this execution"
+)
+parser.add_argument("git_branch", action="store", help="Git branch")
 args = parser.parse_args()
 
 config_path = args.config_path
+run_type = args.run_type
+git_branch = ("branch/" + args.git_branch.replace("origin/", "")).replace(
+    "/", "_"
+)
 
 ssh_cert = os.environ["ssh_key_file"]
 ssh_username = os.environ["ssh_username"]
@@ -21,8 +29,13 @@ if not os.path.isfile("bi-emr2.pem"):
         myfile.write(rsa_contents)
 
 ec2 = boto3.client("ec2")
+
+tag_name = "ue00mdaapp01"
+if run_type in ["dev", "stage"]:
+    tag_name = f"{tag_name}_{run_type}_{git_branch}"
+
 response = ec2.describe_instances(
-    Filters=[{"Name": "tag:Hostname", "Values": ["ue00mdaapp01"]}]
+    Filters=[{"Name": "tag:Hostname", "Values": [tag_name]}]
 )
 
 for rsvn in response.get("Reservations"):

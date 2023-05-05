@@ -85,7 +85,9 @@ with open(config_path_output, "w") as file:
                         rm -rf /var/lib/jenkins/workspace/Ec2-Start-Stop/Ec2-OnDemand-ue00mdaapp01/output.txt
                         export AWS=/usr/local/bin/aws
                         cd /var/lib/jenkins/workspace/Ec2-Start-Stop/Ec2-OnDemand-ue00mdaapp01/
-                        instanceId=`$AWS ec2 run-instances --region us-east-1 --image-id ami-0de53d8956e8dcf80 --instance-type r5.12xlarge --key-name bi-emr --iam-instance-profile Name=EMRMDAEc2InstanceProfile --subnet-id subnet-6317c629 --security-group-ids sg-03a3c4770d1be5f84 sg-b0ce14c4 sg-d0cb11a4 --user-data file://ec2-config.sh --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ue00mdaapp01},{Key=Project,Value=MemberDataAggregation},{Key=AppName,Value=MemberDataAggregation},{Key=CreatedBy,Value=kpamidimarri@bjs.com},{Key=BusinessUnit,Value=FrontOffice},{Key=ServiceType,Value=App},{Key=Environment,Value=Prod},{Key=Hostname,Value=ue00mdaapp01},{Key=OSType,Value=AmazonLinux},{Key=ServiceOwner,Value=Other},{Key=Model,Value=true}]' --query 'Instances[].InstanceId' --output text`
+                        curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g' | sed 's/\//_/g)
+
+                        instanceId=`$AWS ec2 run-instances --region us-east-1 --image-id ami-0de53d8956e8dcf80 --instance-type r5.12xlarge --key-name bi-emr --iam-instance-profile Name=EMRMDAEc2InstanceProfile --subnet-id subnet-6317c629 --security-group-ids sg-03a3c4770d1be5f84 sg-b0ce14c4 sg-d0cb11a4 --user-data file://ec2-config.sh --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ue00mdaapp01_dev_$curated_git_branch},{Key=Project,Value=MemberDataAggregation},{Key=AppName,Value=MemberDataAggregation},{Key=CreatedBy,Value=kpamidimarri@bjs.com},{Key=BusinessUnit,Value=FrontOffice},{Key=ServiceType,Value=App},{Key=Environment,Value=Dev},{Key=Hostname,Value=ue00mdaapp01},{Key=OSType,Value=AmazonLinux},{Key=ServiceOwner,Value=Other},{Key=Model,Value=true}]' --query 'Instances[].InstanceId' --output text`
                         $AWS ec2 describe-instances --region us-east-1 --instance-id $instanceId --query 'Reservations[].Instances[].PrivateIpAddress' > output.txt
                         echo $instanceId >> output.txt
                     '''
@@ -109,7 +111,7 @@ with open(config_path_output, "w") as file:
                     echo "RUNNING PROPENSITY MODEL"
                     sh '''
                         export PYTHONPATH=$WORKSPACE:
-                        python3 $WORKSPACE/memberdna/pipelines/trip_spend_model/jenkins_model_run.py ./conf/config_dev.yml
+                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config_dev.yml
                     '''
                     echo "PROPENSITY MODEL FINISHED"
                 }
@@ -119,7 +121,8 @@ with open(config_path_output, "w") as file:
                     node('built-in') {
                         sh '''
                             export AWS=/usr/local/bin/aws
-                            $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].[InstanceId]' --filters 'Name=tag:Name,Values=ue00mdaapp01' --output text`
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g' | sed 's/\//_/g)
+                            $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].[InstanceId]' --filters 'Name=tag:Name,Values=ue00mdaapp01_dev_$curated_git_branch' --output text`
                         '''
                     }
                 }
@@ -130,7 +133,7 @@ with open(config_path_output, "w") as file:
                 echo "RUNNING PROPENSITY MODEL QC"
                 sh '''
                     export PYTHONPATH=$WORKSPACE:
-                    python3  $WORKSPACE/memberdna/pipelines/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/memberdna/pipelines/trip_spend_model/config_dev.yml ${qc_save}
+                    python3  $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_dev.yml ${qc_save}
                 '''
                 echo "PROPENSITY MODEL QC FINISHED"
             }
