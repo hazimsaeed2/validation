@@ -50,6 +50,7 @@ with open(config_path_output, "w") as file:
                     pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
                     python3 -m ensurepip --upgrade
                     pyspark_venv/bin/pip install -r pe_memberdna/requirements.txt --no-cache-dir
+                    rm -f pyspark_venv.tar.gz
                     venv-pack -o pyspark_venv.tar.gz
                     python3 _config_step.py
                     deactivate
