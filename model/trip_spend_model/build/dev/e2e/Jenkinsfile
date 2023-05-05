@@ -62,6 +62,8 @@ with open(config_path_output, "w") as file:
                 sh '''
                     export PYTHONPATH=$WORKSPACE:
                     python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} dev ${GIT_BRANCH}
+                    ls $WORKSPACE/pe_memberdna/model/trip_spend_model
+                    ls $WORKSPACE/pe_memberdna/model/trip_spend_model/conf
                     cat $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_dev.yaml
                     d = b
                 '''
