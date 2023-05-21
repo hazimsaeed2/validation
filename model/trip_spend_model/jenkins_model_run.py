@@ -14,9 +14,14 @@ def execute_ssh_command(ssh_key_path, host, username, command):
     c.connect(hostname=host, username=username, pkey=k)
     print(f"Connected to TP Model EC2 machine: {host} ")
     print(f"Executing command {command}")
-    _, stdout, stderr = c.exec_command(command)
-    print(f"stdout is {stdout.read()}")
-    print(f"stderr is {stderr.read()}")
+    for i in range(0, 10):
+        _, stdout, stderr = c.exec_command(command)
+        stderr_str = stderr.read()
+        stdout_str = stdout.read()
+        print(f"stdout is {stdout_str}")
+        print(f"stderr is {stderr_str}")
+        if not stderr_str:
+            break
     c.close()
 
 
@@ -103,8 +108,6 @@ command_list = [
 ]
 
 ssh_command = " && ".join(command_list)
-print(command_list)
-print(ssh_command)
 
 if ping_test(host_ip):
     execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
