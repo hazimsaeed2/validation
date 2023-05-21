@@ -6,18 +6,17 @@ import boto3
 import paramiko
 
 
-def execute_ssh_command(ssh_key_path, host, username, commands):
+def execute_ssh_command(ssh_key_path, host, username, command):
     k = paramiko.RSAKey.from_private_key_file(ssh_key_path)
     c = paramiko.SSHClient()
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print(f"Trying to connect to TP Model EC2 machine: {host} ")
     c.connect(hostname=host, username=username, pkey=k)
     print(f"Connected to TP Model EC2 machine: {host} ")
-    for command in commands:
-        print(f"\nExecuting command {command}")
-        _, stdout, stderr = c.exec_command(command)
-        print(f"stdout is {stdout.read()}")
-        print(f"stderr is {stderr.read()}")
+    print(f"Executing command {command}")
+    _, stdout, stderr = c.exec_command(command)
+    print(f"stdout is {stdout.read()}")
+    print(f"stderr is {stderr.read()}")
     c.close()
 
 
@@ -104,6 +103,8 @@ command_list = [
 ]
 
 ssh_command = " && ".join(command_list)
+print(command_list)
+print(ssh_command)
 
 if ping_test(host_ip):
     execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
