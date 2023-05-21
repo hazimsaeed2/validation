@@ -111,7 +111,7 @@ with open(config_path_output, "w") as file:
                     echo "RUNNING PROPENSITY MODEL"
                     sh '''
                         export PYTHONPATH=$WORKSPACE:
-                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config_dev.yml
+                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config_dev.yml dev $GIT_BRANCH
                     '''
                     echo "PROPENSITY MODEL FINISHED"
                 }
