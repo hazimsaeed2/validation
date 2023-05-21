@@ -121,7 +121,7 @@ with open(config_path_output, "w") as file:
                     node('built-in') {
                         sh '''
                             export AWS=/usr/local/bin/aws
-                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g' | sed 's/\//_/g)
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g' | sed 's/\\//_/g')
                             $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].[InstanceId]' --filters 'Name=tag:Name,Values=ue00mdaapp01_dev_$curated_git_branch' --output text`
                         '''
                     }
