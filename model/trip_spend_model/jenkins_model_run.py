@@ -38,10 +38,15 @@ response = ec2.describe_instances(
     Filters=[{"Name": "tag:Hostname", "Values": [tag_name]}]
 )
 
+host_ip = None
+
 for rsvn in response.get("Reservations"):
     if "PrivateIpAddress" in rsvn["Instances"][0]:
         host_ip = rsvn["Instances"][0]["PrivateIpAddress"]
         break
+
+if host_ip is None:
+    raise Exception("Cannot get the host IP of the EC2 instance")
 
 print("Using EC2 IpAddress of " + host_ip)
 
