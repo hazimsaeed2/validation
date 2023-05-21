@@ -103,12 +103,14 @@ command_list = [
     "sudo python3 -m pip install scikit-learn==0.24.2",
 ]
 
+ssh_command = " && ".join(command_list)
+
 if ping_test(host_ip):
-    execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", command_list)
+    execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
 else:
     raise Exception(f"EC2 machine {host_ip} is not reachable ")
 
-cmd = [
+scp_command = [
     "scp",
     "-v",
     "-i",
@@ -120,7 +122,7 @@ cmd = [
 ]
 
 try:
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(scp_command, capture_output=True, text=True)
 except subprocess.CalledProcessError as e:
     raise RuntimeError(
         "command '{}' return with error (code {}): {}".format(
@@ -128,14 +130,10 @@ except subprocess.CalledProcessError as e:
         )
     )
 
-cmd = [
-    "cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict > models_predict.txt ",
-]
+ssh_command = "cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict > models_predict.txt "
 
-execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", cmd)
+execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
 
-cmd = [
-    "cat pe_memberdna/model/trip_spend_model/models_predict.txt",
-]
+ssh_command = "cat pe_memberdna/model/trip_spend_model/models_predict.txt"
 
-execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", cmd)
+execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
