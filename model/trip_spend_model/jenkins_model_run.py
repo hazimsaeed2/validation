@@ -15,6 +15,7 @@ def execute_ssh_command(ssh_key_path, host, username, command):
     print(f"Connected to TP Model EC2 machine: {host} ")
     print(f"Executing command {command}")
     for i in range(0, 10):
+        print(f"SSH command execution: iteration {i+1}")
         _, stdout, stderr = c.exec_command(command)
         stderr_str = stderr.read()
         stdout_str = stdout.read()
