@@ -1,8 +1,33 @@
+import time
 import os
 import subprocess
-import urllib.parse
 import argparse
 import boto3
+import paramiko
+
+
+def execute_ssh_command(ssh_key_path, host, username, commands):
+    k = paramiko.RSAKey.from_private_key_file(ssh_key_path)
+    c = paramiko.SSHClient()
+    c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    print(f"Trying to connect to TP Model EC2 machine: {host} ")
+    c.connect(hostname=host, username=username, pkey=k)
+    print(f"Connected to TP Model EC2 machine: {host} ")
+    for command in commands:
+        print(f"\nExecuting command {command}")
+        _, stdout, stderr = c.exec_command(command)
+        print(f"stdout is {stdout.read()}")
+        print(f"stderr is {stderr.read()}")
+    c.close()
+
+
+def ping_test(host):
+    if (os.system("ping -c 1 " + host)) == 0:
+        print("Successfully pinged")
+        return 1
+    else:
+        return 0
+
 
 parser = argparse.ArgumentParser(description="Model run.")
 parser.add_argument("config_path", action="store", help="Config path")
@@ -52,7 +77,18 @@ print("Using EC2 IpAddress of " + host_ip)
 
 subprocess.check_call(["chmod", "400", "bi-emr2.pem"])
 
-pass_url = urllib.parse.quote(os.environ["bitbucket_pass"])
+# initialized a counter.
+n = 0
+# runs until n < 24,just to avoid the infinite loop.
+# this will execute the ping_test() func in every 10 seconds.
+while n < 24:
+    ping_return = ping_test(host_ip)
+
+    if ping_return == 1:
+        break
+    else:
+        time.sleep(10)
+        n = n + 1
 
 command_list = [
     "sudo yum install git -y",
@@ -67,59 +103,39 @@ command_list = [
     "sudo python3 -m pip install scikit-learn==0.24.2",
 ]
 
-for comm in command_list:
-    cmd = [
-        "ssh",
-        "-o StrictHostKeyChecking=no",
-        "-i",
-        "bi-emr2.pem",
-        "ec2-user" + "@" + host_ip,
-        comm,
-    ]
-
-    try:
-        result = subprocess.check_output(cmd)
-        print(result)
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-        raise Exception("error when running " + str(cmd))
-
+if ping_test(host_ip):
+    execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", command_list)
+else:
+    raise Exception(f"EC2 machine {host_ip} is not reachable ")
 
 cmd = [
     "scp",
+    "-v",
     "-i",
     "bi-emr2.pem",
+    "-o StrictHostKeyChecking=no",
     "-r",
     "pe_memberdna/",
     "ec2-user" + "@" + host_ip + ":pe_memberdna/",
 ]
-result = subprocess.check_output(cmd)
-print(result)
-
-cmd = [
-    "ssh",
-    "-o StrictHostKeyChecking=no",
-    "-i",
-    "bi-emr2.pem",
-    "ec2-user" + "@" + host_ip,
-    f"cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict config={config_path} > models_predict.txt ",
-]
 
 try:
-    result = subprocess.check_output(cmd)
-    print(result)
+    result = subprocess.run(cmd, capture_output=True, text=True)
 except subprocess.CalledProcessError as e:
-    print(e.output)
-    raise Exception("error when running " + str(cmd))
+    raise RuntimeError(
+        "command '{}' return with error (code {}): {}".format(
+            e.cmd, e.returncode, e.output
+        )
+    )
 
 cmd = [
-    "ssh",
-    "-o StrictHostKeyChecking=no",
-    "-i",
-    "bi-emr2.pem",
-    "ec2-user" + "@" + host_ip,
-    "cat pe_memberdna/model/trip_spend_model/models_predict.txt ",
+    "cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict > models_predict.txt ",
 ]
 
-result = subprocess.check_output(cmd)
-print(result)
+execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", cmd)
+
+cmd = [
+    "cat pe_memberdna/model/trip_spend_model/models_predict.txt",
+]
+
+execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", cmd)
