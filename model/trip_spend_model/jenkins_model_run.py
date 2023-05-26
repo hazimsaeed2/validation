@@ -8,14 +8,14 @@ import paramiko
 
 def execute_ssh_command(ssh_key_path, host, username, command):
     k = paramiko.RSAKey.from_private_key_file(ssh_key_path)
-    c = paramiko.SSHClient()
-    c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    print(f"Trying to connect to TP Model EC2 machine: {host} ")
-    c.connect(hostname=host, username=username, pkey=k)
-    print(f"Connected to TP Model EC2 machine: {host} ")
-    print(f"Executing command {command}")
     for i in range(0, 10):
         print(f"SSH command execution: iteration {i+1}")
+        c = paramiko.SSHClient()
+        c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        print(f"Trying to connect to TP Model EC2 machine: {host} ")
+        c.connect(hostname=host, username=username, pkey=k)
+        print(f"Connected to TP Model EC2 machine: {host} ")
+        print(f"Executing command {command}")
         _, stdout, stderr = c.exec_command(command)
         stderr_str = stderr.read()
         stdout_str = stdout.read()
