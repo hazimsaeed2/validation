@@ -48,6 +48,13 @@ git_branch = ("branch/" + args.git_branch.replace("origin/", "")).replace(
     "/", "_"
 )
 
+config_suffix = ""
+
+if run_type == "dev" or run_type == "stage":
+    config_suffix = f"_{run_type}"
+
+yaml_path = f"./conf/config{config_suffix}.yml"
+
 ssh_cert = os.environ["ssh_key_file"]
 ssh_username = os.environ["ssh_username"]
 
@@ -135,7 +142,7 @@ except subprocess.CalledProcessError as e:
         )
     )
 
-ssh_command = "cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict > models_predict.txt "
+ssh_command = f"cd pe_memberdna/model/trip_spend_model ; export PYTHONPATH=/home/ec2-user ; make models_predict config={yaml_path} > models_predict.txt "
 
 execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
 
