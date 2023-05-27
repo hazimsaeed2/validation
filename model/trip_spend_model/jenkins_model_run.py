@@ -17,11 +17,13 @@ def execute_ssh_command(ssh_key_path, host, username, command):
         print(f"Connected to TP Model EC2 machine: {host} ")
         print(f"Executing command {command}")
         _, stdout, stderr = c.exec_command(command)
+        exit_code = stdout.channel.recv_exit_status()
         stderr_str = stderr.read()
         stdout_str = stdout.read()
         print(f"stdout is {stdout_str}")
         print(f"stderr is {stderr_str}")
-        if not stderr_str:
+        print(f"exit code is {exit_code}")
+        if exit_code == 0:
             break
     c.close()
 
