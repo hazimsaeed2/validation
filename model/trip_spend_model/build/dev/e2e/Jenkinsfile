@@ -21,7 +21,7 @@ for path in config_data["shared"].keys():
         config_data["shared"][path] = config_data["shared"][path].replace(
             "Code_and_Data_repo", f"Code_and_Data_repo/dev/ref"
         )
-    elif path in ["base_path", "ad_hoc_output_path", "model_path", "dataset_path", "prediction_path"]:
+    elif path in ["base_path"]:
         config_data["shared"][path] = config_data["shared"][path].replace(
             "Code_and_Data_repo", f"Code_and_Data_repo/dev/{git_branch}"
         )

@@ -7,10 +7,10 @@ shared:
       split_rate: 0.8
       sample_rate: 0.2
       base_path: 'Code_and_Data_repo/MODELDATA'
-      ad_hoc_output_path: '/Code_and_Data_repo/AD_HOC'
-      model_path: '/Code_and_Data_repo/MODELS/TRIP_SPEND_MODELS'
-      dataset_path: '/Code_and_Data_repo/DATASETS/TRIP_SPEND_MODELS'
-      prediction_path: '/Code_and_Data_repo/PREDICTIONS/TRIP_SPEND_MODELS'
+      ad_hoc_output_path: 'AD_HOC'
+      model_path: 'MODELS/TRIP_SPEND_MODELS'
+      dataset_path: 'DATASETS/TRIP_SPEND_MODELS'
+      prediction_path: 'PREDICTIONS/TRIP_SPEND_MODELS'
       high_frequency_visit_threshold: 12
       low_frequency_visit_threshold: 0
       run_name: 'dev_12_19'
