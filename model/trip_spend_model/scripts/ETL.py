@@ -64,6 +64,7 @@ ETL_OUTPUT_PATH = "{}/transformed_customer_data".format(
 )  # etl_{}_{}
 CUBE_PATH = "s3n://{}/{}".format(BUCKET, config["shared"]["cube_path"])
 FEATURE_PATH = "s3n://{}/{}".format(BUCKET, config["shared"]["feature_path"])
+print("AAA ", FEATURE_PATH)
 LOOKUP_PATH = "s3n://{}/{}".format(BUCKET, config["etl"]["lookup_path"])
 BBM_WEEKS_PATH = "s3n://{}/{}".format(BUCKET, config["etl"]["BBM_weeks_path"])
 save_path = OUTPUT_PATH + "/CONF/cnfg_etl.yml"
