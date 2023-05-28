@@ -19,8 +19,15 @@ args = parser.parse_args()
 with open(args.config, "r") as stream:
     config = yaml.load(stream, Loader=yaml.FullLoader)
 
+BUCKET = config["shared"]["bucket"]
 run_name = config["shared"]["run_name"]
-path = f"s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/MODELS/TRIP_SPEND_MODELS/{run_name}/"
+
+path = "s3://{}/{}/{}/{}/".format(
+    BUCKET,
+    config["shared"]["base_path"],
+    config["shared"]["model_path"],
+    run_name,
+)
 
 bucket, key = split_path_bucket_key(path)
 trip_output_file_list = list_s3_dir(bucket, key)
@@ -34,7 +41,10 @@ current_features = (
     .head(10)
 )
 past_features = pd.read_csv(
-    "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/featureImportance.csv"
+    "s3://{}/{}".format(
+        BUCKET,
+        config["shared"]["past_features"],
+    )
 )
 current_features.reset_index(drop=True, inplace=True)
 current_features.rename(columns=lambda x: f"{x}_{run_name}", inplace=True)
@@ -158,7 +168,10 @@ current_metric = current_metric[
     ]
 ]
 past_metric = pd.read_csv(
-    "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/rf_metrics.csv"
+    "s3://{}/{}".format(
+        BUCKET,
+        config["shared"]["past_metric"],
+    )
 )
 all_metric = pd.concat([current_metric, past_metric]).drop_duplicates()
 all_metric.reset_index(drop=True, inplace=True)
@@ -167,11 +180,19 @@ if args.save == "yes":
     print("saving")
     write_local_to_s3(
         past_features,
-        "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/featureImportance.csv",
+        "s3://{}/{}/{}".format(
+            BUCKET,
+            config["shared"]["base_path"],
+            config["shared"]["current_features"],
+        )
     )
     write_local_to_s3(
         all_metric,
-        "s3://memberanalytics-data-out-prod/Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/rf_metrics.csv",
+        "s3://{}/{}/{}".format(
+            BUCKET,
+            config["shared"]["base_path"],
+            config["shared"]["current_metric"],
+        )
     )
 else:
     print("not saving")

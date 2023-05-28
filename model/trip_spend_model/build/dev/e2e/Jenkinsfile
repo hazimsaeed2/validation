@@ -17,7 +17,7 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
 for path in config_data["shared"].keys():
-    if path in ["feature_path", "cube_path"]:
+    if path in ["feature_path", "cube_path", "past_features", "past_metric"]:
         config_data["shared"][path] = config_data["shared"][path].replace(
             "Code_and_Data_repo", f"Code_and_Data_repo/dev/ref"
         )

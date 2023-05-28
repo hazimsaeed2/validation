@@ -9,6 +9,10 @@ shared:
       base_path: 'Code_and_Data_repo/MODELDATA'
       ad_hoc_output_path: 'AD_HOC'
       model_path: 'MODELS/TRIP_SPEND_MODELS'
+      past_features: 'Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/featureImportance.csv'
+      past_metric: 'Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/rf_metrics.csv'
+      current_features: 'QC/TRIP_PROPENSITY/featureImportance.csv'
+      current_metric: 'QC/TRIP_PROPENSITY/rf_metrics.csv'
       dataset_path: 'DATASETS/TRIP_SPEND_MODELS'
       prediction_path: 'PREDICTIONS/TRIP_SPEND_MODELS'
       high_frequency_visit_threshold: 12
