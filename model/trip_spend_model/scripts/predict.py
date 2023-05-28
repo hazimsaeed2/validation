@@ -82,6 +82,8 @@ save_path = PREDICTION_PATH + "CONF/cnfg_predict.yml"
 iotools.copy_file_to_s3(parsed.config, save_path)
 pub_key = os.environ.get("AWS_ACCESS_KEY_ID")
 private_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+print(parsed.week)
+print(config["predict"]["weeks_to_predict"])
 if parsed.week is None:
     WEEKS_TO_PREDICT = config["predict"]["weeks_to_predict"]
 else:
@@ -107,10 +109,10 @@ client = boto3.client("s3")
 result = client.list_objects(
     Bucket=BUCKET, Prefix="{}/".format(CUBE_PATH), Delimiter="/"
 )
-print(CUBE_PATH)
+
 for o in result.get("CommonPrefixes"):
     WEEKS += [o.get("Prefix")]
-print(WEEKS)
+
 trip_features = iotools.read_s3_to_local(
     TRIP_FEATURE_PATH, ftype="csv", sep=","
 )
