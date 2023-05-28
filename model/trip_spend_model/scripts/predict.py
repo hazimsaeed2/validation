@@ -107,9 +107,10 @@ client = boto3.client("s3")
 result = client.list_objects(
     Bucket=BUCKET, Prefix="{}/".format(CUBE_PATH), Delimiter="/"
 )
+print(CUBE_PATH)
 for o in result.get("CommonPrefixes"):
     WEEKS += [o.get("Prefix")]
-
+print(WEEKS)
 trip_features = iotools.read_s3_to_local(
     TRIP_FEATURE_PATH, ftype="csv", sep=","
 )

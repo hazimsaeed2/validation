@@ -79,6 +79,6 @@ grid_search:
       output_path: '/Code_and_Data_repo/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
 predict:
       weeks_to_predict:
-            - '2019-11-30'
+            - '2022-10-29'
       trip_model_date: '20191202'
       spend_model_date: '20191202'
