@@ -73,9 +73,9 @@ config["shared"]["cube_path"] = args.cube_path
     config["etl"]["end_date"],
 ) = misc.get_previous_fiscal_weekend(13 * 365 / 12, last_cube_date_str)
 
-config["predict"]["weeks_to_predict"] = [config["etl"]["end_date"]]
-
 if not (run_type == "dev"):
+    config["predict"]["weeks_to_predict"] = [config["etl"]["end_date"]]
+
     config["predict"]["trip_model_date"] = datetime.date.today().strftime(
         "%Y%m%d"
     )
