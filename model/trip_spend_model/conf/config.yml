@@ -19,7 +19,7 @@ shared:
       low_frequency_visit_threshold: 0
       run_name: 'dev_12_19'
 etl:
-      start_date: '2018-11-02'
+      start_date: '2018-10-27'
       end_date: '2019-12-26'
       bbm_week_window: 3
       start_week_windows:
@@ -79,6 +79,6 @@ grid_search:
       output_path: '/Code_and_Data_repo/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
 predict:
       weeks_to_predict:
-            - '2022-10-20'
+            - '2022-10-29'
       trip_model_date: '20191202'
       spend_model_date: '20191202'

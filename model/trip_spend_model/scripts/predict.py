@@ -82,8 +82,6 @@ save_path = PREDICTION_PATH + "CONF/cnfg_predict.yml"
 iotools.copy_file_to_s3(parsed.config, save_path)
 pub_key = os.environ.get("AWS_ACCESS_KEY_ID")
 private_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
-print(parsed.week)
-print(config["predict"]["weeks_to_predict"])
 if parsed.week is None:
     WEEKS_TO_PREDICT = config["predict"]["weeks_to_predict"]
 else:
