@@ -75,7 +75,7 @@ config["shared"]["cube_path"] = args.cube_path
 
 config["predict"]["weeks_to_predict"] = [config["etl"]["end_date"]]
 
-if not (run_type == "dev" or run_type == "stage"):
+if not (run_type == "dev"):
     config["predict"]["trip_model_date"] = datetime.date.today().strftime(
         "%Y%m%d"
     )
