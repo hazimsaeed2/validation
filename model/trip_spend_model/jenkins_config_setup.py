@@ -75,10 +75,13 @@ config["shared"]["cube_path"] = args.cube_path
 
 config["predict"]["weeks_to_predict"] = [config["etl"]["end_date"]]
 
-config["predict"]["trip_model_date"] = datetime.date.today().strftime("%Y%m%d")
-config["predict"]["spend_model_date"] = datetime.date.today().strftime(
-    "%Y%m%d"
-)
+if not (run_type == "dev" or run_type == "stage"):
+    config["predict"]["trip_model_date"] = datetime.date.today().strftime(
+        "%Y%m%d"
+    )
+    config["predict"]["spend_model_date"] = datetime.date.today().strftime(
+        "%Y%m%d"
+    )
 
 with open(yaml_path, "w") as config_file:
     yaml.dump(config, config_file)
