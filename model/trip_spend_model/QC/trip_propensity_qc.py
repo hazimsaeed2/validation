@@ -184,7 +184,7 @@ if args.save == "yes":
             BUCKET,
             config["shared"]["base_path"],
             config["shared"]["current_features"],
-        )
+        ),
     )
     write_local_to_s3(
         all_metric,
@@ -192,7 +192,7 @@ if args.save == "yes":
             BUCKET,
             config["shared"]["base_path"],
             config["shared"]["current_metric"],
-        )
+        ),
     )
 else:
     print("not saving")
