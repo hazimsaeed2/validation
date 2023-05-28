@@ -83,5 +83,8 @@ if not (run_type == "dev"):
         "%Y%m%d"
     )
 
+print("AAA")
+print(config)
+
 with open(yaml_path, "w") as config_file:
     yaml.dump(config, config_file)
