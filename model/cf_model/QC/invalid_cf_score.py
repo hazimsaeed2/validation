@@ -10,7 +10,7 @@ from pe_memberdna.model.cf_model.lib.cf_io import (
     load_config,
     calculate_filepaths,
 )
-from memberdna.lib.iotools import (
+from pe_memberdna.lib.iotools import (
     write_local_to_s3,
 )
 
