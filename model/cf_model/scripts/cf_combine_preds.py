@@ -32,7 +32,7 @@ PARAMS, PATHS = calculate_filepaths(PARAMS, PATHS)
 conf = SparkConf().setAppName("cf_combine")
 sc = SparkContext(conf=conf)
 spark = SparkSession.builder.getOrCreate()
-spark.sparkContext.setLogLevel("WARN")
+# spark.sparkContext.setLogLevel("WARN")
 
 # (3) ---- READ DATA ---- #
 print("(1/3) reading data...")
