@@ -56,22 +56,22 @@ for config_type in ["AH4", "AH5"]:
                     cd pe_memberdna
                     python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} dev ${GIT_BRANCH}
 
-					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_dev.yml
-					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_dev.yml
-					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH5_dev.yml
+					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --config ./model/cf_model/conf/config_AH5_dev.yml
+					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --config ./model/cf_model/conf/config_AH5_dev.yml
+					spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --config ./model/cf_model/conf/config_AH5_dev.yml
 
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_dev.yml --future
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_dev.yml --rmse
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_dev.yml --future
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_dev.yml --rmse
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --config ./model/cf_model/conf/config_AH5_dev.yml --future
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --config ./model/cf_model/conf/config_AH5_dev.yml --rmse
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --config ./model/cf_model/conf/config_AH4_dev.yml --future
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --config ./model/cf_model/conf/config_AH4_dev.yml --rmse
 
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_dev.yml
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_dev.yml
-                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --config ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --config ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --config ./model/cf_model/conf/config_AH4_dev.yml
 
-                    spark-submit ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_dev.yml
-                    spark-submit ./model/cf_model/QC/invalid_cf_score.py --config=./model/cf_model/conf/config_AH4_dev.yml
-                    spark-submit ./model/cf_model/QC/top_cat.py --config=./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --config ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/QC/invalid_cf_score.py --config ./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/QC/top_cat.py --config ./model/cf_model/conf/config_AH4_dev.yml
 
                     deactivate
                 '''

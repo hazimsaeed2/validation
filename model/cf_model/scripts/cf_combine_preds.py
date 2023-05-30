@@ -32,7 +32,7 @@ PARAMS, PATHS = calculate_filepaths(PARAMS, PATHS)
 conf = SparkConf().setAppName("cf_combine")
 sc = SparkContext(conf=conf)
 spark = SparkSession.builder.getOrCreate()
-# spark.sparkContext.setLogLevel("WARN")
+spark.sparkContext.setLogLevel("WARN")
 
 # (3) ---- READ DATA ---- #
 print("(1/3) reading data...")
@@ -85,15 +85,11 @@ CNFG_OUTPUT_PATH = os.path.join(
 )
 PATHS["COMBINE_LOG"] = os.path.join(output_path, "LOG", "cf_combine_preds.csv")
 
-print("AAA")
-print(PATHS)
-print(CNFG_OUTPUT_PATH)
-print(output_path)
-# copy_file_to_s3(CFG_PATH, CNFG_OUTPUT_PATH)
+copy_file_to_s3(CFG_PATH, CNFG_OUTPUT_PATH)
 
 pq_path = output_path + "/PARQUET"
 print("writing parquet version at {}".format(pq_path))
-# combined_df.write.parquet(pq_path, mode="overwrite")
+combined_df.write.parquet(pq_path, mode="overwrite")
 
 # (9) --- Write Log and Shut Down --- #
 
@@ -105,7 +101,7 @@ log_line = {
     "items": PARAMS["items"],
     "cnfg_file": CNFG_OUTPUT_PATH,
 }
-# write_local_to_s3(log_line, PATHS["COMBINE_LOG"], mode="append")
+write_local_to_s3(log_line, PATHS["COMBINE_LOG"], mode="append")
 
 
 print("done")
