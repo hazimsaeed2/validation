@@ -70,8 +70,8 @@ for config_type in ["AH4", "AH5"]:
                     spark-submit --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4_dev.yml
 
                     spark-submit ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_dev.yml
-                    spark-submit ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4_dev.yml
-                    spark-submit ./model/cf_model/QC/top_cat.py --config=conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/QC/invalid_cf_score.py --config=./model/cf_model/conf/config_AH4_dev.yml
+                    spark-submit ./model/cf_model/QC/top_cat.py --config=./model/cf_model/conf/config_AH4_dev.yml
 
                     deactivate
                 '''
