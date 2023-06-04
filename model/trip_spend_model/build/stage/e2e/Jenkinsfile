@@ -22,6 +22,7 @@ pipeline {
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/QC/TRIP_PROPENSITY/featureImportance.csv s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/QC/TRIP_PROPENSITY/featureImportance.csv
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/QC/TRIP_PROPENSITY/rf_metrics.csv s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/QC/TRIP_PROPENSITY/rf_metrics.csv
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES/customer_cube_full s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES/customer_cube_full
                     '''
                     echo "Stage data in sync with prod"
                 }
