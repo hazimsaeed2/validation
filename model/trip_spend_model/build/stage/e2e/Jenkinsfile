@@ -35,7 +35,7 @@ saturday = today - timedelta(days=(today.weekday() + 1) % 7)
 last_saturdays = [saturday - timedelta(weeks=i) for i in range(3, -1, -1)]
 
 # Format the dates as yyyy-mm-dd
-formatted_dates = list(reverse([date.strftime('%Y-%m-%d') for date in last_saturdays]))
+formatted_dates = list(reversed([date.strftime('%Y-%m-%d') for date in last_saturdays]))
 
 # Print the formatted dates
 for date in formatted_dates:
