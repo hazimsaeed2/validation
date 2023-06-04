@@ -54,6 +54,7 @@ print(key, end="")
                     echo $latest_cube_path
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/propensity_model_for_trips/input_files s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/propensity_model_for_trips/input_files
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/QC/TRIP_PROPENSITY s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/QC/TRIP_PROPENSITY
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES/customer_cube_full s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES/customer_cube_full
                 '''
