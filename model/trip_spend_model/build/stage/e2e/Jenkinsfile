@@ -39,7 +39,6 @@ formatted_dates = list(reversed([date.strftime('%Y-%m-%d') for date in last_satu
 
 # Print the formatted dates
 for date in formatted_dates:
-    print(date)
     key = f'CUBES/customer_cube_{date}'
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=key)
     folder_exists = 'Contents' in response
@@ -115,7 +114,6 @@ with open(config_path_output, "w") as file:
         stage('Setup Config') {
             steps {
                 sh '''
-                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
                     export PYTHONPATH=$WORKSPACE:
                     source pyspark_venv/bin/activate
                     python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} stage ${GIT_BRANCH}
