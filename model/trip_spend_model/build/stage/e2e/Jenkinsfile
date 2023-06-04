@@ -17,34 +17,37 @@ pipeline {
                 script {
                     def content = """
 import boto3
-import re
+from datetime import datetime, timedelta
 
 # Set your bucket name and regex pattern
 bucket_name = 'memberanalytics-data-out-prod'
-regex_pattern = r'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}'
 
 # Create the S3 client
 s3 = boto3.client('s3')
 
-# Initialize variables for latest object
-latest_object_key = None
-latest_object_timestamp = None
+# Get today's date
+today = datetime.today()
 
-# Paginate through the objects in the bucket
-paginator = s3.get_paginator('list_objects_v2')
-page_iterator = paginator.paginate(Bucket=bucket_name)
+# Find the previous Sunday
+sunday = today - timedelta(days=today.weekday())
 
-for page in page_iterator:
-    if 'Contents' in page:
-        for obj in page['Contents']:
-            object_key = obj['Key']
-            if re.match(regex_pattern, object_key):
-                object_timestamp = obj['LastModified']
-                if latest_object_timestamp is None or object_timestamp > latest_object_timestamp:
-                    latest_object_key = object_key
-                    latest_object_timestamp = object_timestamp
+# Calculate the last three Sundays
+last_sundays = [sunday - timedelta(weeks=i) for i in range(3, -1, -1)]
 
-print(latest_object_key, end="")
+# Format the dates as yyyy-mm-dd
+formatted_dates = [date.strftime('%Y-%m-%d') for date in last_sundays]
+
+# Print the formatted dates
+for date in formatted_dates:
+    print(date)
+    key = f'CUBES/customer_cube_{date}'
+    try:
+        s3.head_object(Bucket=bucket_name, Key=key)
+        break
+    except Exception as e:
+        print(e)
+
+print(key, end="")
                     """
                 writeFile file: '_env_setup.py', text: content
                 }
