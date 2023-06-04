@@ -26,8 +26,9 @@ regex_pattern = r'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}'
 # Create the S3 client
 s3 = boto3.client('s3')
 
-# Initialize the list to store object keys
-object_keys = []
+# Initialize variables for latest object
+latest_object_key = None
+latest_object_timestamp = None
 
 # Paginate through the objects in the bucket
 paginator = s3.get_paginator('list_objects_v2')
@@ -38,15 +39,12 @@ for page in page_iterator:
         for obj in page['Contents']:
             object_key = obj['Key']
             if re.match(regex_pattern, object_key):
-                object_keys.append(object_key)
+                object_timestamp = obj['LastModified']
+                if latest_object_timestamp is None or object_timestamp > latest_object_timestamp:
+                    latest_object_key = object_key
+                    latest_object_timestamp = object_timestamp
 
-# Sort the object keys by LastModified timestamp
-sorted_keys = sorted(object_keys, key=lambda key: s3.head_object(Bucket=bucket_name, Key=key)['LastModified'])
-
-# Retrieve the latest object key
-latest_object = sorted_keys[-1] if sorted_keys else None
-
-print(latest_object, end="")
+print(latest_object_key, end="")
                     """
                 writeFile file: '_env_setup.py', text: content
                 }
