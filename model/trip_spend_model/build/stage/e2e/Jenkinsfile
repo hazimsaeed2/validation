@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        latest_cube_path=$(aws s3api list-objects-v2 --bucket memberanalytics-data-out-prod --query "reverse(sort_by(Contents[?matches(Key, 'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}') == \`true\`], &LastModified))[:1].Key" --output text)
+                        latest_cube_path=$(aws s3api list-objects-v2 --bucket memberanalytics-data-out-prod --query "reverse(sort_by(Contents[?matches(Key, 'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}') == \\`true\\`], &LastModified))[:1].Key" --output text)
                         echo $latest_cube_path
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/propensity_model_for_trips/input_files/features_spend_all_numeric_features.csv s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/propensity_model_for_trips/input_files/features_spend_all_numeric_features.csv
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
