@@ -21,7 +21,7 @@ import re
 
 # Set your bucket name and regex pattern
 bucket_name = 'memberanalytics-data-out-prod'
-regex_pattern = r'CUBES/customer_cube_\d{4}-\d{2}-\d{2}'
+regex_pattern = r'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}'
 
 # Create the S3 client
 s3 = boto3.client('s3')
