@@ -23,19 +23,28 @@ import re
 bucket_name = 'memberanalytics-data-out-prod'
 regex_pattern = r'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}'
 
-print(regex_pattern)
-
 # Create the S3 client
 s3 = boto3.client('s3')
 
-# Retrieve the object list
-response = s3.list_objects_v2(Bucket=bucket_name)
+# Initialize the list to store object keys
+object_keys = []
 
-print(response)
+# Paginate through the objects in the bucket
+paginator = s3.get_paginator('list_objects_v2')
+page_iterator = paginator.paginate(Bucket=bucket_name)
 
-# Filter and sort the objects locally
-filtered_objects = [obj['Key'] for obj in response['Contents'] if re.match(regex_pattern, obj['Key'])]
-latest_object = sorted(filtered_objects, key=lambda x: response['Contents'][x]['LastModified'], reverse=True)[0]
+for page in page_iterator:
+    if 'Contents' in page:
+        for obj in page['Contents']:
+            object_key = obj['Key']
+            if re.match(regex_pattern, object_key):
+                object_keys.append(object_key)
+
+# Sort the object keys by LastModified timestamp
+sorted_keys = sorted(object_keys, key=lambda key: s3.head_object(Bucket=bucket_name, Key=key)['LastModified'])
+
+# Retrieve the latest object key
+latest_object = sorted_keys[-1] if sorted_keys else None
 
 print(latest_object, end="")
                     """
