@@ -28,14 +28,14 @@ s3 = boto3.client('s3')
 # Get today's date
 today = datetime.today()
 
-# Find the previous Sunday
-sunday = today - timedelta(days=today.weekday())
+# Find the previous Saturday
+saturday = today - timedelta(days=(today.weekday() + 1) % 7)
 
-# Calculate the last three Sundays
-last_sundays = [sunday - timedelta(weeks=i) for i in range(3, -1, -1)]
+# Calculate the last three saturdays
+last_saturdays = [saturday - timedelta(weeks=i) for i in range(3, -1, -1)]
 
 # Format the dates as yyyy-mm-dd
-formatted_dates = [date.strftime('%Y-%m-%d') for date in last_sundays]
+formatted_dates = list(reverse([date.strftime('%Y-%m-%d') for date in last_saturdays]))
 
 # Print the formatted dates
 for date in formatted_dates:
