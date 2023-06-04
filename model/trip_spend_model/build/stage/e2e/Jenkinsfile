@@ -41,11 +41,10 @@ formatted_dates = list(reversed([date.strftime('%Y-%m-%d') for date in last_satu
 for date in formatted_dates:
     print(date)
     key = f'CUBES/customer_cube_{date}'
-    try:
-        s3.head_object(Bucket=bucket_name, Key=key)
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=key)
+    folder_exists = 'Contents' in response
+    if folder_exists:
         break
-    except Exception as e:
-        print(e)
 
 print(key, end="")
                     """
