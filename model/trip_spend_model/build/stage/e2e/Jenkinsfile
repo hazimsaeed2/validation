@@ -23,11 +23,15 @@ import re
 bucket_name = 'memberanalytics-data-out-prod'
 regex_pattern = r'CUBES/customer_cube_\\d{4}-\\d{2}-\\d{2}'
 
+print(regex_pattern)
+
 # Create the S3 client
 s3 = boto3.client('s3')
 
 # Retrieve the object list
 response = s3.list_objects_v2(Bucket=bucket_name)
+
+print(response)
 
 # Filter and sort the objects locally
 filtered_objects = [obj['Key'] for obj in response['Contents'] if re.match(regex_pattern, obj['Key'])]
