@@ -56,7 +56,7 @@ print(key, end="")
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/lookup
                     aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/QC/TRIP_PROPENSITY s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/QC/TRIP_PROPENSITY
-                    aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES/customer_cube_full s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES/customer_cube_full
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES
                 '''
                 echo "Stage data in sync with prod"
             }
