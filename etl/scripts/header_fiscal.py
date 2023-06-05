@@ -4,12 +4,23 @@ import os
 
 import pe_memberdna.etl.lib.validations_ETL as validations
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
 def main(job, data_paths, config_validation):
     logging.info("Starting processing table header_fiscal")
+
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        [
+            "header",
+            "fiscal_days",
+        ],
+    )
 
     header = job.spark.read.parquet(data_paths["intermediate"]["header"])
     header.registerTempTable("header")

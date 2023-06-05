@@ -5,7 +5,7 @@ import os
 import pe_memberdna.etl.lib.validations_ETL as validations
 import pyspark.sql.functions as sqlf
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 from pyspark.sql.types import *
 
@@ -30,6 +30,14 @@ def main(job, data_paths, config_validation):
 
     logging.info(
         "Reading the input file " + data_paths["source"]["quotient_id"]
+    )
+
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        ["member_extended"],
     )
 
     df = (

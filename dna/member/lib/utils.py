@@ -117,7 +117,8 @@ def get_latest_path(config_path):
     pattern = "YYYYmmdd"
     pattern_position = config_path.find(pattern)
     if pattern_position < 0:
-        raise ValueError("config path does not have YYYYmmdd pattern")
+        print("config path does not have YYYYmmdd pattern")
+        return config_path
 
     bucket, prefix = iotools.split_path_bucket_key(
         config_path[:pattern_position]

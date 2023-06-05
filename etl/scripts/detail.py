@@ -4,7 +4,7 @@ import os
 
 import pyspark.sql.functions as sqlf
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 
 
@@ -13,6 +13,15 @@ def main(job, data_paths, config_validation):
     logging.info("Starting processing table detail")
 
     source_path = data_paths["source"]["detail"]
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
+    etl_input_data_validator(
+        "source",
+        recency_lookback_duration,
+        data_paths,
+        [
+            "detail",
+        ],
+    )
 
     # EXTENDED_PRC_AMT needs special selection because of a data problem
     # upstream. For more details on the bug please consult notes.txt

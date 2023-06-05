@@ -3,7 +3,7 @@ import logging
 import os
 
 from pe_memberdna.lib.job_manager import JobManager
-from pe_memberdna.etl.lib.s3 import input_data_validator
+from pe_memberdna.etl.lib.s3 import etl_input_data_validator
 from pe_memberdna.etl.lib.utility import *
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.window import Window
@@ -12,10 +12,17 @@ from pyspark.sql.window import Window
 def main(job, data_paths, config_validation):
     logging.info("Starting processing table item_with_brand")
 
+    recency_lookback_duration = data_paths.get("recency_lookback_duration", {})
     item_path = data_paths["intermediate"]["item"]
     brand_path = data_paths["intermediate"]["brand"]
     ah5_path = data_paths["intermediate"]["AH5"]
     dest_path = data_paths["intermediate"]["item_with_brand"]
+    etl_input_data_validator(
+        "intermediate",
+        recency_lookback_duration,
+        data_paths,
+        ["item", "brand", "AH5"],
+    )
 
     item = getDf(
         job.spark,

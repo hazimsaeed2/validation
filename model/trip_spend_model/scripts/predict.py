@@ -107,6 +107,7 @@ client = boto3.client("s3")
 result = client.list_objects(
     Bucket=BUCKET, Prefix="{}/".format(CUBE_PATH), Delimiter="/"
 )
+
 for o in result.get("CommonPrefixes"):
     WEEKS += [o.get("Prefix")]
 

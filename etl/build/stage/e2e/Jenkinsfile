@@ -7,8 +7,9 @@ pipeline {
                     agent { node env.node_1 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-1"
@@ -18,8 +19,9 @@ pipeline {
                     agent { node env.node_2 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-2"
@@ -29,8 +31,9 @@ pipeline {
                     agent { node env.node_3 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-3"
@@ -43,15 +46,15 @@ pipeline {
             steps {
                 script {
                     sh  '''
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180614.txt --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180719.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180829.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Header
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Detail
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/stage/ref/Transaction_Payment
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/stage/ref/Other --exclude Promo* --exclude RFM_July2017_Present.csv --exclude people.txt --exclude kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude kantar_storemaster_hierarchy_data_SAP_20180829.txt
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/stage/ref/Email_Events
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/stage/ref/ATC --exclude old/*
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/stage/ref/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180614.txt --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180719.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180829.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Header
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Detail
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Payment
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Other --exclude Promo* --exclude RFM_July2017_Present.csv --exclude people.txt --exclude kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude kantar_storemaster_hierarchy_data_SAP_20180829.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Email_Events
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/ATC --exclude old/*
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/control_files
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
                     '''
                     echo "Stage data in sync with prod"
@@ -126,11 +129,11 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -196,11 +199,11 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -266,11 +269,11 @@ config_path_output = "pe_memberdna/etl/configs/config_stage.yaml"
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
-        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/stage/ref"
+        "memberanalytics-data-in-prod", f"memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref"
     )
 
 for k in config_data["data_paths"]["intermediate"].keys():
@@ -473,6 +476,34 @@ with open(config_path_output, "w") as file:
                             deactivate
                         '''
                         echo "Ran step-3 cluster-3 script"
+                    }
+                }
+            }
+        }
+        stage('Starting 4th Parallel run') {
+            parallel {
+                stage('Scaling down cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        echo "Scaling down cluster-1"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-1"
+                    }
+                }
+                stage('Scaling down cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        echo "Scaling down cluster-3"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-3"
                     }
                 }
             }

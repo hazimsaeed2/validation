@@ -1,0 +1,222 @@
+pipeline {
+    agent { node env.Node }
+    stages {
+        stage('Environment setup') {
+            steps {
+                sh '''
+                    curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                    aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                    aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                    mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                '''
+                echo "Ran environemnt setup on cluster"
+            }
+        }
+        stage("Data sync") {
+            steps {
+                script {
+                    def content = """
+import boto3
+from datetime import datetime, timedelta
+
+# Set your bucket name and regex pattern
+bucket_name = 'memberanalytics-data-out-prod'
+
+# Create the S3 client
+s3 = boto3.client('s3')
+
+# Get today's date
+today = datetime.today()
+
+# Find the previous Saturday
+saturday = today - timedelta(days=(today.weekday() + 1) % 7)
+
+# Calculate the last three saturdays
+last_saturdays = [saturday - timedelta(weeks=i) for i in range(3, -1, -1)]
+
+# Format the dates as yyyy-mm-dd
+formatted_dates = list(reversed([date.strftime('%Y-%m-%d') for date in last_saturdays]))
+
+# Print the formatted dates
+for date in formatted_dates:
+    key = f'CUBES/customer_cube_{date}'
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=key)
+    folder_exists = 'Contents' in response
+    if folder_exists:
+        break
+
+print(key, end="")
+                    """
+                writeFile file: '_env_setup.py', text: content
+                }
+                sh  '''
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/propensity_model_for_trips/input_files s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/propensity_model_for_trips/input_files
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/lookup
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/QC/TRIP_PROPENSITY s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/QC/TRIP_PROPENSITY
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES
+                '''
+                echo "Stage data in sync with prod"
+            }
+        }
+        stage('Prepare environment') {
+            steps {
+                script {
+                    def content = """
+import os
+import yaml
+
+config_path_input = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
+config_path_output = f"pe_memberdna/model/trip_spend_model/conf/config_stage.yml"
+
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.Loader)
+
+for path in config_data["shared"].keys():
+    if path in ["feature_path", "cube_path", "past_features", "past_metric"]:
+        config_data["shared"][path] = config_data["shared"][path].replace(
+            "Code_and_Data_repo", f"Code_and_Data_repo/stage/ref"
+        )
+    elif path in ["base_path"]:
+        config_data["shared"][path] = config_data["shared"][path].replace(
+            "Code_and_Data_repo", f"Code_and_Data_repo/stage/{git_branch}"
+        )
+
+for path in config_data["etl"].keys():
+    if path in ["BBM_weeks_path", "lookup_path"]:
+        config_data["etl"][path] = config_data["etl"][path].replace(
+            "Code_and_Data_repo", f"Code_and_Data_repo/stage/ref"
+        )
+
+config_data["grid_search"]["output_path"] = config_data["grid_search"]["output_path"].replace(
+    "Code_and_Data_repo", f"Code_and_Data_repo/stage/{git_branch}"
+)
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                    """
+                writeFile file: '_config_step.py', text: content
+                }
+                sh '''
+                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$WORKSPACE:
+
+                    source pyspark_venv/bin/activate
+                    python3 _config_step.py
+                    deactivate
+                '''
+            }
+        }
+        stage('Scaling up') {
+            steps {
+                script {
+                    echo "Scaling up"
+                    sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --spot_node_cnt 10 --wait 120
+                    '''
+                    echo "Scaled up"
+                }
+            }
+        }        
+        stage('Setup Config') {
+            steps {
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    source pyspark_venv/bin/activate
+                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} stage ${GIT_BRANCH}
+                '''
+            }
+        }
+        stage('Propensity Model ETL') {
+            steps {
+                echo "RUNNING PROPENSITY MODEL ETL"
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+                    spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_stage.yml
+                '''
+                echo "PROPENSITY MODEL ETL FINISHED"
+            }
+        }
+        stage('Scaling down') {
+            steps {
+                echo "Scaling down"
+                sh '''
+                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$wrkspce:
+                    python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                    rm -rf $wrkspce/*
+                '''
+                echo "Scaled down"
+            }
+        }
+        stage('Setup EC2') {
+            steps {
+                node('built-in') {
+                    sh '''
+                        rm -rf /var/lib/jenkins/workspace/Ec2-Start-Stop/Ec2-OnDemand-ue00mdaapp01/output.txt
+                        export AWS=/usr/local/bin/aws
+                        cd /var/lib/jenkins/workspace/Ec2-Start-Stop/Ec2-OnDemand-ue00mdaapp01/
+                        curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g' | sed 's/\\//_/g')
+
+                        instanceId=`$AWS ec2 run-instances --region us-east-1 --image-id ami-0de53d8956e8dcf80 --instance-type r5.12xlarge --key-name bi-emr --iam-instance-profile Name=EMRMDAEc2InstanceProfile --subnet-id subnet-6317c629 --security-group-ids sg-03a3c4770d1be5f84 sg-b0ce14c4 sg-d0cb11a4 --user-data file://ec2-config.sh --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=ue00mdaapp01_stage_$curated_git_branch},{Key=Project,Value=MemberDataAggregation},{Key=AppName,Value=MemberDataAggregation},{Key=CreatedBy,Value=kpamidimarri@bjs.com},{Key=BusinessUnit,Value=FrontOffice},{Key=ServiceType,Value=App},{Key=Environment,Value=stage},{Key=Hostname,Value=ue00mdaapp01_stage_$curated_git_branch},{Key=OSType,Value=AmazonLinux},{Key=ServiceOwner,Value=Other},{Key=Model,Value=true}]" --query "Instances[].InstanceId" --output text`
+                        $AWS ec2 describe-instances --region us-east-1 --instance-id $instanceId --query "Reservations[].Instances[].PrivateIpAddress" > output.txt
+                        echo $instanceId >> output.txt
+                    '''
+                }
+            }
+        }
+        stage('Run Trip Propensity') {
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'SSH-PROD-hadoop',
+                        keyFileVariable: 'ssh_key_file',
+                        passphraseVariable: 'ssh_pass',
+                        usernameVariable: 'ssh_username'),
+                    usernamePassword(credentialsId: 'bitbucket-service-account',
+                        usernameVariable: 'bitbucket_username',
+                        passwordVariable: 'bitbucket_pass')
+                    ])
+                {
+                    echo "$ssh_username"
+                    echo "RUNNING PROPENSITY MODEL"
+                    sh '''
+                        export PYTHONPATH=$WORKSPACE:
+                        source pyspark_venv/bin/activate
+                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config_stage.yml stage $GIT_BRANCH
+                        deactivate
+                    '''
+                    echo "PROPENSITY MODEL FINISHED"
+                }
+            }
+            post {
+                always {
+                    node('built-in') {
+                        sh '''
+                            export AWS=/usr/local/bin/aws
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g' | sed 's/\\//_/g')
+                            $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query "Reservations[*].Instances[*].[InstanceId]" --filters "Name=tag:Name,Values=ue00mdaapp01_stage_$curated_git_branch" --output text`
+                        '''
+                    }
+                }
+            }
+        }
+		stage('Propensity Model QC') {
+            steps {
+                echo "RUNNING PROPENSITY MODEL QC"
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_stage.yml ${qc_save}
+                '''
+                echo "PROPENSITY MODEL QC FINISHED"
+            }
+        }
+    }
+}

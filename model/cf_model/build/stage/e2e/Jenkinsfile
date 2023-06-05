@@ -1,72 +1,44 @@
 pipeline {
     agent none
     stages {
-        parallel {
-            stage('Running environment setup on cluster-1') {
-                agent { node env.node_1 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-1"
+        stage('Environment setup') {
+            parallel {
+                stage('Running environment setup on cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        sh '''
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-1"
+                    }
                 }
-            }
-            stage('Running environment setup on cluster-2') {
-                agent { node env.node_2 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-2"
+                stage('Running environment setup on cluster-2') {
+                    agent { node env.node_2 }
+                    steps {
+                        sh '''
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-2"
+                    }
                 }
-            }
-            stage('Running environment setup on cluster-3') {
-                agent { node env.node_3 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-3"
+                stage('Running environment setup on cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        sh '''
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-3"
+                    }
                 }
-            }
-        }
-		stage('Setup Config for cluster-1') {
-            agent { node env.node_1 }
-            steps {
-                sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                '''
-            }
-
-        }
-
-        stage('Setup Config for cluster - 2') {
-            agent { node env.node_2 }
-            steps {
-                sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                '''
-            }
-        }
-
-        stage('Setup Config for cluster-3 ') {
-            agent { node env.node_3 }
-            steps {
-                sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                '''
             }
         }
         stage("Data sync") {
@@ -77,54 +49,61 @@ pipeline {
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master/member_extended
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction_fiscal/detail
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates/master/item_with_brand s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates/master/item_with_brand
-                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES s3://memberanalytics-data-out-prod/Code_and_Data_repo/CUBES
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master/club_square_with_brand
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/trip_spend_predictions s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/PREDICTIONS/trip_spend_predictions
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14b s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/DATASETS/sales_by_membercatbbm14b
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14a s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/DATASETS/sales_by_membercatbbm14a
                     '''
                     echo "Stage data in sync with prod"
                 }
             }
         }
-        stage('Scaling up cluster -1') {
-            agent { node env.node_1 }
-            steps {
-                script {
-                    sh  '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
-                    '''
-                        echo "Scaled up cluster-1"
+        stage('Cluster scaling') {
+            parallel {
+                stage('Scaling up cluster -1') {
+                    agent { node env.node_1 }
+                    steps {
+                        script {
+                            sh  '''
+                                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                                export PYTHONPATH=$wrkspce:
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 10 --wait 120
+                            '''
+                                echo "Scaled up cluster-1"
+                        }
+                    }
                 }
-            }
-        }
-        stage('Scaling up cluster-2') {
-            agent { node env.node_2 }
-            steps {
-                script {
-                    echo "Scaling up"
-                    sh '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
-                    '''
-                    echo "Scaled up cluster-2"
+                stage('Scaling up cluster-2') {
+                    agent { node env.node_2 }
+                    steps {
+                        script {
+                            echo "Scaling up"
+                            sh '''
+                                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                                export PYTHONPATH=$wrkspce:
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 10 --wait 120
+                            '''
+                            echo "Scaled up cluster-2"
+                        }
+                    }
                 }
-            }
-        }
 
-        stage('Scaling up cluster-3') {
-            agent { node env.node_3 }
-            steps {
-                script {
-                    echo "Scaling up"
-                    sh '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
-                        '''
-                    echo "Scaled up cluster-3"
+                stage('Scaling up cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        script {
+                            echo "Scaling up"
+                            sh '''
+                                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                                export PYTHONPATH=$wrkspce:
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 10 --wait 120
+                                '''
+                            echo "Scaled up cluster-3"
+                        }
+                    }
                 }
             }
         }
@@ -135,29 +114,37 @@ pipeline {
                     steps {
                         script {
                             def content = """
-for config_type in ["AH4", "AH5"]:
-    config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
-    config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
+import os
+import yaml
 
-    git_branch = os.getenv('GIT_BRANCH')
+for config_type in ["AH4", "AH5"]:
+    config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yml"
+    config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yml"
+
+    git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
     with open(config_path_input) as file:
         config_data = yaml.load(file, Loader=yaml.Loader)
 
     for path in config_data["paths"].keys():
-        config_data["paths"][path][] = config_data["paths"][path].replace(
-            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
-        )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        if path in ["PROPENSITY_PREDICTIONS", "BBM14_PAST_CAT_SALES", "BBM14_FUTURE_CAT_SALES"]:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/ref/MODELDATA"
+            )
+        else:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
+            )
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/stage/ref/AD_HOC"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/stage/ref/CATEGORY_DNA"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/ref/CUBES"
         )
 
@@ -183,19 +170,27 @@ for config_type in ["AH4", "AH5"]:
                     steps {
                         script {
                             def content = """
+import os
+import yaml
+
 for config_type in ["AH4", "AH5"]:
     config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
 
-    git_branch = os.getenv('GIT_BRANCH')
+    git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
     with open(config_path_input) as file:
         config_data = yaml.load(file, Loader=yaml.Loader)
 
     for path in config_data["paths"].keys():
-        config_data["paths"][path][] = config_data["paths"][path].replace(
-            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
-        )
+        if path in ["PROPENSITY_PREDICTIONS", "BBM14_PAST_CAT_SALES", "BBM14_FUTURE_CAT_SALES"]:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/ref/MODELDATA"
+            )
+        else:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
+            )
         config_data["paths"][path][] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
@@ -238,15 +233,20 @@ for config_type in ["AH4", "AH5"]:
     config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
 
-    git_branch = os.getenv('GIT_BRANCH')
+    git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
     with open(config_path_input) as file:
         config_data = yaml.load(file, Loader=yaml.Loader)
 
     for path in config_data["paths"].keys():
-        config_data["paths"][path][] = config_data["paths"][path].replace(
-            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
-        )
+        if path in ["PROPENSITY_PREDICTIONS", "BBM14_PAST_CAT_SALES", "BBM14_FUTURE_CAT_SALES"]:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/ref/MODELDATA"
+            )
+        else:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
+            )
         config_data["paths"][path][] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
@@ -279,6 +279,43 @@ for config_type in ["AH4", "AH5"]:
                 }
 		    }
 		}
+        stage('Config setup') {
+            parallel {
+                stage('Setup Config for cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
+                        '''
+                    }
+
+                }
+
+                stage('Setup Config for cluster - 2') {
+                    agent { node env.node_2 }
+                    steps {
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
+                        '''
+                    }
+                }
+
+                stage('Setup Config for cluster-3 ') {
+                    agent { node env.node_3 }
+                    steps {
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
+                        '''
+                    }
+                }
+            }
+        }
 
         stage('Starting 1st Parallel run') {
             parallel {
@@ -293,13 +330,7 @@ for config_type in ["AH4", "AH5"]:
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
-                            python3 -m venv pyspark_venv
                             source pyspark_venv/bin/activate
-                            pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                            python3 -m ensurepip --upgrade
-                            pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
-                            venv-pack -o pyspark_venv.tar.gz
-
                             cd pe_memberdna
                             python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
 							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_stage.yaml
@@ -319,15 +350,9 @@ for config_type in ["AH4", "AH5"]:
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
-                            python3 -m venv pyspark_venv
                             source pyspark_venv/bin/activate
-                            pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                            python3 -m ensurepip --upgrade
-                            pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
-                            venv-pack -o pyspark_venv.tar.gz
-
                             cd pe_memberdna
-                            python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                            python3 model/cf_model/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
                             spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_stage.yaml --future
 							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_stage.yaml --rmse
 							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_stage.yaml --future
@@ -346,15 +371,9 @@ for config_type in ["AH4", "AH5"]:
                             export PYSPARK_PYTHON=environment/bin/python
                             export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
 
-                            python3 -m venv pyspark_venv
                             source pyspark_venv/bin/activate
-                            pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                            python3 -m ensurepip --upgrade
-                            pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
-                            venv-pack -o pyspark_venv.tar.gz
-
                             cd pe_memberdna
-                            python3 jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
 							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
 							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
 							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
@@ -365,7 +384,31 @@ for config_type in ["AH4", "AH5"]:
 
 		    }
 		}
-        stage('Scaling down the cluster-2') {
+        stage('Starting 2nd Parallel run') {
+            parallel {
+                stage('Running combined_preds, top_cat and invalid_cf_score') {
+                    agent { node env.node_1 }
+                    steps {
+
+                        sh '''
+                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$WORKSPACE:
+                            cd $WORKSPACE
+                            unset SPARK_OPTIONS
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
+                            source pyspark_venv/bin/activate
+                            echo "RUNNING combined_preds, top_cat and invalid_cf_score STARTED"
+                            python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                            spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
+                            spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4_stage.yaml
+                            spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/top_cat.py --config=conf/config_AH4_stage.yaml
+                        '''
+                            echo "RUNNING combined_preds, top_cat and invalid_cf_score FINISHED"
+                            echo "CF MODEL FINISHED WITH QC"
+
+                    }
+				}
+                stage('Scaling down the cluster-2') {
                     agent { node env.node_2 }
                     steps {
                         echo "Scaling down cluster-2"
@@ -378,30 +421,6 @@ for config_type in ["AH4", "AH5"]:
                         echo "Scaled down cluster-2"
                     }
                 }
-        stage('Starting 2nd Parallel run') {
-            parallel {
-                stage('Running combined_preds, top_cat and invalid_cf_score') {
-                    agent { node env.node_1 }
-                        steps {
-
-							sh '''
-                                WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                                export PYTHONPATH=$WORKSPACE:
-                                cd $WORKSPACE
-                                unset SPARK_OPTIONS
-                                export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
-                                source pyspark_venv/bin/activate
-								echo "RUNNING combined_preds, top_cat and invalid_cf_score STARTED"
-                                python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-								spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
-                                spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4_stage.yaml
-                                spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/top_cat.py --config=conf/config_AH4_stage.yaml
-							'''
-								echo "RUNNING combined_preds, top_cat and invalid_cf_score FINISHED"
-								echo "CF MODEL FINISHED WITH QC"
-
-						}
-					}
                 stage('Scaling down the cluster-3') {
                     agent { node env.node_3 }
                     steps {

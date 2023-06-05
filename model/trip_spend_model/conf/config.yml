@@ -7,15 +7,19 @@ shared:
       split_rate: 0.8
       sample_rate: 0.2
       base_path: 'Code_and_Data_repo/MODELDATA'
-      ad_hoc_output_path: 'Code_and_Data_repo/AD_HOC'
-      model_path: 'Code_and_Data_repo/MODELS/TRIP_SPEND_MODELS'
-      dataset_path: 'Code_and_Data_repo/DATASETS/TRIP_SPEND_MODELS'
-      prediction_path: 'Code_and_Data_repo/PREDICTIONS/TRIP_SPEND_MODELS'
+      ad_hoc_output_path: 'AD_HOC'
+      model_path: 'MODELS/TRIP_SPEND_MODELS'
+      past_features: 'Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/featureImportance.csv'
+      past_metric: 'Code_and_Data_repo/MODELDATA/QC/TRIP_PROPENSITY/rf_metrics.csv'
+      current_features: 'QC/TRIP_PROPENSITY/featureImportance.csv'
+      current_metric: 'QC/TRIP_PROPENSITY/rf_metrics.csv'
+      dataset_path: 'DATASETS/TRIP_SPEND_MODELS'
+      prediction_path: 'PREDICTIONS/TRIP_SPEND_MODELS'
       high_frequency_visit_threshold: 12
       low_frequency_visit_threshold: 0
       run_name: 'dev_12_19'
 etl:
-      start_date: '2018-11-02'
+      start_date: '2018-10-27'
       end_date: '2019-12-26'
       bbm_week_window: 3
       start_week_windows:
@@ -72,9 +76,9 @@ grid_search:
             - 1000
             - 5000
       model: 'bin'
-      output_path: 'Code_and_Data_repo/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
+      output_path: '/Code_and_Data_repo/MODELDATA/TRIP_SPEND_MODELS/LOGS/'
 predict:
       weeks_to_predict:
-            - '2019-11-30'
+            - '2022-10-22'
       trip_model_date: '20191202'
       spend_model_date: '20191202'

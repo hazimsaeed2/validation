@@ -7,8 +7,9 @@ pipeline {
                     agent { node env.node_1 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-1"
@@ -18,8 +19,9 @@ pipeline {
                     agent { node env.node_2 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-2"
@@ -29,8 +31,9 @@ pipeline {
                     agent { node env.node_3 }
                     steps {
                         sh '''
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/origin/${GIT_BRANCH}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-3"
@@ -44,7 +47,7 @@ pipeline {
                 script {
                     sh  '''
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
-                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards_fiscal
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/bcg_maps
@@ -128,7 +131,7 @@ import yaml
 config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
 config_path_output = "pe_memberdna/dna/member/configs/config_stage.yaml"
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
@@ -142,7 +145,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+    "Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv", "Code_and_Data_repo/stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
@@ -186,7 +189,7 @@ import yaml
 config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
 config_path_output = "pe_memberdna/dna/member/configs/config_stage.yaml"
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
@@ -200,7 +203,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+    "Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv", "Code_and_Data_repo/stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
@@ -244,7 +247,7 @@ import yaml
 config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
 config_path_output = "pe_memberdna/dna/member/configs/config_stage.yaml"
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.Loader)
@@ -258,7 +261,7 @@ config_data["paths"]["input"]["s3_stat_path"] = config_data["paths"]["input"]["s
 )
 
 config_data["paths"]["input"]["mbr_basic_path"] = config_data["paths"]["input"]["mbr_basic_path"].replace(
-    "Membership/PE_Membership_Mstr_YYYYmmdd.csv", "stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+    "Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv", "Code_and_Data_repo/stage/ref/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 )
 
 config_data["paths"]["output"]["dir"] = config_data["paths"]["output"]["dir"].replace(
@@ -365,7 +368,7 @@ import datetime
 with open('pe_memberdna/etl/configs/config.yaml') as config_file:
    config_data = yaml.load(config_file)
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
@@ -492,7 +495,7 @@ import datetime
 with open('pe_memberdna/etl/configs/config.yaml') as config_file:
    config_data = yaml.load(config_file)
 
-git_branch = os.getenv('GIT_BRANCH')
+git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 for k in config_data["data_paths"]["source"].keys():
     config_data["data_paths"]["source"][k] = config_data["data_paths"]["source"][k].replace(
@@ -556,13 +559,41 @@ with open('pe_memberdna/etl/configs/config_stage.yaml','w') as config_file:
                             export PYTHONPATH=$WORKSPACE:
                             cd $WORKSPACE
                             unset SPARK_OPTIONS
-                            export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
 
                             cd pe_memberdna/dna/member
                             spark-submit ${SPARK_OPTIONS} --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=16g scripts/merge.py --config_path ./configs/config_stage.yaml
                         '''
                         echo "Ran step-3 cluster-3 script"
+                    }
+                }
+            }
+        }
+        stage('Starting 4th Parallel run') {
+            parallel {
+                stage('Scaling down cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        echo "Scaling down cluster-1"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-1"
+                    }
+                }
+                stage('Scaling down cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        echo "Scaling down cluster-3"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-3"
                     }
                 }
             }
