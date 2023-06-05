@@ -84,6 +84,9 @@ pipeline {
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master/club_square_with_brand
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/
                         aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/trip_spend_predictions s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/PREDICTIONS/trip_spend_predictions
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14b s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/DATASETS/sales_by_membercatbbm14b
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14a s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/DATASETS/sales_by_membercatbbm14a
                     '''
                     echo "Stage data in sync with prod"
                 }
@@ -151,9 +154,14 @@ for config_type in ["AH4", "AH5"]:
         config_data = yaml.load(file, Loader=yaml.Loader)
 
     for path in config_data["paths"].keys():
-        config_data["paths"][path] = config_data["paths"][path].replace(
-            "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
-        )
+        if path in ["PROPENSITY_PREDICTIONS", "BBM14_PAST_CAT_SALES", "BBM14_FUTURE_CAT_SALES"]:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/ref/MODELDATA"
+            )
+        else:
+            config_data["paths"][path] = config_data["paths"][path].replace(
+                "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
+            )
         config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
