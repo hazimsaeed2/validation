@@ -70,7 +70,7 @@ pipeline {
                             sh  '''
                                 wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                                 export PYTHONPATH=$wrkspce:
-                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 10 --wait 120
                             '''
                                 echo "Scaled up cluster-1"
                         }
@@ -84,7 +84,7 @@ pipeline {
                             sh '''
                                 wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                                 export PYTHONPATH=$wrkspce:
-                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 10 --wait 120
                             '''
                             echo "Scaled up cluster-2"
                         }
@@ -99,7 +99,7 @@ pipeline {
                             sh '''
                                 wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                                 export PYTHONPATH=$wrkspce:
-                                python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 10 --wait 120
                                 '''
                             echo "Scaled up cluster-3"
                         }
