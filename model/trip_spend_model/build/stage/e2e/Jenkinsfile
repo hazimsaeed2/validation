@@ -146,6 +146,18 @@ with open(config_path_output, "w") as file:
                 echo "PROPENSITY MODEL ETL FINISHED"
             }
         }
+        stage('Scaling down') {
+            steps {
+                echo "Scaling down"
+                sh '''
+                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$wrkspce:
+                    python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                    rm -rf $wrkspce/*
+                '''
+                echo "Scaled down"
+            }
+        }
         stage('Setup EC2') {
             steps {
                 node('built-in') {
@@ -203,22 +215,10 @@ with open(config_path_output, "w") as file:
                 echo "RUNNING PROPENSITY MODEL QC"
                 sh '''
                     export PYTHONPATH=$WORKSPACE:
-                    python3  $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_stage.yml ${qc_save}
+                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config_stage.yml ${qc_save}
                 '''
                 echo "PROPENSITY MODEL QC FINISHED"
             }
-        }
-    }
-    stage('Scaling down') {
-        steps {
-            echo "Scaling down"
-            sh '''
-                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                export PYTHONPATH=$wrkspce:
-                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
-                rm -rf $wrkspce/*
-            '''
-            echo "Scaled down"
         }
     }
 }
