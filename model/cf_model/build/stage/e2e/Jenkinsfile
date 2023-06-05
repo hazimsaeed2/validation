@@ -41,43 +41,6 @@ pipeline {
                 }
             }
         }
-        stage('Config setup') {
-            parallel {
-                stage('Setup Config for cluster-1') {
-                    agent { node env.node_1 }
-                    steps {
-                        sh '''
-                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$wrkspce:
-                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
-                        '''
-                    }
-
-                }
-
-                stage('Setup Config for cluster - 2') {
-                    agent { node env.node_2 }
-                    steps {
-                        sh '''
-                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$wrkspce:
-                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
-                        '''
-                    }
-                }
-
-                stage('Setup Config for cluster-3 ') {
-                    agent { node env.node_3 }
-                    steps {
-                        sh '''
-                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$wrkspce:
-                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
-                        '''
-                    }
-                }
-            }
-        }
         stage("Data sync") {
             agent { node env.node_1 }
             steps {
@@ -316,6 +279,43 @@ for config_type in ["AH4", "AH5"]:
                 }
 		    }
 		}
+        stage('Config setup') {
+            parallel {
+                stage('Setup Config for cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
+                        '''
+                    }
+
+                }
+
+                stage('Setup Config for cluster - 2') {
+                    agent { node env.node_2 }
+                    steps {
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
+                        '''
+                    }
+                }
+
+                stage('Setup Config for cluster-3 ') {
+                    agent { node env.node_3 }
+                    steps {
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type} stage ${GIT_BRANCH}
+                        '''
+                    }
+                }
+            }
+        }
 
         stage('Starting 1st Parallel run') {
             parallel {
