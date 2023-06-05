@@ -41,7 +41,7 @@ pipeline {
                 }
             }
         }
-        stage('Environment setup') {
+        stage('Config setup') {
             parallel {
                 stage('Setup Config for cluster-1') {
                     agent { node env.node_1 }
@@ -98,7 +98,7 @@ pipeline {
                 }
             }
         }
-        stage('Environment setup') {
+        stage('Cluster scaling') {
             parallel {
                 stage('Scaling up cluster -1') {
                     agent { node env.node_1 }
