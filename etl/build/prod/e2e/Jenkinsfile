@@ -1,38 +1,40 @@
 pipeline {
     agent none
     stages {
-        parallel {
-            stage('Running environment setup on cluster-1') {
-                agent { node env.node_1 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-1"
+        stage('Environment setup') {
+            parallel {
+                stage('Running environment setup on cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        sh '''
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-1"
+                    }
                 }
-            }
-            stage('Running environment setup on cluster-2') {
-                agent { node env.node_2 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-2"
+                stage('Running environment setup on cluster-2') {
+                    agent { node env.node_2 }
+                    steps {
+                        sh '''
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-2"
+                    }
                 }
-            }
-            stage('Running environment setup on cluster-3') {
-                agent { node env.node_3 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-3"
+                stage('Running environment setup on cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        sh '''
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                        '''
+                        echo "Ran environemnt setup on cluster-3"
+                    }
                 }
             }
         }
@@ -88,6 +90,184 @@ pipeline {
                 }
             }
         }
+        stage('Starting environment config setup') {
+            parallel {
+                stage('Running config setup on cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        script {
+                            def content = """
+import os
+import yaml
+
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config.yaml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.Loader)
+
+for k in config_data["data_paths"]["intermediate"].keys():
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+    )
+
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                            """
+                        writeFile file: '_config_cluster_1.py', text: content
+                        }
+
+                        sh '''
+                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$WORKSPACE:
+
+                            source pyspark_venv/bin/activate
+                            python3 _config_cluster_1.py
+                            deactivate
+                        '''
+                        echo "Ran config setup cluster-1 scripts"
+                    }
+                }
+                stage('Running config setup on cluster-2') {
+                    agent { node env.node_2 }
+                    steps {
+                        script {
+                            def content = """
+import os
+import yaml
+
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config.yaml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.Loader)
+
+for k in config_data["data_paths"]["intermediate"].keys():
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+    )
+
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                            """
+                        writeFile file: '_config_cluster_2.py', text: content
+                        }
+
+                        sh '''
+                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$WORKSPACE:
+
+                            source pyspark_venv/bin/activate
+                            python3 _config_cluster_2.py
+                            deactivate
+                        '''
+                        echo "Ran config setup cluster-2 scripts"
+                    }
+                }
+                stage('Running config setup on cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        script {
+                            def content = """
+import os
+import yaml
+
+config_path_input = "pe_memberdna/etl/configs/config.yaml"
+config_path_output = "pe_memberdna/etl/configs/config.yaml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.Loader)
+
+for k in config_data["data_paths"]["intermediate"].keys():
+    config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+    )
+
+for k in config_data["data_paths"]["sampled"].keys():
+    config_data["data_paths"]["sampled"][k] = config_data["data_paths"]["sampled"][k].replace(
+        "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+    )
+
+config_data["data_paths"]["dq"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data["data_paths"]["archived"] = config_data["data_paths"]["dq"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data["validation"]["s3_stat_path"] = config_data["validation"]["s3_stat_path"].replace(
+    "memberanalytics-data-out-prod/Code_and_Data_repo", f"memberanalytics-data-out-prod/Code_and_Data_repo/prod"
+)
+
+config_data['data_paths']['recency_lookback_duration']['global'] = 0
+if 'local' in config_data['data_paths']['recency_lookback_duration']:
+    for k in config_data['data_paths']['recency_lookback_duration']['local'].keys():
+        config_data['data_paths']['recency_lookback_duration']['local'][k] = 0
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                            """
+                        writeFile file: '_config_cluster_3.py', text: content
+                        }
+
+                        sh '''
+                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$WORKSPACE:
+
+                            source pyspark_venv/bin/activate
+                            python3 _config_cluster_3.py
+                            deactivate
+                        '''
+                        echo "Ran config setup cluster-3 scripts"
+                    }
+                }
+		    }
+		}
         stage('Starting 1st Parallel run') {
             parallel {
                 stage('Running step-1 on cluster-1') {
@@ -103,7 +283,7 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step1_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step1_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-1 cluster-1 scripts"
@@ -122,7 +302,7 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=18g --driver-memory=18g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step1_cluster2 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step1_cluster2 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-1 cluster-2 script"
@@ -141,7 +321,7 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step1_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step1_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-1 cluster-3 script"
@@ -175,7 +355,7 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step2_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step2_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-2 cluster-1 script"
@@ -193,7 +373,7 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step2_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step2_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-2 cluster-3 script"
@@ -215,7 +395,7 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=19g --driver-memory=19g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step3_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step3_cluster1 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-3 cluster-1 script"
@@ -233,10 +413,38 @@ pipeline {
                             source pyspark_venv/bin/activate
                             export SPARK_OPTIONS=$SPARK_OPTIONS" --conf spark.sql.broadcastTimeout=-1 --executor-memory=24g --driver-memory=24g --executor-cores=5 --conf spark.sql.shuffle.partitions=800"
                             cd pe_memberdna
-                            make -C etl etl_complete_prod_step3_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS"
+                            make -C etl etl_complete_prod_step3_cluster3 SPARK_OPTIONS="$SPARK_OPTIONS" CONFIG_PATH="./configs/config.yaml"
                             deactivate
                         '''
                         echo "Ran step-3 cluster-3 script"
+                    }
+                }
+            }
+        }
+        stage('Starting 4th Parallel run') {
+            parallel {
+                stage('Scaling down cluster-1') {
+                    agent { node env.node_1 }
+                    steps {
+                        echo "Scaling down cluster-1"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-1"
+                    }
+                }
+                stage('Scaling down cluster-3') {
+                    agent { node env.node_3 }
+                    steps {
+                        echo "Scaling down cluster-3"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --spot_node_cnt 0 --ondemand_node_cnt 0 --wait 120
+                        '''
+                        echo "Scaled down cluster-3"
                     }
                 }
             }

@@ -72,6 +72,8 @@ ec2 = boto3.client("ec2")
 tag_name = "ue00mdaapp01"
 if run_type in ["dev", "stage"]:
     tag_name = f"{tag_name}_{run_type}_{git_branch}"
+elif run_type == "prod":
+    tag_name = f"{tag_name}_{run_type}"
 
 response = ec2.describe_instances(
     Filters=[{"Name": "tag:Hostname", "Values": [tag_name]}]

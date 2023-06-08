@@ -1,267 +1,164 @@
 pipeline {
-    agent none
+    agent { node env.Node }
     stages {
-        parallel {
-            stage('Running environment setup on cluster-1') {
-                agent { node env.node_1 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-1"
-                }
-            }
-            stage('Running environment setup on cluster-2') {
-                agent { node env.node_2 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-2"
-                }
-            }
-            stage('Running environment setup on cluster-3') {
-                agent { node env.node_3 }
-                steps {
-                    sh '''
-                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                        tar -xf pyspark_venv.tar.gz
-                    '''
-                    echo "Ran environemnt setup on cluster-3"
-                }
-            }
-        }
-		stage('Setup Config for cluster-1') {
-            agent { node env.node_1 }
+        stage('Environment setup') {
             steps {
                 sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
+                    aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                    aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                    mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                 '''
-            }
-
-        }
-
-        stage('Setup Config for cluster - 2') {
-            agent { node env.node_2 }
-            steps {
-                sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                '''
+                echo "Ran environemnt setup on cluster"
             }
         }
-
-        stage('Setup Config for cluster-3 ') {
-            agent { node env.node_3 }
-            steps {
-                sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                '''
-            }
-        }
-
-        stage('Scaling up cluster -1') {
-            agent { node env.node_1 }
+        stage('Prepare environment') {
             steps {
                 script {
-                    sh  '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
-                    '''
-                        echo "Scaled up cluster-1"
+                    def content = """
+import os
+import yaml
+
+config_path_input = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
+config_path_output = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
+
+with open(config_path_input) as file:
+    config_data = yaml.load(file, Loader=yaml.Loader)
+
+for path in config_data["shared"].keys():
+    config_data["shared"][path] = config_data["shared"][path].replace(
+        "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+    )
+
+for path in config_data["etl"].keys():
+    if path in ["BBM_weeks_path", "lookup_path"]:
+        config_data["etl"][path] = config_data["etl"][path].replace(
+            "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+        )
+
+config_data["grid_search"]["output_path"] = config_data["grid_search"]["output_path"].replace(
+    "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+)
+
+with open(config_path_output, "w") as file:
+    documents = yaml.dump(config_data, file)
+                    """
+                writeFile file: '_config_step.py', text: content
                 }
+                sh '''
+                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$WORKSPACE:
+
+                    source pyspark_venv/bin/activate
+                    python3 _config_step.py
+                    deactivate
+                '''
             }
         }
-        stage('Scaling up cluster-2') {
-            agent { node env.node_2 }
+        stage('Scaling up') {
             steps {
                 script {
                     echo "Scaling up"
                     sh '''
                         wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                         export PYTHONPATH=$wrkspce:
-                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
+                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --spot_node_cnt 10 --wait 120
                     '''
-                    echo "Scaled up cluster-2"
+                    echo "Scaled up"
                 }
             }
-        }
-
-        stage('Scaling up cluster-3') {
-            agent { node env.node_3 }
+        }        
+        stage('Setup Config') {
             steps {
-                script {
-                    echo "Scaling up"
-                    sh '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
-                        '''
-                    echo "Scaled up cluster-3"
-                }
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    source pyspark_venv/bin/activate
+                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} prod none
+                '''
             }
         }
-
-        stage('Starting 1st Parallel run') {
-            parallel {
-                stage('Running step-1 on cluster-1') {
-                    agent { node env.node_1 }
-                    steps {
-						echo "RUNNING CF MODEL"
-                        sh '''
-                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
-                            export PYSPARK_PYTHON=environment/bin/python
-                            export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
-
-                            python3 -m venv pyspark_venv
-                            source pyspark_venv/bin/activate
-                            pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                            python3 -m ensurepip --upgrade
-                            pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
-                            venv-pack -o pyspark_venv.tar.gz
-
-                            cd pe_memberdna
-                            python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5.yml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5.yml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH5.yml
-                        '''
-                        echo "Ran step-1 cluster-1 scripts"
-                    }
-                }
-                stage('Running step-1 on cluster-2') {
-                    agent { node env.node_2 }
-                    steps {
-                        sh '''
-                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
-                            export PYSPARK_PYTHON=environment/bin/python
-                            export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
-
-                            python3 -m venv pyspark_venv
-                            source pyspark_venv/bin/activate
-                            pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                            python3 -m ensurepip --upgrade
-                            pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
-                            venv-pack -o pyspark_venv.tar.gz
-
-                            cd pe_memberdna
-                            python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                            spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5.yml --future
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5.yml --rmse
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4.yml --future
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4.yml --rmse
-                        '''
-                        echo "Ran step-1 cluster-2 script"
-                    }
-                }
-                stage('Running step-1 in cluster-3') {
-                    agent { node env.node_3 }
-                    steps {
-                        sh '''
-                            WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$WORKSPACE:
-                            export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
-                            export PYSPARK_PYTHON=environment/bin/python
-                            export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
-
-                            python3 -m venv pyspark_venv
-                            source pyspark_venv/bin/activate
-                            pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
-                            python3 -m ensurepip --upgrade
-                            pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
-                            venv-pack -o pyspark_venv.tar.gz
-
-                            cd pe_memberdna
-                            python3 jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4.yml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4.yml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4.yml
-                        '''
-                        echo "Ran step-1 cluster-3 script"
-                    }
-                }
-
-		    }
-		}
-        stage('Scaling down the cluster-2') {
-                    agent { node env.node_2 }
-                    steps {
-                        echo "Scaling down cluster-2"
-                        sh '''
-                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$wrkspce:
-                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
-                            rm -rf $wrkspce/*
-                        '''
-                        echo "Scaled down cluster-2"
-                    }
-                }
-        stage('Starting 2nd Parallel run') {
-            parallel {
-                stage('Running combined_preds, top_cat and invalid_cf_score') {
-                    agent { node env.node_1 }
-                        steps {
-
-							sh '''
-                                WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                                export PYTHONPATH=$WORKSPACE:
-                                cd $WORKSPACE
-                                unset SPARK_OPTIONS
-                                export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
-                                source pyspark_venv/bin/activate
-								echo "RUNNING combined_preds, top_cat and invalid_cf_score STARTED"
-                                python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-								spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4.yml
-                                spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4.yml
-                                spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/top_cat.py --config=conf/config_AH4.yml
-							'''
-								echo "RUNNING combined_preds, top_cat and invalid_cf_score FINISHED"
-								echo "CF MODEL FINISHED WITH QC"
-
-						}
-					}
-                stage('Scaling down the cluster-3') {
-                    agent { node env.node_3 }
-                    steps {
-                        echo "Scaling down cluster-3"
-                        sh '''
-                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                            export PYTHONPATH=$wrkspce:
-                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
-                            rm -rf $wrkspce/*
-                        '''
-                        echo "Scaled down cluster-3"
-                    }
-                }
-
-			}
-		}
-        stage('Scaling down the cluster-1') {
-            agent { node env.node_1 }
+        stage('Propensity Model ETL') {
             steps {
-                echo "Scaling down cluster-1"
+                echo "RUNNING PROPENSITY MODEL ETL"
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+                    spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config.yml
+                '''
+                echo "PROPENSITY MODEL ETL FINISHED"
+            }
+        }
+        stage('Scaling down') {
+            steps {
+                echo "Scaling down"
                 sh '''
                     wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                     export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                    python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
                     rm -rf $wrkspce/*
                 '''
-                echo "Scaled down cluster-1"
+                echo "Scaled down"
+            }
+        }
+        stage('Setup EC2') {
+            steps {
+                node('built-in') {
+                    sh '''
+                        rm -rf /var/lib/jenkins/workspace/Ec2-Start-Stop/Ec2-OnDemand-ue00mdaapp01/output.txt
+                        export AWS=/usr/local/bin/aws
+                        cd /var/lib/jenkins/workspace/Ec2-Start-Stop/Ec2-OnDemand-ue00mdaapp01/
+
+                        instanceId=`$AWS ec2 run-instances --region us-east-1 --image-id ami-0de53d8956e8dcf80 --instance-type r5.12xlarge --key-name bi-emr --iam-instance-profile Name=EMRMDAEc2InstanceProfile --subnet-id subnet-6317c629 --security-group-ids sg-03a3c4770d1be5f84 sg-b0ce14c4 sg-d0cb11a4 --user-data file://ec2-config.sh --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=ue00mdaapp01_prod},{Key=Project,Value=MemberDataAggregation},{Key=AppName,Value=MemberDataAggregation},{Key=CreatedBy,Value=kpamidimarri@bjs.com},{Key=BusinessUnit,Value=FrontOffice},{Key=ServiceType,Value=App},{Key=Environment,Value=prod},{Key=Hostname,Value=ue00mdaapp01_prod},{Key=OSType,Value=AmazonLinux},{Key=ServiceOwner,Value=Other},{Key=Model,Value=true}]" --query "Instances[].InstanceId" --output text`
+                        $AWS ec2 describe-instances --region us-east-1 --instance-id $instanceId --query "Reservations[].Instances[].PrivateIpAddress" > output.txt
+                        echo $instanceId >> output.txt
+                    '''
+                }
+            }
+        }
+        stage('Run Trip Propensity') {
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'SSH-PROD-hadoop',
+                        keyFileVariable: 'ssh_key_file',
+                        passphraseVariable: 'ssh_pass',
+                        usernameVariable: 'ssh_username'),
+                    usernamePassword(credentialsId: 'bitbucket-service-account',
+                        usernameVariable: 'bitbucket_username',
+                        passwordVariable: 'bitbucket_pass')
+                    ])
+                {
+                    echo "$ssh_username"
+                    echo "RUNNING PROPENSITY MODEL"
+                    sh '''
+                        export PYTHONPATH=$WORKSPACE:
+                        source pyspark_venv/bin/activate
+                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config.yml prod none
+                        deactivate
+                    '''
+                    echo "PROPENSITY MODEL FINISHED"
+                }
+            }
+            post {
+                always {
+                    node('built-in') {
+                        sh '''
+                            export AWS=/usr/local/bin/aws
+                            $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query "Reservations[*].Instances[*].[InstanceId]" --filters "Name=tag:Name,Values=ue00mdaapp01_prod" --output text`
+                        '''
+                    }
+                }
+            }
+        }
+		stage('Propensity Model QC') {
+            steps {
+                echo "RUNNING PROPENSITY MODEL QC"
+                sh '''
+                    export PYTHONPATH=$WORKSPACE:
+                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config.yml ${qc_save}
+                '''
+                echo "PROPENSITY MODEL QC FINISHED"
             }
         }
     }

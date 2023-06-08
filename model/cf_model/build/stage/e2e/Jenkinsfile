@@ -8,8 +8,8 @@ pipeline {
                     steps {
                         sh '''
                             curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-1"
@@ -20,8 +20,8 @@ pipeline {
                     steps {
                         sh '''
                             curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-2"
@@ -32,8 +32,8 @@ pipeline {
                     steps {
                         sh '''
                             curated_git_branch=$(echo "$GIT_BRANCH"  | sed 's/origin/branch/g')
-                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/code/pe_memberdna pe_memberdna
-                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                            aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${curated_git_branch}/code/pe_memberdna pe_memberdna
+                            aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/branch/${curated_git_branch}/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
                             mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
                         '''
                         echo "Ran environemnt setup on cluster-3"
@@ -174,8 +174,8 @@ import os
 import yaml
 
 for config_type in ["AH4", "AH5"]:
-    config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
-    config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
+    config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yml"
+    config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yml"
 
     git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
@@ -191,16 +191,16 @@ for config_type in ["AH4", "AH5"]:
             config_data["paths"][path] = config_data["paths"][path].replace(
                 "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
             )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/stage/ref/AD_HOC"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/stage/ref/CATEGORY_DNA"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/ref/CUBES"
         )
 
@@ -230,8 +230,8 @@ import os
 import yaml
 
 for config_type in ["AH4", "AH5"]:
-    config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yaml"
-    config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yaml"
+    config_path_input = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yml"
+    config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}_stage.yml"
 
     git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
@@ -247,16 +247,16 @@ for config_type in ["AH4", "AH5"]:
             config_data["paths"][path] = config_data["paths"][path].replace(
                 "Code_and_Data_repo/MODELDATA", f"Code_and_Data_repo/stage/{git_branch}/MODELDATA"
             )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/pipelined_intermediates", f"Code_and_Data_repo/stage/ref/pipelined_intermediates"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/AD_HOC", f"Code_and_Data_repo/stage/ref/AD_HOC"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CATEGORY_DNA", f"Code_and_Data_repo/stage/ref/CATEGORY_DNA"
         )
-        config_data["paths"][path][] = config_data["paths"][path].replace(
+        config_data["paths"][path] = config_data["paths"][path].replace(
             "Code_and_Data_repo/CUBES", f"Code_and_Data_repo/stage/ref/CUBES"
         )
 
@@ -332,10 +332,9 @@ for config_type in ["AH4", "AH5"]:
 
                             source pyspark_venv/bin/activate
                             cd pe_memberdna
-                            python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_stage.yaml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_stage.yaml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH5_stage.yaml
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_stage.yml
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_stage.yml
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH5_stage.yml
                         '''
                         echo "Ran step-1 cluster-1 scripts"
                     }
@@ -352,11 +351,10 @@ for config_type in ["AH4", "AH5"]:
 
                             source pyspark_venv/bin/activate
                             cd pe_memberdna
-                            python3 model/cf_model/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                            spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_stage.yaml --future
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_stage.yaml --rmse
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_stage.yaml --future
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_stage.yaml --rmse
+                            spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH5_stage.yml --future
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH5_stage.yml --rmse
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_stage.yml --future
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_stage.yml --rmse
                         '''
                         echo "Ran step-1 cluster-2 script"
                     }
@@ -373,10 +371,9 @@ for config_type in ["AH4", "AH5"]:
 
                             source pyspark_venv/bin/activate
                             cd pe_memberdna
-                            python3 pe_memberdna/model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
-							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_etl.py --conf ./model/cf_model/conf/config_AH4_stage.yml
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/als_train.py --conf ./model/cf_model/conf/config_AH4_stage.yml
+							spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_utils.py,./model/cf_model/lib/cf_io.py,./model/cf_model/lib/models.py,./model/cf_model/lib/cf_metrics.py,./model/cf_model/lib/backtest.py ./model/cf_model/scripts/cf_predict.py --conf ./model/cf_model/conf/config_AH4_stage.yml
                         '''
                         echo "Ran step-1 cluster-3 script"
                     }
@@ -398,10 +395,9 @@ for config_type in ["AH4", "AH5"]:
                             export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
                             source pyspark_venv/bin/activate
                             echo "RUNNING combined_preds, top_cat and invalid_cf_score STARTED"
-                            python3 model/cf_model/jenkins_config_setup.py ${inHomeDate} ${lambda} ${propPath} ${predRoot} ${cubePath} ${run_type}
-                            spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_stage.yaml
-                            spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4_stage.yaml
-                            spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/top_cat.py --config=conf/config_AH4_stage.yaml
+                            spark-submit --num-executors 59 --executor-cores 15 --executor-memory 32G --py-files ./model/cf_model/lib/cf_io.py ./model/cf_model/scripts/cf_combine_preds.py --conf ./model/cf_model/conf/config_AH4_stage.yml
+                            spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/invalid_cf_score.py --config=conf/config_AH4_stage.yml
+                            spark-submit --conf spark.sql.broadcastTimeout=-1 --driver-memory=19g --executor-memory=19g --executor-cores=5 --conf spark.sql.shufflepartitions=600 --conf spark.network.timeout=10000001s --conf spark.executor.memoryOverhead=4g ./model/cf_model/QC/top_cat.py --config=conf/config_AH4_stage.yml
                         '''
                             echo "RUNNING combined_preds, top_cat and invalid_cf_score FINISHED"
                             echo "CF MODEL FINISHED WITH QC"
