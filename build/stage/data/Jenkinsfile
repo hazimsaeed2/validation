@@ -1,0 +1,109 @@
+pipeline {
+    agent none
+    stages {
+        stage("Data sync ETL") {
+            agent { node env.node }
+            steps {
+                script {
+                    sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Master_Data/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Master_Data --exclude PE_Vendors_Site_Article_*.csv --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180614.txt --exclude Archive/kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180719.txt --exclude Archive/kantar_storemaster_hierarchy_data_SAP_20180829.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Header/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Header
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Detail/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Detail
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Transaction_Payment/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Transaction_Payment
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Other/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Other --exclude Promo* --exclude RFM_July2017_Present.csv --exclude people.txt --exclude kantar_itemmaster_hierarchy_data_SAP_20180829.txt --exclude kantar_storemaster_hierarchy_data_SAP_20180829.txt
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Email_Events/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Email_Events
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/ATC/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/ATC --exclude old/*
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/control_files/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
+                    '''
+                    echo "Stage data in sync with prod"
+                }
+            }
+        }
+        stage("Data sync Member DNA") {
+            agent { node env.node }
+            steps {
+                script {
+                    sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
+                        aws s3 sync --delete s3://memberanalytics-data-in-prod/Membership/ s3://memberanalytics-data-in-prod/Code_and_Data_repo/stage/ref/Membership --exclude Archive/BCG_Member_Hist.txt --exclude Archive/DataLogix_customer_data_20180829.txt --exclude BCG_Email_Opt_Status_2018_05_01.txt --exclude ls/DataLogix_customer_data.txt --exclude ls/BCG_Member_Hist.txt
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/bcg_maps
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/control_files s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/coupon_clip
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/coupon_clip_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/lookup
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/quotient_id
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/sampled s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/sampled
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/skeleton
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction_fiscal
+                    '''
+                    echo "Stage data in sync with prod"
+                }
+            }
+        }
+        stage("Data sync Category DNA") {
+            agent { node env.node }
+            steps {
+                script {
+                    sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/awards_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/awards_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/bcg_maps s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/bcg_maps
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/control_files s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/control_files
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/coupon_clip
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/coupon_clip_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/coupon_clip_fiscal
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/lookup
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/quotient_id s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/quotient_id
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/sampled s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/sampled
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/skeleton s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/skeleton
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction_fiscal
+                    '''
+                    echo "Stage data in sync with prod"
+                }
+            }
+        }
+        stage("Data sync CF Model") {
+            agent { node env.node }
+            steps {
+                script {
+                    sh  '''
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master/member_extended
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/transaction_fiscal/detail
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates/master/item_with_brand s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates/master/item_with_brand
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/master/club_square_with_brand
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/ s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/trip_spend_predictions s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/PREDICTIONS/trip_spend_predictions
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14b s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/DATASETS/sales_by_membercatbbm14b
+                        aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14a s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/DATASETS/sales_by_membercatbbm14a
+                    '''
+                    echo "Stage data in sync with prod"
+                }
+            }
+        }
+        stage("Data sync TP Model") {
+            agent { node env.node }
+            steps {
+                script {
+                    sh  '''
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/propensity_model_for_trips/input_files s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/propensity_model_for_trips/input_files
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/AD_HOC/pipelined_intermediates
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/pipelined_intermediates/lookup s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/pipelined_intermediates/lookup
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/MODELDATA/QC/TRIP_PROPENSITY s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/MODELDATA/QC/TRIP_PROPENSITY
+                    aws s3 sync --delete s3://memberanalytics-data-out-prod/CUBES s3://memberanalytics-data-out-prod/Code_and_Data_repo/stage/ref/CUBES
+                    '''
+                    echo "Stage data in sync with prod"
+                }
+            }
+        }
+    }
+}
