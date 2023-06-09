@@ -12,10 +12,10 @@ from pe_memberdna.dna.category.lib.build import Build
 def open_configs(args):
     """ """
     with open(args.config_path) as config_file:
-        config = yaml.load(config_file, Loader=yaml.Loader)
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
 
     with open(args.reqs_path) as reqs_file:
-        reqs = yaml.load(reqs_file, Loader=yaml.Loader)
+        reqs = yaml.load(reqs_file, Loader=yaml.FullLoader)
 
     return (reqs, config)
 

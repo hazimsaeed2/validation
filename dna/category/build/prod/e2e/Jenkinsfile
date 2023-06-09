@@ -79,7 +79,7 @@ config_path_output = "pe_memberdna/dna/category/configs/reqs.yaml"
 git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data['detail']['path'] = config_data['detail']['path'].replace(
     'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/prod/pipelined_intermediates'
@@ -114,7 +114,7 @@ config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
 git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
     'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/prod/pipelined_intermediates'
@@ -163,7 +163,7 @@ config_path_input = "pe_memberdna/dna/category/configs/reqs.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/reqs.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data['detail']['path'] = config_data['detail']['path'].replace(
     'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/prod/pipelined_intermediates'
@@ -198,7 +198,7 @@ config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
 git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data['paths']['brand'] = config_data['paths']['brand'].replace(
     'Code_and_Data_repo/pipelined_intermediates', 'Code_and_Data_repo/prod/pipelined_intermediates'

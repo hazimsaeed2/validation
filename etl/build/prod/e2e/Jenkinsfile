@@ -7,9 +7,11 @@ pipeline {
                     agent { node env.node_1 }
                     steps {
                         sh '''
+                            rm -rf pe_memberdna
                             aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
                             aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                            rm -rf pyspark_venv
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv --overwrite
                         '''
                         echo "Ran environemnt setup on cluster-1"
                     }
@@ -18,9 +20,11 @@ pipeline {
                     agent { node env.node_2 }
                     steps {
                         sh '''
+                            rm -rf pe_memberdna
                             aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
                             aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                            rm -rf pyspark_venv
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv --overwrite
                         '''
                         echo "Ran environemnt setup on cluster-2"
                     }
@@ -29,9 +33,11 @@ pipeline {
                     agent { node env.node_3 }
                     steps {
                         sh '''
+                            rm -rf pe_memberdna
                             aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
                             aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                            rm -rf pyspark_venv
+                            mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv --overwrite
                         '''
                         echo "Ran environemnt setup on cluster-3"
                     }
@@ -104,7 +110,7 @@ config_path_input = "pe_memberdna/etl/configs/config.yaml"
 config_path_output = "pe_memberdna/etl/configs/config.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
@@ -135,6 +141,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
+    file.flush()
                             """
                         writeFile file: '_config_cluster_1.py', text: content
                         }
@@ -162,7 +169,7 @@ config_path_input = "pe_memberdna/etl/configs/config.yaml"
 config_path_output = "pe_memberdna/etl/configs/config.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
@@ -193,6 +200,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
+    file.flush()
                             """
                         writeFile file: '_config_cluster_2.py', text: content
                         }
@@ -220,7 +228,7 @@ config_path_input = "pe_memberdna/etl/configs/config.yaml"
 config_path_output = "pe_memberdna/etl/configs/config.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 for k in config_data["data_paths"]["intermediate"].keys():
     config_data["data_paths"]["intermediate"][k] = config_data["data_paths"]["intermediate"][k].replace(
@@ -251,6 +259,7 @@ if 'local' in config_data['data_paths']['recency_lookback_duration']:
 
 with open(config_path_output, "w") as file:
     documents = yaml.dump(config_data, file)
+    file.flush()
                             """
                         writeFile file: '_config_cluster_3.py', text: content
                         }

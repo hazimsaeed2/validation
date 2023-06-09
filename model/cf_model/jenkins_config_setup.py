@@ -47,7 +47,7 @@ for AH_type in ["AH4", "AH5"]:
     yaml_path = curr_dir + f"/conf/config_{AH_type}{config_suffix}.yml"
 
     with open(yaml_path) as config_file:
-        config = yaml.load(config_file, Loader=yaml.Loader)
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
 
     if args.in_home_date == "automatic":
         last_cube_date_str = get_max_file_date(

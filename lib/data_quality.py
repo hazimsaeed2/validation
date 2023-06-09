@@ -157,7 +157,7 @@ class DQ_check(object):
         """
         if _key_exists(self.s3_stat_path):
             s3_response = get_s3_object(self.s3_stat_path)
-            return yaml.load(s3_response, Loader=yaml.Loader)
+            return yaml.load(s3_response, Loader=yaml.FullLoader)
         return {}
 
     def get_stat(self, tabletype="", tablename="", testname=""):

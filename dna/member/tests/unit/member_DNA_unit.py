@@ -49,7 +49,7 @@ def prepare_member_dna_data(
     """
 
     with open(unittest_config_path) as config_file:
-        unittest_config = yaml.load(config_file, Loader=yaml.Loader)
+        unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
 
     etl_unit.prepare_etl_data(spark_in, unittest_etl_config_path)
     etl_unit.run_etl(simulated_etl_config_path)
@@ -94,7 +94,7 @@ def run_member_dna(simulated_config_path):
     """
 
     with open(simulated_config_path) as config_file:
-        config = yaml.load(config_file, Loader=yaml.Loader)
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
 
     sys.argv.extend(["--config", simulated_config_path])
     gen_cpn_and_dig_1.main()
@@ -177,7 +177,7 @@ class TestVectorVsMemberDna(unittest.TestCase):
                 config_file.write(config)
 
         with open(cls.unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
+            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         test_utils.remove_from_s3(
             unittest_config["root_s3_path"] + "data_out/"
@@ -192,14 +192,14 @@ class TestVectorVsMemberDna(unittest.TestCase):
         run_member_dna(cls.simulated_config_path)
 
         with open(cls.unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
+            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         cls.cube_df = spark.read.parquet(
             unittest_config["root_s3_path"] + "data_out/customer_cube_full",
         )
 
         with open(cls.desired_results_path) as config_file:
-            cls.desired_results = yaml.load(config_file, Loader=yaml.Loader)
+            cls.desired_results = yaml.load(config_file, Loader=yaml.FullLoader)
 
     def test_memeber_dna_coupon(self):
         """
@@ -288,7 +288,7 @@ class TestVectorVsMemberDna(unittest.TestCase):
         """
 
         with open(cls.unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
+            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         test_utils.remove_from_s3(
             unittest_config["root_s3_path"] + "data_out/"
@@ -331,10 +331,10 @@ class TestMemberDnaAutoDate(cat_dna_unit.TestAutoDate, unittest.TestCase):
                 config_file.write(config)
 
         with open(self.simulated_config_path) as config_file:
-            self.config = yaml.load(config_file, Loader=yaml.Loader)
+            self.config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         with open(unittest_config_path) as config_file:
-            unittest_config = yaml.load(config_file, Loader=yaml.Loader)
+            unittest_config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         for _, paths in unittest_config["additional_files"].items():
             local_path = os.path.join(parent_dir, paths["local_file"])

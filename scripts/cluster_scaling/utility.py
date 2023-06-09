@@ -11,7 +11,7 @@ def get_config(printYAML=False):
 
     config_path = os.path.dirname(os.path.abspath(__file__)) + "/config.yaml"
     with open(config_path) as config_file:
-        config = yaml.load(config_file, Loader=yaml.Loader)
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
 
     if printYAML:
         pprint.pprint(config)

@@ -104,7 +104,7 @@ config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
 config_path_output = "pe_memberdna/dna/member/configs/config.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
     "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/prod/pipelined_intermediates"
@@ -160,7 +160,7 @@ config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
 config_path_output = "pe_memberdna/dna/member/configs/config.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
     "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/prod/pipelined_intermediates"
@@ -216,7 +216,7 @@ config_path_input = "pe_memberdna/dna/member/configs/config.yaml"
 config_path_output = "pe_memberdna/dna/member/configs/config.yaml"
 
 with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.Loader)
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 config_data["paths"]["input"]["dir"] = config_data["paths"]["input"]["dir"].replace(
     "Code_and_Data_repo/pipelined_intermediates", "Code_and_Data_repo/prod/pipelined_intermediates"

@@ -64,7 +64,7 @@ class JobManager(object):
             config - dictionary structure containign the config file
         """
         with open(args.config_path) as config_file:
-            config = yaml.load(config_file, Loader=yaml.Loader)
+            config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         end_date_str = config["club_square_config"].get("max_date")
 

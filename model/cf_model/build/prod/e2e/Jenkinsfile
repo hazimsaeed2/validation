@@ -99,7 +99,7 @@ for config_type in ["AH4", "AH5"]:
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yml"
 
     with open(config_path_input) as file:
-        config_data = yaml.load(file, Loader=yaml.Loader)
+        config_data = yaml.load(file, Loader=yaml.FullLoader)
 
     for path in config_data["paths"].keys():
         if path in ["PROPENSITY_PREDICTIONS", "BBM14_PAST_CAT_SALES", "BBM14_FUTURE_CAT_SALES"]:
@@ -153,7 +153,7 @@ for config_type in ["AH4", "AH5"]:
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yml"
 
     with open(config_path_input) as file:
-        config_data = yaml.load(file, Loader=yaml.Loader)
+        config_data = yaml.load(file, Loader=yaml.FullLoader)
 
     for path in config_data["paths"].keys():
         config_data["paths"][path] = config_data["paths"][path].replace(
@@ -202,7 +202,7 @@ for config_type in ["AH4", "AH5"]:
     config_path_output = f"pe_memberdna/model/cf_model/conf/config_{config_type}.yml"
 
     with open(config_path_input) as file:
-        config_data = yaml.load(file, Loader=yaml.Loader)
+        config_data = yaml.load(file, Loader=yaml.FullLoader)
 
     for path in config_data["paths"].keys():
         if path in ["PROPENSITY_PREDICTIONS", "BBM14_PAST_CAT_SALES", "BBM14_FUTURE_CAT_SALES"]:

@@ -94,7 +94,7 @@ def load_config(conf_path_in=None):
         cfg_path = conf_path_in
 
     with open(cfg_path, "r") as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.Loader)
+        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
     return cfg, cfg_path
 
 

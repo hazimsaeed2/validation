@@ -209,10 +209,10 @@ class TestCategoryDnaAutoDate(TestAutoDate, unittest.TestCase):
                 config_file.write(config)
 
         with open(simulated_config_path) as config_file:
-            self.config = yaml.load(config_file, Loader=yaml.Loader)
+            self.config = yaml.load(config_file, Loader=yaml.FullLoader)
 
         with open(simulated_reqs_path) as reqs_file:
-            self.reqs = yaml.load(reqs_file, Loader=yaml.Loader)
+            self.reqs = yaml.load(reqs_file, Loader=yaml.FullLoader)
 
     def del_cfg(self, key_in, config_in=None):
         """

@@ -43,7 +43,7 @@ def load_config():
     else:
         cfg_path = args.config
     with open(cfg_path, "r") as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.Loader)
+        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
     cfg["shared"]["future_run"] = args.future
     cfg["shared"]["rmse"] = args.rmse
     return cfg, cfg_path
