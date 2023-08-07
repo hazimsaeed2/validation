@@ -40,16 +40,18 @@ def main(conf_path_in=None):
     )  # 1 for BBM, 0 for other
     EXAMPLES = [
         {"name": "Rong", "id": 58564596},
+        {"name": "Nick", "id": 15047949},
         {"name": "Doug", "id": 41510081},
-        {"name": "Susan", "id": 76882031},
+        {"name": "Susan", "id": 49894411},
         {"name": "Keith", "id": 37837336},
         {"name": "Kristy", "id": 5285455},
+        {"name": "Jay", "id": 16164657},
+        {"name": "Dan", "id": 62184331},
+        {"name": "Kevin", "id": 49559960},
         {"name": "Tom", "id": 9665302},
-        {"name": "MEGHAN JOLIE", "id": 68770944},
-        {"name": "SAMANTHA MANZELLO", "id": 61620238},
-        {"name": "SONYA MCCORMACK", "id": 61842674},
-        {"name": "Kelsey Gainor", "id": 70558415},
-        {"name": "Michelle Crockford", "id": 58432200},
+        {"name": "Tony", "id": 60734956},
+        {"name": "Bingxin", "id": 60936219},
+        {"name": "Kaitlyn", "id": 61478475},
     ]
 
     TESTS_TO_RUN = [
