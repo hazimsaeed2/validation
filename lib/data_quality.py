@@ -7,6 +7,18 @@ from urllib.parse import urlparse
 import boto3
 import pyspark.sql.functions as sqlf
 import yaml
+from decimal import Decimal
+
+
+def decimal_constructor(loader, node):
+    value = loader.construct_scalar(node)
+    return Decimal(value)
+
+
+yaml.add_constructor(
+    "tag:yaml.org,2002:python/object/apply:decimal.Decimal",
+    decimal_constructor,
+)
 
 
 from pe_memberdna.lib.iotools import s3_copy, split_path_bucket_key
