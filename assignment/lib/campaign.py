@@ -22,9 +22,9 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as sqlf
 from pyspark.sql.window import Window as W
 
-import pe_memberdna.pipelines.assignment.lib.checks as checks
-import pe_memberdna.pipelines.assignment.lib.ingest as ig
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+import pe_memberdna.assignment.lib.checks as checks
+import pe_memberdna.assignment.lib.ingest as ig
+from pe_member_dna.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN_EXT,
     CONSTRUCT_COLUMN_EXT_BACKFILL,
     LAYOUT_ID_MATCH,
@@ -43,27 +43,27 @@ from pe_member_dna.pipelines.assignment.lib.assn_utils import (
     palindrome_sample,
     read_subset_and_cast,
 )
-from pe_member_dna.pipelines.assignment.lib.filters import filter_functions
-from pe_member_dna.pipelines.assignment.lib.ingest import (
+from pe_member_dna.assignment.lib.filters import filter_functions
+from pe_member_dna.assignment.lib.ingest import (
     broadcast_filter,
     join_category_agnostic,
 )
-import pe_memberdna.pipelines.assignment.lib.schemas.cdsa_schemas as cdsa_schemas
-from pe_member_dna.pipelines.assignment.lib.slots import (
+import pe_memberdna.assignment.lib.schemas.cdsa_schemas as cdsa_schemas
+from pe_member_dna.assignment.lib.slots import (
     fill_slot,
     offer_data_to_list,
 )
-from pe_member_dna.pipelines.lib.iotools import (
+from pe_member_dna.lib.iotools import (
     read_s3_to_local,
     split_path_bucket_key,
     write_json_to_s3,
 )
-from pe_member_dna.pipelines.lib.spark_util import (
+from pe_member_dna.lib.spark_util import (
     get_logger,
     truncate_history,
     union_with_mismatched_columns,
 )
-from pe_member_dna.pipelines.lib.utils import (
+from pe_member_dna.lib.utils import (
     apply_unionall,
     stack,
     convert_id_cols_to_str,
