@@ -6,29 +6,28 @@ import unittest
 import warnings
 
 import pandas
-import pe_memberdna.pipelines.assignment.lib.input_checks.exceptions as excp
-import pe_memberdna.pipelines.assignment.lib.input_checks.longitudinal_design_check as ldc
-import pe_memberdna.pipelines.assignment.lib.validators as validators
 import xmlrunner
 from mock import Mock, patch
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
-from pe_memberdna.pipelines.assignment.lib.input_checks.campaign_check import (
+
+import pe_memberdna.assignment.lib.input_checks.exceptions as excp
+import pe_memberdna.assignment.lib.input_checks.longitudinal_design_check as ldc
+import pe_memberdna.assignment.lib.validators as validators
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.input_checks.campaign_check import (
     check_campaign,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks.cells_check import (
+from pe_memberdna.assignment.lib.input_checks.cells_check import (
     check_cells_csv,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks.checker import Check
-from pe_memberdna.pipelines.assignment.lib.input_checks.json_check import (
+from pe_memberdna.assignment.lib.input_checks.checker import Check
+from pe_memberdna.assignment.lib.input_checks.json_check import (
     check_jsons,
     converts_to_json,
     get_jsons,
     has_correct_static_data,
     name_matches_id,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks.path_check import (
-    check_paths,
-)
+from pe_memberdna.assignment.lib.input_checks.path_check import check_paths
 
 
 class CampaignCheckTestCase(unittest.TestCase):
@@ -79,7 +78,7 @@ class CampaignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.campaign_check.read_s3_to_local"
     )
     def test_valid_campaign(self, read_s3_to_local):
         read_s3_to_local.return_value = self.valid_campaigns
@@ -111,7 +110,7 @@ class CampaignCheckTestCase(unittest.TestCase):
         self.assertEqual(actual_checks, expected_checks)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.campaign_check.read_s3_to_local"
     )
     def test_duplicate_experiment_id(self, read_s3_to_local):
         duplicate_campaigns = self.valid_campaigns.append(
@@ -137,7 +136,7 @@ class CampaignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.campaign_check.read_s3_to_local"
     )
     def test_no_previous_experiments(self, read_s3_to_local):
         no_previous_experiments = self.valid_campaigns.append(
@@ -172,7 +171,7 @@ class CampaignCheckTestCase(unittest.TestCase):
         self.assertEqual(actual_checks, expected_checks)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.campaign_check.read_s3_to_local"
     )
     def test_expected_dist_min_max_is_the_same(self, read_s3_to_local):
         min_max_the_same = self.valid_campaigns.append(
@@ -214,10 +213,10 @@ class CampaignCheckTestCase(unittest.TestCase):
         self.assertEqual(actual_checks, expected_checks)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.warnings.warn"
+        "memberdna.assignment.lib.input_checks.campaign_check.warnings.warn"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.campaign_check.read_s3_to_local"
     )
     def test_expected_dist_not_between_min_max(self, read_s3_to_local, warn):
         not_between_min_max = self.valid_campaigns.append(
@@ -269,7 +268,7 @@ class CampaignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.campaign_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.campaign_check.read_s3_to_local"
     )
     def test_missing_experiment_id(self, read_s3_to_local):
         read_s3_to_local.return_value = self.valid_campaigns
@@ -292,7 +291,7 @@ class CheckJSONSTestCase(unittest.TestCase):
     """Unit tests for check_jsons"""
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_no_jsons_present_in_experiment(self, get_jsons_mock):
         get_jsons_mock.return_value = ([], [])
@@ -303,16 +302,16 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.has_correct_static_data"
+        "memberdna.assignment.lib.input_checks.json_check.has_correct_static_data"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.name_matches_id"
+        "memberdna.assignment.lib.input_checks.json_check.name_matches_id"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_construct_is_ok(
         self,
@@ -352,10 +351,10 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_construct_is_not_valid_json(
         self, get_jsons_mock, converts_to_json_mock
@@ -368,13 +367,13 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertRaises(excp.AssignmentInputError, check_jsons, job)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.name_matches_id"
+        "memberdna.assignment.lib.input_checks.json_check.name_matches_id"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_construct_id_mismatch(
         self, get_jsons_mock, converts_to_json_mock, name_matches_id_mock
@@ -388,19 +387,19 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertRaises(excp.AssignmentInputError, check_jsons, job)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.warnings.warn"
+        "memberdna.assignment.lib.input_checks.json_check.warnings.warn"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.has_correct_static_data"
+        "memberdna.assignment.lib.input_checks.json_check.has_correct_static_data"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.name_matches_id"
+        "memberdna.assignment.lib.input_checks.json_check.name_matches_id"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_construct_has_incorrect_static_data(
         self,
@@ -436,13 +435,13 @@ class CheckJSONSTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.name_matches_id"
+        "memberdna.assignment.lib.input_checks.json_check.name_matches_id"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_segment_is_ok(
         self, get_jsons_mock, converts_to_json_mock, name_matches_id_mock
@@ -471,10 +470,10 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_segment_is_not_valid_json(
         self, get_jsons_mock, converts_to_json_mock
@@ -486,13 +485,13 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertRaises(excp.AssignmentInputError, check_jsons, job)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.name_matches_id"
+        "memberdna.assignment.lib.input_checks.json_check.name_matches_id"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_segment_id_mismatch(
         self, get_jsons_mock, converts_to_json_mock, name_matches_id_mock
@@ -505,16 +504,16 @@ class CheckJSONSTestCase(unittest.TestCase):
         self.assertRaises(excp.AssignmentInputError, check_jsons, job)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.has_correct_static_data"
+        "memberdna.assignment.lib.input_checks.json_check.has_correct_static_data"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.name_matches_id"
+        "memberdna.assignment.lib.input_checks.json_check.name_matches_id"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.converts_to_json"
+        "memberdna.assignment.lib.input_checks.json_check.converts_to_json"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.get_jsons"
+        "memberdna.assignment.lib.input_checks.json_check.get_jsons"
     )
     def test_json_check_stops_at_first_error(
         self,
@@ -539,7 +538,7 @@ class ConvertsToJSONTestCase(unittest.TestCase):
     """Unit tests for converts_to_json"""
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_converts_ok_to_json(self, read_s3_to_local):
         read_s3_to_local.return_value = None
@@ -556,7 +555,7 @@ class ConvertsToJSONTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_value_error(self, read_s3_to_local):
         read_s3_to_local.side_effect = ValueError(
@@ -586,7 +585,7 @@ class NameMatchesIDTestCase(unittest.TestCase):
     """Unit tests for name_matches_id"""
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_name_matches_id(self, read_s3_to_local):
         read_s3_to_local.side_effect = [
@@ -601,7 +600,7 @@ class NameMatchesIDTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_name_does_not_match_id(self, read_s3_to_local):
         read_s3_to_local.side_effect = [
@@ -617,7 +616,7 @@ class NameMatchesIDTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_key_not_present_in_json(self, read_s3_to_local):
         read_s3_to_local.side_effect = [{"invalid_key": "3"}]
@@ -633,7 +632,7 @@ class HasCorrectStaticDataTestCase(unittest.TestCase):
     """Unit tests for has_correct_static_data"""
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_static_slot_is_using_dummy_data(self, read_s3_to_local):
         to_check = """{
@@ -663,7 +662,7 @@ class HasCorrectStaticDataTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_static_slot_is_not_using_dummy_data(self, read_s3_to_local):
         to_check = """{
@@ -692,7 +691,7 @@ class HasCorrectStaticDataTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_static_slot_not_present(self, read_s3_to_local):
         to_check = """{
@@ -724,7 +723,7 @@ class HasCorrectStaticDataTestCase(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_mixture_of_valid_invalid_static_slots(self, read_s3_to_local):
         to_check = """{
@@ -782,7 +781,7 @@ class GetJSONSTestCase(unittest.TestCase):
         self.ok_cells = pandas.read_csv(ok_csv, sep=",")
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.json_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.json_check.read_s3_to_local"
     )
     def test_return_ids(self, read_s3_to_local):
         read_s3_to_local.return_value = self.ok_cells
@@ -905,7 +904,7 @@ class CheckCellsCSV(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.cells_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.cells_check.read_s3_to_local"
     )
     def test_valid_cells_csv(self, read_s3_to_local):
         read_s3_to_local.return_value = self.valid_cells_block
@@ -951,7 +950,7 @@ class CheckCellsCSV(unittest.TestCase):
         self.assertEqual(actual_checks, expected_checks)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.cells_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.cells_check.read_s3_to_local"
     )
     def test_experiment_id_mismatch(self, read_s3_to_local):
         read_s3_to_local.return_value = self.valid_cells_block
@@ -970,7 +969,7 @@ class CheckCellsCSV(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.cells_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.cells_check.read_s3_to_local"
     )
     def test_cell_experiment_entry_duplicates(self, read_s3_to_local):
         duplicate_entries = self.valid_cells_block.append(
@@ -1019,7 +1018,7 @@ class CheckCellsCSV(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.cells_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.cells_check.read_s3_to_local"
     )
     def test_cell_start_greater_than_cell_end(self, read_s3_to_local):
         greater_start_date = self.valid_cells_block.append(
@@ -1064,7 +1063,7 @@ class CheckCellsCSV(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.cells_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.cells_check.read_s3_to_local"
     )
     def test_inhome_date_greater_than_cell_end(self, read_s3_to_local):
         greater_inhome_date = self.valid_cells_block.append(
@@ -1109,7 +1108,7 @@ class CheckCellsCSV(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.cells_check.read_s3_to_local"
+        "memberdna.assignment.lib.input_checks.cells_check.read_s3_to_local"
     )
     def test_date_format(self, read_s3_to_local):
         invalid_month_inhome_date_format = self.valid_cells_block.append(
@@ -1364,10 +1363,10 @@ class CheckPathTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.warnings.warn"
+        "memberdna.assignment.lib.input_checks.path_check.warnings.warn"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.is_s3_path"
+        "memberdna.assignment.lib.input_checks.path_check.is_s3_path"
     )
     def test_all_paths_are_valid(self, is_s3_path, warn):
         is_s3_path.return_value = True
@@ -1388,13 +1387,13 @@ class CheckPathTestCase(unittest.TestCase):
         self.assertEqual(warn.call_count, 0)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.warnings.warn"
+        "memberdna.assignment.lib.input_checks.path_check.warnings.warn"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.is_s3_path"
+        "memberdna.assignment.lib.input_checks.path_check.is_s3_path"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.is_s3_file"
+        "memberdna.assignment.lib.input_checks.path_check.is_s3_file"
     )
     def test_path_does_not_exist(self, is_s3_path, is_s3_file, warn):
         is_s3_path.return_value = False
@@ -1415,10 +1414,10 @@ class CheckPathTestCase(unittest.TestCase):
         self.assertEqual(actual_checks, self.expected_checks)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.is_s3_path"
+        "memberdna.assignment.lib.input_checks.path_check.is_s3_path"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.is_s3_file"
+        "memberdna.assignment.lib.input_checks.path_check.is_s3_file"
     )
     def test_file_does_not_exist(self, is_s3_path, is_s3_file):
         is_s3_path.return_value = False
@@ -1434,7 +1433,7 @@ class CheckPathTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks.path_check.is_s3_path"
+        "memberdna.assignment.lib.input_checks.path_check.is_s3_path"
     )
     def test_warnings_for_optional_paths(self, is_s3_path):
         is_s3_path.return_value = True
@@ -1504,7 +1503,7 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
             ),
         )
 
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_design_fails_with_dups(self, data_read):
         data_read.return_value = pandas.DataFrame(
             columns=[
@@ -1527,10 +1526,10 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_invalid_segment_config(
         self, data_read, read_s3_to_local
     ):
@@ -1578,10 +1577,10 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_cell_without_longitudinal_segment(
         self, data_read, read_s3_to_local
     ):
@@ -1634,10 +1633,10 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_segment_without_long_id(
         self, data_read, read_s3_to_local
     ):
@@ -1693,10 +1692,10 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_design_fails_with_invalid_handshakes(
         self, data_read, read_s3_to_local
     ):
@@ -1772,14 +1771,14 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.warnings.warn"
     )
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_experiment_executed_in_different_order(
         self, data_read, read_s3_to_local, warn
     ):
@@ -1865,10 +1864,10 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
         )
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_design_checks_pass(
         self, data_read, read_s3_to_local
     ):
@@ -1992,10 +1991,10 @@ class LongitudinalDesignCheckTestCase(unittest.TestCase):
             self.assertEqual(expected_checks[idx], check)
 
     @patch(
-        "memberdna.pipelines.assignment.lib.input_checks."
+        "memberdna.assignment.lib.input_checks."
         "longitudinal_design_check.iotools.read_s3_to_local"
     )
-    @patch("memberdna.pipelines.assignment.lib.assn_io.read_s3_to_local")
+    @patch("memberdna.assignment.lib.assn_io.read_s3_to_local")
     def test_longitudinal_segment_with_composite_segment(
         self, data_read, read_s3_to_local
     ):

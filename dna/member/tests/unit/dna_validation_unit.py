@@ -2,8 +2,6 @@ import argparse
 import datetime
 import logging
 import os
-import numpy as np
-import pandas as pd
 import subprocess
 import sys
 import traceback
@@ -11,16 +9,17 @@ import unittest
 import unittest.mock as mock
 
 import findspark
-import xmlrunner
-import yaml
+import numpy as np
+import pandas as pd
+import pe_memberdna.dna.lib.validations_DNA as validations_DNA
 import pyspark
 import pyspark.sql as sql
 import pyspark.sql.functions as sqlf
+import xmlrunner
+import yaml
 
-import pe_memberdna.dna.lib.validations_DNA as validations_DNA
+import pe_memberdna.lib.iotools as iotools
 import pe_memberdna.testing_support.lib.utility as test_utils
-import pe_memberdna.pipelines.lib.iotools as iotools
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

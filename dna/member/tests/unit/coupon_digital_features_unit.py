@@ -3,13 +3,12 @@ import warnings
 
 import pandas as pd
 import xmlrunner
-
 from pyspark.sql import SparkSession
 
+from pe_memberdna.assignment.lib.assn_io import JobManager
 from pe_memberdna.dna.member.lib.coupon_digital_features import (
     feature_cpn_channel,
 )
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
 
 
 class CouponDigitalFeaturesTestCase(unittest.TestCase):

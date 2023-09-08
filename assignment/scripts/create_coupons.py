@@ -7,12 +7,14 @@ from datetime import datetime, timedelta
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
-from pe_memberdna.pipelines.assignment.lib.checks import (
+from pyspark import StorageLevel
+
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.checks import (
     check_execution_overwrite,
     check_prod_status,
 )
-from pe_memberdna.pipelines.assignment.lib.coupon_utils import (
+from pe_memberdna.assignment.lib.coupon_utils import (
     add_coupons,
     append_new_campaign,
     append_non_duplicates,
@@ -23,7 +25,7 @@ from pe_memberdna.pipelines.assignment.lib.coupon_utils import (
     format_coupons,
     remove_exclusions,
 )
-from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
+from pe_memberdna.assignment.lib.schemas.coupon_schemas import (
     BASKET_COUPON_SCHEMA,
     CAT_COUPON_SCHEMA,
     CPN_BNK_SCHEMA,
@@ -33,8 +35,7 @@ from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
     MEM_TRIP_SCHEMA,
     MEM_USAGE_SCHEMA,
 )
-from pe_memberdna.pipelines.lib.iotools import write_local_to_s3
-from pyspark import StorageLevel
+from pe_memberdna.lib.iotools import write_local_to_s3
 
 
 def has_coupons(job):

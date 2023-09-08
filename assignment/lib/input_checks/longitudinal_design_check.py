@@ -3,13 +3,13 @@ import warnings
 
 import pandas as pd
 
-import pe_memberdna.pipelines.assignment.lib.assn_io as assn_io
-import pe_memberdna.pipelines.assignment.lib.assn_utils as assn_utils
-import pe_memberdna.pipelines.assignment.lib.formatters as formatters
-import pe_memberdna.pipelines.lib.iotools as iotools
-import pe_memberdna.pipelines.assignment.lib.input_checks.checker as checker
-import pe_memberdna.pipelines.assignment.lib.input_checks.exceptions as excp
-import pe_memberdna.pipelines.assignment.lib.validators as validators
+import pe_memberdna.assignment.lib.assn_io as assn_io
+import pe_memberdna.assignment.lib.assn_utils as assn_utils
+import pe_memberdna.assignment.lib.formatters as formatters
+import pe_memberdna.assignment.lib.input_checks.checker as checker
+import pe_memberdna.assignment.lib.input_checks.exceptions as excp
+import pe_memberdna.assignment.lib.validators as validators
+import pe_memberdna.lib.iotools as iotools
 
 
 def check_longitudinal_design(job):
