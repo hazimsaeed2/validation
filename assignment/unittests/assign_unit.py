@@ -6,9 +6,7 @@ import unittest
 import pandas as pd
 import xmlrunner
 from mock import Mock, patch
-import pandas as pd
-
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pe_memberdna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
 
@@ -2210,84 +2208,72 @@ if __name__ == "__main__":
     import findspark
 
     findspark.init()
-    from pyspark.sql import SparkSession, Row
     import copy
-    from pyspark.sql import functions as F
 
-    from pe_member_dna.pipelines.lib.spark_util import (
-        union_with_mismatched_columns,
+    from pe_memberdna.pipelines.assignment.lib.assn_io import (
+        calculate_filepaths,
+        dump_config,
+        load_config,
     )
-    from pe_member_dna.pipelines.assignment.lib.filters import (
-        special_club,
-        special_zipcode,
-        tenure,
-        new,
-        expired,
-        trial,
-    )
-    from pe_member_dna.pipelines.assignment.lib.filters import (
-        gas,
-        avg_basket,
-        ROI_positive,
-        construct_satisfied,
-        general_filter,
-        run_sub_filters,
-        longitudinal,
-    )
-    from pe_member_dna.pipelines.assignment.lib.slots import (
-        rank_by_col,
-        cf,
-        cf_combined,
-        basket,
-        static,
-        random,
-        stretch_spend,
-    )
-    from pe_member_dna.pipelines.assignment.lib.slots import (
-        sql,
-        waterfall_slots,
-        compose_slots,
-        limit_to_cf_match,
-    )
-    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
-        flag_rows,
-        filter_rows,
-        mapping,
-        map_under_threshold,
-        check_cpn_nbr_or_version,
-    )
-    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
-        fill_with_average,
+    from pe_memberdna.pipelines.assignment.lib.assn_utils import (
         apply_offer_recency,
         calc_avg_basket,
         calc_overlapping_cols,
-        downsample_rows,
-        load_past_longitudinal_mbrs,
-    )
-    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
-        cap_value,
-        create_equal_size_bucket,
-        calc_sampling_value,
-        rdd_rank_by_col,
         calc_sampling_seg,
-    )
-    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
-        palindrome_rank_group,
-        palindrome_sample,
-        deterministic_sample,
+        calc_sampling_value,
         cap_top_percentile,
-    )
-    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+        cap_value,
+        check_cpn_nbr_or_version,
+        create_equal_size_bucket,
+        deterministic_sample,
+        downsample_rows,
+        fill_with_average,
+        filter_rows,
+        flag_rows,
         get_all_of_key,
         get_key_values,
+        load_past_longitudinal_mbrs,
+        map_under_threshold,
+        mapping,
+        palindrome_rank_group,
+        palindrome_sample,
+        rdd_rank_by_col,
         read_subset_and_cast,
         update_categories,
     )
-    from pe_member_dna.pipelines.assignment.lib.assn_io import (
-        calculate_filepaths,
-        load_config,
-        dump_config,
+    from pe_memberdna.pipelines.assignment.lib.filters import (
+        ROI_positive,
+        avg_basket,
+        construct_satisfied,
+        expired,
+        gas,
+        general_filter,
+        longitudinal,
+        new,
+        run_sub_filters,
+        special_club,
+        special_zipcode,
+        tenure,
+        trial,
     )
+    from pe_memberdna.pipelines.assignment.lib.slots import (
+        basket,
+        cf,
+        cf_combined,
+        compose_slots,
+        limit_to_cf_match,
+        random,
+        rank_by_col,
+        sql,
+        static,
+        stretch_spend,
+        waterfall_slots,
+    )
+    from pe_memberdna.pipelines.lib.spark_util import (
+        union_with_mismatched_columns,
+    )
+    from pyspark.sql import Row, SparkSession
+    from pyspark.sql import functions as F
 
     name = "assign_unit_test"
 

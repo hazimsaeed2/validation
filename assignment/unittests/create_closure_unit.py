@@ -8,11 +8,10 @@ TODO: This test is not comprehensive and does not test all data
 import os
 import unittest
 
+import pe_memberdna.pipelines.assignment.scripts.create_closure as create_closure
 import pyspark.sql.functions as sqlf
 import xmlrunner
-
-import pe_memberdna.pipelines.assignment.scripts.create_closure as create_closure
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
 
 
 class TestCreateClosure(unittest.TestCase):

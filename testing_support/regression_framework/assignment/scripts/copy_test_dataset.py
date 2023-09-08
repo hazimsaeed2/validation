@@ -1,15 +1,14 @@
 import argparse
 import os
-import yaml
 
-from pe_member_dna.pipelines.lib.iotools import (
-    s3_copy,
-    split_path_bucket_key,
-    s3_delete,
+import yaml
+from pe_memberdna.pipelines.lib.iotools import (
     is_s3_file,
     is_s3_path,
+    s3_copy,
+    s3_delete,
+    split_path_bucket_key,
 )
-
 
 if __name__ == "__main__":
 

@@ -4,40 +4,37 @@ TODO: Add integration test
 """
 
 from datetime import datetime, timedelta
-from pe_member_dna.pipelines.assignment.lib.coupon_utils import (
-    calculate_discount,
-)
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pyspark import StorageLevel
-
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
     check_prod_status,
 )
-from pe_member_dna.pipelines.assignment.lib.coupon_utils import (
+from pe_memberdna.pipelines.assignment.lib.coupon_utils import (
     add_coupons,
     append_new_campaign,
     append_non_duplicates,
+    calculate_discount,
     calculate_member_trips,
     calculate_member_usage,
     clean_cpg_coupon_file,
     format_coupons,
     remove_exclusions,
 )
-from pe_member_dna.pipelines.assignment.lib.schemas.coupon_schemas import (
+from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
     BASKET_COUPON_SCHEMA,
     CAT_COUPON_SCHEMA,
-    CPN_DISCOUNT_SCHEMA,
     CPN_BNK_SCHEMA,
+    CPN_DISCOUNT_SCHEMA,
     CPN_MAP_SCHEMA,
     CPN_QUALS_SCHEMA,
     MEM_TRIP_SCHEMA,
     MEM_USAGE_SCHEMA,
 )
-from pe_member_dna.pipelines.lib.iotools import write_local_to_s3
+from pe_memberdna.pipelines.lib.iotools import write_local_to_s3
+from pyspark import StorageLevel
 
 
 def has_coupons(job):

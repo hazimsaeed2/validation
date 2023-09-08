@@ -10,10 +10,8 @@ TODO:
 """
 
 import pyspark.sql.functions as sqlf
-from pyspark import StorageLevel
-
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     calc_overlapping_cols,
     calc_sampling_seg,
     calc_sampling_value,
@@ -22,12 +20,13 @@ from pe_member_dna.pipelines.assignment.lib.assn_utils import (
     read_subset_and_cast,
     set_mail_flag,
 )
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pe_memberdna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
-from pe_member_dna.pipelines.lib.iotools import read_s3_to_local
-from pe_member_dna.pipelines.lib.spark_util import truncate_history
-from pe_member_dna.pipelines.lib.utils import top_n
+from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+from pe_memberdna.pipelines.lib.spark_util import truncate_history
+from pe_memberdna.pipelines.lib.utils import top_n
+from pyspark import StorageLevel
 
 
 def main(conf_path_in=None):
