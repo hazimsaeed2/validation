@@ -21,6 +21,12 @@ yaml.add_constructor(
 )
 
 
+def decimal_representer(dumper, data):
+    return dumper.represent_float(float(data))
+
+
+yaml.add_representer(Decimal, decimal_representer)
+
 from pe_memberdna.lib.iotools import s3_copy, split_path_bucket_key
 
 

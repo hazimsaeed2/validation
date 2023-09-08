@@ -109,6 +109,16 @@ with open(config_path_output, "w") as file:
                 '''
             }
         }
+        stage('Check cluster status before step - 1'){
+            agent{ 'built-in' }
+			    steps {
+                    sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        sh pe_memberdna/scripts/cluster_spinup.sh $NODE
+                    '''
+                }
+        }
         stage('Scaling up') {
             steps {
                 script {
@@ -121,7 +131,7 @@ with open(config_path_output, "w") as file:
                     echo "Scaled up"
                 }
             }
-        }        
+        }
         stage('Setup Config') {
             steps {
                 sh '''
