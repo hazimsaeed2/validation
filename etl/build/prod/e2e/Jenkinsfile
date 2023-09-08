@@ -44,6 +44,16 @@ pipeline {
                 }
             }
         }
+        stage('Check cluster status before step - 1'){
+            agent{ 'built-in' }
+			    steps {
+                    sh '''
+                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$wrkspce:
+                        sh pe_memberdna/scripts/cluster_spinup.sh mdapeupp01 mdapeupp02 mdapeupp03
+                    '''
+                }
+        }
         stage("Cluster scaling") {
             parallel {
                 stage('Scaling up cluster -1') {
