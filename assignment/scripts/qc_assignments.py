@@ -62,8 +62,7 @@ def main(conf_path_in=None):
         "downsampled_coupons",
         "check_cell_size",
         "check_sensitive_content",
-        "count_cf_ineligible",
-        "calculate_cost",  # keep last in list
+        "count_cf_ineligible", # keep last in list
     ]
 
     # getting the downsampling information
@@ -134,13 +133,6 @@ def main(conf_path_in=None):
     job.data.tables["article_map"] = job.data.tables[
         "article_map"
     ].dropDuplicates(["article_nbr"])
-
-    if not has_coupons(job.config.params):
-        job.data.tables["cpn_redemption"] = None
-    else:
-        job.data.read("cpn_redemption", "SIZING_BUDGET", filetype="csv")
-        if job.data.tables["cpn_redemption"].columns == []:
-            job.data.tables["cpn_redemption"] = None
 
     job.data.read("coupon_bank", "COUPON_BANK", filetype="csv")
     job.data.read("cdsa_assgn", "CDSA_ASSGN", filetype="parquet")

@@ -170,18 +170,6 @@ def trial_cells(cells):
     return result
 
 
-def calculate_cost(cpn_redemption):
-    """Calculate total coupon cost"""
-    if not cpn_redemption:
-        return 0
-    else:
-        return (
-            cpn_redemption.groupBy()
-            .agg(sqlf.sum(cpn_redemption.CPN_COST))
-            .collect()[0][0]
-        )
-
-
 def control_test(cells):
     """Test if control/test pairs are comparable."""
     allowable_difference = 0.05
@@ -487,11 +475,6 @@ class QCTestRunner:
                 "text": "CF Ineligible Members (out of ~5.4m full BBM pop): ",
                 "fn": count_cf_ineligible,
                 "input_data": "job",
-            },
-            "calculate_cost": {
-                "text": "Total coupon cost: ",
-                "fn": calculate_cost,
-                "input_data": "cpn_redemption",
             },
             "basket_cell": {
                 "text": "Basket Cells Have Lower Sales: ",
