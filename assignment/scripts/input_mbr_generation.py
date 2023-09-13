@@ -86,10 +86,10 @@ mbr_filtered = mbr.join(DNA, "MBRSHP_SID").filter(col("cpn_channel").isin("paper
 print(f"mbr filtered for P&D cpn_channel : {mbr_filtered.count()}")
 
 print("mbr by cpn_channel")
-print(mbr_filtered.groupBy("cpn_channel").count().show())
+mbr_filtered.groupBy("cpn_channel").count().show()
 
 print("mbr by decile")
-print(mbr_filtered.groupBy("DECILE").count().show())
+mbr_filtered.groupBy("DECILE").count().show()
 
 print(f"mbr count : {mbr.count()}")
 
