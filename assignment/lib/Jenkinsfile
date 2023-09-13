@@ -9,8 +9,8 @@ pipeline {
                         credentialsId: 'bitbucket-service-account',
                         url: 'https://bitbucket.bjs.com/scm/an/pe_memberdna.git'
                 }
+            }
         }
-
         stage('Scaling up cluster -1') {
             agent { node env.node_1 }
                 steps {
@@ -21,7 +21,9 @@ pipeline {
                                 python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
                             '''
                                 echo "Scaled up cluster-1"
-                            }
+                    }
+                }
+        }
 
         stage('Starting input generation') {
             agent { node env.node_1 }
@@ -46,16 +48,20 @@ pipeline {
                 '''
                 echo "COMPLETED RUNNING INPUT GENERATION"
             }
+        }
 
-            stage('Scaling down the cluster-1') {
-                agent { node env.node_1 }
-                steps {
-                    echo "Scaling down cluster-1"
-                    sh '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
-                        rm -rf $wrkspce/*
-                    '''
-                    echo "Scaled down cluster-1"
-                }
+        stage('Scaling down the cluster-1') {
+            agent { node env.node_1 }
+            steps {
+                echo "Scaling down cluster-1"
+                sh '''
+                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$wrkspce:
+                    python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                    rm -rf $wrkspce/*
+                '''
+                echo "Scaled down cluster-1"
+            }
+        }
+    }
+}
