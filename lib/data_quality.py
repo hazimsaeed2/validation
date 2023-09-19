@@ -11,8 +11,15 @@ from decimal import Decimal
 
 
 def decimal_constructor(loader, node):
-    value = loader.construct_scalar(node)
-    return Decimal(value)
+    if isinstance(node, yaml.ScalarNode):
+        value = loader.construct_scalar(node)
+        return Decimal(value)
+    elif isinstance(node, yaml.SequenceNode) and len(node.value) == 1:
+        element_node = node.value[0]
+        value = loader.construct_scalar(element_node)
+        return Decimal(value)
+    else:
+        raise ValueError("Invalid YAML format for decimal.Decimal")
 
 
 yaml.add_constructor(
