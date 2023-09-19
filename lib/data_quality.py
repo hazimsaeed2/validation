@@ -20,6 +20,11 @@ yaml.add_constructor(
     decimal_constructor,
 )
 
+yaml.SafeLoader.add_constructor(
+    "tag:yaml.org,2002:python/object/apply:decimal.Decimal",
+    decimal_constructor,
+)
+
 
 def decimal_representer(dumper, data):
     return dumper.represent_float(float(data))
@@ -175,7 +180,7 @@ class DQ_check(object):
         """
         if _key_exists(self.s3_stat_path):
             s3_response = get_s3_object(self.s3_stat_path)
-            return yaml.load(s3_response, Loader=yaml.FullLoader)
+            return yaml.safe_load(s3_response)
         return {}
 
     def get_stat(self, tabletype="", tablename="", testname=""):
