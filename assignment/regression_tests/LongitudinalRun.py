@@ -1,11 +1,13 @@
+import pe_memberdna.pipelines.assignment.lib.campaign as campaign
+import pe_memberdna.pipelines.assignment.lib.schemas.cdsa_schemas as schemas
+import pe_memberdna.pipelines.lib.iotools as iotools
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
+    load_past_longitudinal_mbrs,
+)
 
-import pe_memberdna.assignment.lib.campaign as campaign
-import pe_memberdna.assignment.lib.schemas.cdsa_schemas as schemas
-import pe_memberdna.lib.iotools as iotools
 import pe_memberdna.testing_support.regression_framework.regression as regression
-from pe_memberdna.assignment.lib.assn_utils import load_past_longitudinal_mbrs
 
 
 class LongitudinalFirstRun(regression.RegressionTest):

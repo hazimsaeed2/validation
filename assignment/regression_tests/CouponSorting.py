@@ -1,8 +1,8 @@
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
+from pe_memberdna.pipelines.assignment.lib.assn_utils import CONSTRUCT_COLUMN
 
 import pe_memberdna.testing_support.regression_framework.regression as regression
-from pe_memberdna.assignment.lib.assn_utils import CONSTRUCT_COLUMN
 
 
 class CouponSorting(regression.RegressionTest):

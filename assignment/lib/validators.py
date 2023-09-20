@@ -3,7 +3,7 @@ import functools
 import pandas
 import pyspark.sql.functions as sqlf
 
-import pe_memberdna.assignment.lib.input_checks.exceptions as excp
+import pe_memberdna.pipelines.assignment.lib.input_checks.exceptions as excp
 
 DATE_PATTERN = "^([1-9]|1[0-2])\/([1-9]|[12]\d|3[01])\/([12]\d{3})$"
 

@@ -50,6 +50,19 @@ Notes:
 import warnings
 from functools import reduce
 
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
+    calc_avg_basket,
+    deterministic_df,
+    filter_rows,
+    map_under_threshold,
+    mapping,
+)
+from pe_memberdna.pipelines.assignment.lib.ingest import _broadcast_cross_join
+from pe_memberdna.pipelines.lib.spark_util import (
+    get_logger,
+    union_with_mismatched_columns,
+)
+from pe_memberdna.pipelines.lib.utils import top_n
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import abs as fabs
 from pyspark.sql.functions import avg, col, concat, countDistinct, desc, lit
@@ -58,20 +71,6 @@ from pyspark.sql.functions import row_number
 from pyspark.sql.functions import sum as fsum
 from pyspark.sql.functions import when
 from pyspark.sql.window import Window
-
-from pe_memberdna.assignment.lib.assn_utils import (
-    calc_avg_basket,
-    deterministic_df,
-    filter_rows,
-    map_under_threshold,
-    mapping,
-)
-from pe_memberdna.assignment.lib.ingest import _broadcast_cross_join
-from pe_memberdna.lib.spark_util import (
-    get_logger,
-    union_with_mismatched_columns,
-)
-from pe_memberdna.lib.utils import top_n
 
 slot_functions = {}
 

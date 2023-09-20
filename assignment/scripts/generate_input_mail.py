@@ -1,7 +1,7 @@
 import pyspark.sql.functions as sqlf
 
-import pe_memberdna.assignment.lib.assn_io as assn_io
-import pe_memberdna.assignment.lib.checks as checks
+import pe_memberdna.pipelines.assignment.lib.assn_io as assn_io
+import pe_memberdna.pipelines.assignment.lib.checks as checks
 
 
 def main(conf_path_in=None):

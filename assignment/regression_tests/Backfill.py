@@ -1,10 +1,15 @@
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
+    read_subset_and_cast,
+)
+from pe_memberdna.pipelines.assignment.lib.ingest import _generate_cross_join
+from pe_memberdna.pipelines.assignment.lib.slots import (
+    hardest,
+    rank_by_agg_col,
+)
 from pyspark.sql import Window
 from pyspark.sql.functions import col, lit, rank, when
 
 import pe_memberdna.testing_support.regression_framework.regression as regression
-from pe_memberdna.assignment.lib.assn_utils import read_subset_and_cast
-from pe_memberdna.assignment.lib.ingest import _generate_cross_join
-from pe_memberdna.assignment.lib.slots import hardest, rank_by_agg_col
 
 
 class Backfill(regression.RegressionTest):

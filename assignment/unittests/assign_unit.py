@@ -6,8 +6,9 @@ import unittest
 import pandas as pd
 import xmlrunner
 from mock import Mock, patch
-
-from pe_memberdna.assignment.lib.checks import check_execution_overwrite
+from pe_memberdna.pipelines.assignment.lib.checks import (
+    check_execution_overwrite,
+)
 
 
 class TestUtils2(unittest.TestCase):
@@ -540,7 +541,7 @@ class TestUtils2(unittest.TestCase):
         self.assertEqual(df_match.count(), df.count())
         self.assertEqual(df_match.count(), exp_df.count())
 
-    @patch("memberdna.assignment.lib.assn_utils.spark")
+    @patch("memberdna.pipelines.assignment.lib.assn_utils.spark")
     def test_check_cast_type(self, spark_mock):
         spark_mock.read.csv.return_value = sc.parallelize(
             [
@@ -556,7 +557,7 @@ class TestUtils2(unittest.TestCase):
         self.assertEqual(types[2][1], "double")
         self.assertEqual(types[3][1], "int")
 
-    @patch("memberdna.assignment.lib.assn_utils.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.assn_utils.read_s3_to_local")
     def test_load_past_longitudinal_mbrs_with_no_past_cells(
         self, read_s3_to_local
     ):
@@ -579,9 +580,9 @@ class TestUtils2(unittest.TestCase):
         self.assertEqual(mbrs.count(), 0)
 
     @patch(
-        "memberdna.assignment.lib.assn_utils.read_subset_and_cast"
+        "memberdna.pipelines.assignment.lib.assn_utils.read_subset_and_cast"
     )
-    @patch("memberdna.assignment.lib.assn_utils.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.assn_utils.read_s3_to_local")
     def test_load_past_longitudinal_mbrs_with_past_members(
         self, read_s3_to_local, read_subset_and_cast
     ):
@@ -615,14 +616,14 @@ class TestUtils2(unittest.TestCase):
         self.assertEqual(mbrs.collect()[0], Row(mbrshp_sid="001"))
 
     @patch(
-        "memberdna.assignment.lib.assn_utils.checks."
+        "memberdna.pipelines.assignment.lib.assn_utils.checks."
         "check_loaded_long_cells"
     )
-    @patch("memberdna.assignment.lib.assn_utils.log")
+    @patch("memberdna.pipelines.assignment.lib.assn_utils.log")
     @patch(
-        "memberdna.assignment.lib.assn_utils.read_subset_and_cast"
+        "memberdna.pipelines.assignment.lib.assn_utils.read_subset_and_cast"
     )
-    @patch("memberdna.assignment.lib.assn_utils.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.assn_utils.read_s3_to_local")
     def test_load_past_longitudinal_mbrs_with_no_past_members(
         self,
         read_s3_to_local,
@@ -1991,7 +1992,7 @@ class CalculateFilepathsTestCase(unittest.TestCase):
                 target, input_path, correct_path, path_updates
             )
 
-    @patch("memberdna.assignment.lib.assn_io.generate_campaign_path")
+    @patch("memberdna.pipelines.assignment.lib.assn_io.generate_campaign_path")
     def test_optional_path(self, generate_campaign_path):
         """
         Looks through the four possible inputs for optional inputs: missing the
@@ -2066,9 +2067,9 @@ class CheckExecutionOverwrite(unittest.TestCase):
         self.params.update(self.cnf["assignment"])
         self.paths = self.cnf["paths"]
 
-    @patch("memberdna.assignment.lib.checks.is_s3_file")
-    @patch("memberdna.assignment.lib.checks.is_s3_path")
-    @patch("memberdna.assignment.lib.checks.get_run_args")
+    @patch("memberdna.pipelines.assignment.lib.checks.is_s3_file")
+    @patch("memberdna.pipelines.assignment.lib.checks.is_s3_path")
+    @patch("memberdna.pipelines.assignment.lib.checks.get_run_args")
     def test_force(self, get_run_args, is_s3_path, is_s3_file):
         get_run_args.return_value = Mock(force=True)
 
@@ -2077,9 +2078,9 @@ class CheckExecutionOverwrite(unittest.TestCase):
         is_s3_path.assert_not_called()
         is_s3_file.assert_not_called()
 
-    @patch("memberdna.assignment.lib.checks.is_s3_file")
-    @patch("memberdna.assignment.lib.checks.is_s3_path")
-    @patch("memberdna.assignment.lib.checks.get_run_args")
+    @patch("memberdna.pipelines.assignment.lib.checks.is_s3_file")
+    @patch("memberdna.pipelines.assignment.lib.checks.is_s3_path")
+    @patch("memberdna.pipelines.assignment.lib.checks.get_run_args")
     def test_first_execution(self, get_run_args, is_s3_path, is_s3_file):
         get_run_args.return_value = Mock(force=False)
         is_s3_path.return_value = False
@@ -2090,9 +2091,9 @@ class CheckExecutionOverwrite(unittest.TestCase):
         is_s3_path.assert_called()
         is_s3_file.assert_called()
 
-    @patch("memberdna.assignment.lib.checks.is_s3_file")
-    @patch("memberdna.assignment.lib.checks.is_s3_path")
-    @patch("memberdna.assignment.lib.checks.get_run_args")
+    @patch("memberdna.pipelines.assignment.lib.checks.is_s3_file")
+    @patch("memberdna.pipelines.assignment.lib.checks.is_s3_path")
+    @patch("memberdna.pipelines.assignment.lib.checks.get_run_args")
     def test_second_execution(self, get_run_args, is_s3_path, is_s3_file):
         get_run_args.return_value = Mock(force=False)
         is_s3_path.return_value = True
@@ -2118,7 +2119,7 @@ class DumpConfigTestCase(unittest.TestCase):
         self.params.update(self.cnf["assignment"])
         self.paths = self.cnf["paths"]
 
-    @patch("memberdna.assignment.lib.assn_io.write_yaml_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.assn_io.write_yaml_to_s3")
     def test_path_provided(self, write_yaml_to_s3):
         test_path = "s3://test_bucket/test_key"
 
@@ -2129,7 +2130,7 @@ class DumpConfigTestCase(unittest.TestCase):
             "test_bucket", "test_key", self.cnf
         )
 
-    @patch("memberdna.assignment.lib.assn_io.write_yaml_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.assn_io.write_yaml_to_s3")
     def test_path_not_provided(self, write_yaml_to_s3):
         output_dir = "s3://test_bucket/test_output_dir"
         expected_path = (
@@ -2156,14 +2157,14 @@ class DumpConfigTestCase(unittest.TestCase):
             self.cnf,
         )
 
-    @patch("memberdna.assignment.lib.assn_io.write_yaml_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.assn_io.write_yaml_to_s3")
     def test_paths_and_params_not_provided(self, write_yaml_to_s3):
         dump_config(self.cnf, cfg_path="s3://test_bucket/test_key")
         write_yaml_to_s3.assert_called_with(
             "test_bucket", "test_key", self.cnf
         )
 
-    @patch("memberdna.assignment.lib.assn_io.write_yaml_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.assn_io.write_yaml_to_s3")
     def test_skip_unknown_parameters(self, write_yaml_to_s3):
         self.params["coupon_inhome_date"] = "coupon_creation param"
         self.params["test_unknown"] = "value"
@@ -2179,7 +2180,7 @@ class DumpConfigTestCase(unittest.TestCase):
             "test_bucket", "test_key", self.cnf
         )
 
-    @patch("memberdna.assignment.lib.assn_io.write_yaml_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.assn_io.write_yaml_to_s3")
     def test_parameters_are_updated(self, write_yaml_to_s3):
         self.params["experiment"] = "50"
         self.params["backfill_method"] = {"basket": "test"}
@@ -2209,15 +2210,12 @@ if __name__ == "__main__":
     findspark.init()
     import copy
 
-    from pyspark.sql import Row, SparkSession
-    from pyspark.sql import functions as F
-
-    from pe_memberdna.assignment.lib.assn_io import (
+    from pe_memberdna.pipelines.assignment.lib.assn_io import (
         calculate_filepaths,
         dump_config,
         load_config,
     )
-    from pe_memberdna.assignment.lib.assn_utils import (
+    from pe_memberdna.pipelines.assignment.lib.assn_utils import (
         apply_offer_recency,
         calc_avg_basket,
         calc_overlapping_cols,
@@ -2243,7 +2241,7 @@ if __name__ == "__main__":
         read_subset_and_cast,
         update_categories,
     )
-    from pe_memberdna.assignment.lib.filters import (
+    from pe_memberdna.pipelines.assignment.lib.filters import (
         ROI_positive,
         avg_basket,
         construct_satisfied,
@@ -2258,7 +2256,7 @@ if __name__ == "__main__":
         tenure,
         trial,
     )
-    from pe_memberdna.assignment.lib.slots import (
+    from pe_memberdna.pipelines.assignment.lib.slots import (
         basket,
         cf,
         cf_combined,
@@ -2271,7 +2269,11 @@ if __name__ == "__main__":
         stretch_spend,
         waterfall_slots,
     )
-    from pe_memberdna.lib.spark_util import union_with_mismatched_columns
+    from pe_memberdna.pipelines.lib.spark_util import (
+        union_with_mismatched_columns,
+    )
+    from pyspark.sql import Row, SparkSession
+    from pyspark.sql import functions as F
 
     name = "assign_unit_test"
 
