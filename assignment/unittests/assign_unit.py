@@ -6,7 +6,9 @@ import unittest
 import pandas as pd
 import xmlrunner
 from mock import Mock, patch
-from pe_memberdna.pipelines.assignment.lib.checks import (
+import pandas as pd
+
+from pe_member_dna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
 
@@ -2208,72 +2210,84 @@ if __name__ == "__main__":
     import findspark
 
     findspark.init()
+    from pyspark.sql import SparkSession, Row
     import copy
+    from pyspark.sql import functions as F
 
-    from pe_memberdna.pipelines.assignment.lib.assn_io import (
-        calculate_filepaths,
-        dump_config,
-        load_config,
+    from pe_member_dna.pipelines.lib.spark_util import (
+        union_with_mismatched_columns,
     )
-    from pe_memberdna.pipelines.assignment.lib.assn_utils import (
-        apply_offer_recency,
-        calc_avg_basket,
-        calc_overlapping_cols,
-        calc_sampling_seg,
-        calc_sampling_value,
-        cap_top_percentile,
-        cap_value,
-        check_cpn_nbr_or_version,
-        create_equal_size_bucket,
-        deterministic_sample,
-        downsample_rows,
-        fill_with_average,
-        filter_rows,
-        flag_rows,
-        get_all_of_key,
-        get_key_values,
-        load_past_longitudinal_mbrs,
-        map_under_threshold,
-        mapping,
-        palindrome_rank_group,
-        palindrome_sample,
-        rdd_rank_by_col,
-        read_subset_and_cast,
-        update_categories,
-    )
-    from pe_memberdna.pipelines.assignment.lib.filters import (
-        ROI_positive,
-        avg_basket,
-        construct_satisfied,
-        expired,
-        gas,
-        general_filter,
-        longitudinal,
-        new,
-        run_sub_filters,
+    from pe_member_dna.pipelines.assignment.lib.filters import (
         special_club,
         special_zipcode,
         tenure,
+        new,
+        expired,
         trial,
     )
-    from pe_memberdna.pipelines.assignment.lib.slots import (
-        basket,
+    from pe_member_dna.pipelines.assignment.lib.filters import (
+        gas,
+        avg_basket,
+        ROI_positive,
+        construct_satisfied,
+        general_filter,
+        run_sub_filters,
+        longitudinal,
+    )
+    from pe_member_dna.pipelines.assignment.lib.slots import (
+        rank_by_col,
         cf,
         cf_combined,
+        basket,
+        static,
+        random,
+        stretch_spend,
+    )
+    from pe_member_dna.pipelines.assignment.lib.slots import (
+        sql,
+        waterfall_slots,
         compose_slots,
         limit_to_cf_match,
-        random,
-        rank_by_col,
-        sql,
-        static,
-        stretch_spend,
-        waterfall_slots,
     )
-    from pe_memberdna.pipelines.lib.spark_util import (
-        union_with_mismatched_columns,
+    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+        flag_rows,
+        filter_rows,
+        mapping,
+        map_under_threshold,
+        check_cpn_nbr_or_version,
     )
-    from pyspark.sql import Row, SparkSession
-    from pyspark.sql import functions as F
+    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+        fill_with_average,
+        apply_offer_recency,
+        calc_avg_basket,
+        calc_overlapping_cols,
+        downsample_rows,
+        load_past_longitudinal_mbrs,
+    )
+    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+        cap_value,
+        create_equal_size_bucket,
+        calc_sampling_value,
+        rdd_rank_by_col,
+        calc_sampling_seg,
+    )
+    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+        palindrome_rank_group,
+        palindrome_sample,
+        deterministic_sample,
+        cap_top_percentile,
+    )
+    from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+        get_all_of_key,
+        get_key_values,
+        read_subset_and_cast,
+        update_categories,
+    )
+    from pe_member_dna.pipelines.assignment.lib.assn_io import (
+        calculate_filepaths,
+        load_config,
+        dump_config,
+    )
 
     name = "assign_unit_test"
 

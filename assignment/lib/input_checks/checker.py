@@ -2,7 +2,7 @@
 Helper classes and functions for dealing with assignment input checks.
 """
 
-from pe_memberdna.lib.misc import print_table
+from pe_member_dna.lib.misc import print_table
 
 
 class Check:

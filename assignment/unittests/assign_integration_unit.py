@@ -3,7 +3,8 @@ import unittest
 
 import pandas as pd
 import xmlrunner
-from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+
+from pe_member_dna.pipelines.lib.iotools import read_s3_to_local
 
 
 class TestCoupon(unittest.TestCase):
@@ -192,8 +193,8 @@ if __name__ == "__main__":
     import findspark
 
     findspark.init()
-    from pyspark import SparkConf, SparkContext
-    from pyspark.sql import Row, SparkSession
+    from pyspark import SparkContext, SparkConf
+    from pyspark.sql import SparkSession, Row
 
     name = "assign_integration_test"
 

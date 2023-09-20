@@ -5,8 +5,9 @@ from datetime import datetime
 import pandas
 import xmlrunner
 from mock import Mock, patch
-from pe_memberdna.pipelines.assignment.lib.checks import check_prod_status
-from pe_memberdna.pipelines.assignment.lib.coupon_utils import (
+
+from pe_member_dna.pipelines.assignment.lib.checks import check_prod_status
+from pe_member_dna.pipelines.assignment.lib.coupon_utils import (
     clean_cpg_coupon_file,
     remove_exclusions,
 )
@@ -338,8 +339,8 @@ if __name__ == "__main__":
     import findspark
 
     findspark.init()
-    from pyspark import SparkConf, SparkContext
-    from pyspark.sql import Row, SparkSession
+    from pyspark import SparkContext, SparkConf
+    from pyspark.sql import SparkSession, Row
 
     name = "coupon_creation_unit_test"
 

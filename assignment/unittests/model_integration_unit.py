@@ -2,9 +2,12 @@
 import unittest
 
 import xmlrunner
-from pe_memberdna.pipelines.cf_model.lib.cf_io import make_predictions_filename
-from pe_memberdna.pipelines.cf_model.lib.models import add_cf_reg
-from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+
+from pe_member_dna.pipelines.cf_model.lib.cf_io import (
+    make_predictions_filename,
+)
+from pe_member_dna.pipelines.cf_model.lib.models import add_cf_reg
+from pe_member_dna.pipelines.lib.iotools import read_s3_to_local
 
 
 class TestCF(unittest.TestCase):
