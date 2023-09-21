@@ -27,9 +27,9 @@ from pyspark.sql.functions import sum as fsum
 from pyspark.sql.functions import when
 from pyspark.sql.window import Window as W
 
-from pe_member_dna.pipelines.assignment.lib.assn_utils import deterministic_df
-from pe_member_dna.pipelines.lib.spark_util import get_logger
-from pe_member_dna.pipelines.lib.utils import top_n
+from pe_memberdna.assignment.lib.assn_utils import deterministic_df
+from pe_memberdna.lib.spark_util import get_logger
+from pe_memberdna.lib.utils import top_n
 
 # ---- HELPERS ---- #
 log = get_logger("ingest")
