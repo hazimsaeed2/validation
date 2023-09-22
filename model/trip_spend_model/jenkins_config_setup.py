@@ -29,6 +29,9 @@ if run_type == "dev" or run_type == "stage":
     config_suffix = f"_{run_type}"
     s3_input_prefix = f"{run_type}/ref/"
     s3_output_prefix = f"{run_type}/{git_branch}/"
+else:
+    s3_input_prefix = f"{run_type}/"
+    s3_output_prefix = f"{run_type}/"
 
 yaml_path = curr_dir + f"/conf/config{config_suffix}.yml"
 

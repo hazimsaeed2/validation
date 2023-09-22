@@ -25,9 +25,10 @@ with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
 for path in config_data["shared"].keys():
-    config_data["shared"][path] = config_data["shared"][path].replace(
-        "Code_and_Data_repo", f"Code_and_Data_repo/prod"
-    )
+    if isinstance(config_data["shared"][path], str):
+        config_data["shared"][path] = config_data["shared"][path].replace(
+            "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+        )
 
 for path in config_data["etl"].keys():
     if path in ["BBM_weeks_path", "lookup_path"]:
