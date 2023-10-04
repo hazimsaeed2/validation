@@ -4,7 +4,12 @@ from datetime import datetime
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-
+from pemember_dna.pipelines.assignment.lib.assn_utils import (
+    deterministic_df,
+    update_categories,
+)
+from pemember_dna.pipelines.lib.spark_util import get_logger
+from pemember_dna.pipelines.lib.utils import top_n, trips_only
 from pyspark.sql.functions import (
     col,
     concat,
@@ -12,25 +17,15 @@ from pyspark.sql.functions import (
     datediff,
     desc,
     explode,
+    format_number,
     lit,
     lower,
-    format_number,
-    row_number,
-    trim,
-    when,
-    regexp_replace,
-    split,
 )
 from pyspark.sql.functions import min as fmin
+from pyspark.sql.functions import regexp_replace, row_number, split
 from pyspark.sql.functions import sum as fsum
+from pyspark.sql.functions import trim, when
 from pyspark.sql.window import Window
-
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
-    deterministic_df,
-    update_categories,
-)
-from pe_member_dna.pipelines.lib.spark_util import get_logger
-from pe_member_dna.pipelines.lib.utils import top_n, trips_only
 
 log = get_logger("coupon_utils")
 

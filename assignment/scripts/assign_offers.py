@@ -3,16 +3,16 @@
 
 from datetime import datetime
 
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.campaign import Campaign
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
+from pemember_dna.pipelines.assignment.lib.campaign import Campaign
+from pemember_dna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
-from pe_member_dna.pipelines.lib.iotools import (
+from pemember_dna.pipelines.lib.iotools import (
     copy_file_to_s3,
     write_local_to_s3,
 )
-from pe_member_dna.pipelines.lib.utils import apply_unionall
+from pemember_dna.pipelines.lib.utils import apply_unionall
 
 
 def main(conf_path_in=None):

@@ -1,20 +1,20 @@
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.input_checks.checker import (
+from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
+from pemember_dna.pipelines.assignment.lib.input_checks.checker import (
     Check,
     print_summary,
 )
-from pe_member_dna.pipelines.assignment.lib.input_checks.exceptions import (
+from pemember_dna.pipelines.assignment.lib.input_checks.exceptions import (
     AssignmentInputError,
 )
-from pe_member_dna.pipelines.assignment.lib.schemas.cdsa_schemas import (
+from pemember_dna.pipelines.assignment.lib.schemas.cdsa_schemas import (
     CELLS_SCHEMA,
 )
-from pe_member_dna.pipelines.assignment.lib.validators import (
+from pemember_dna.pipelines.assignment.lib.validators import (
     check_date_format,
     check_date_range,
     check_header,
 )
-from pe_member_dna.pipelines.lib.iotools import read_s3_to_local
+from pemember_dna.pipelines.lib.iotools import read_s3_to_local
 
 
 def check_cells_csv(job):

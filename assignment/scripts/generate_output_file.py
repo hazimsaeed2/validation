@@ -11,14 +11,13 @@ TODO:
 
 # ---- Initiate Spark Context --- #
 import pyspark.sql.functions as sqlf
-
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
+from pemember_dna.pipelines.assignment.lib.assn_utils import (
     check_cpn_nbr_or_version,
     read_subset_and_cast,
     subset_by_time,
 )
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pemember_dna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
 

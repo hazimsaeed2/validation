@@ -4,19 +4,16 @@ import unittest
 from unittest import mock
 
 import pandas as pd
-import xmlrunner
 import pyspark.sql.functions as sqlf
-
-
-from pe_member_dna.pipelines.assignment.lib.campaign import (
+import xmlrunner
+from pemember_dna.pipelines.assignment.lib.campaign import (
     Campaign,
-    global_min,
     _clean_constructs,
     _parse_constructs,
     _parse_segments,
     decompose_construct,
+    global_min,
 )
-
 
 FF = Campaign.FillType.FF
 BF = Campaign.FillType.BF
@@ -2029,10 +2026,10 @@ if __name__ == "__main__":
         import findspark
 
         findspark.init()
-    from pyspark import SparkContext, SparkConf
-    from pyspark.sql import SparkSession, Row
-    from pyspark.sql.functions import when, col
     import numpy as np
+    from pyspark import SparkConf, SparkContext
+    from pyspark.sql import Row, SparkSession
+    from pyspark.sql.functions import col, when
 
     name = "Campaign.py - unittests"
     spark = SparkSession.builder.appName(name).getOrCreate()

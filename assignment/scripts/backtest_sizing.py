@@ -12,17 +12,16 @@ import sys
 from datetime import datetime
 
 import pyspark.sql.functions as sqlf
-
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
+from pemember_dna.pipelines.assignment.lib.assn_utils import (
     explode_columns,
     has_coupons,
     read_subset_and_cast,
 )
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pemember_dna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
-from pe_member_dna.pipelines.lib.utils import capitalize_col_names, trips_only
+from pemember_dna.pipelines.lib.utils import capitalize_col_names, trips_only
 
 
 def _make_category_agnostic(df):

@@ -1,6 +1,6 @@
 import pyspark.sql.functions as sqlf
+from pemember_dna.pipelines.assignment.lib.assn_utils import CONSTRUCT_COLUMN
 
-from pe_member_dna.pipelines.assignment.lib.assn_utils import CONSTRUCT_COLUMN
 import pe_memberdna.testing_support.regression_framework.regression as regression
 
 

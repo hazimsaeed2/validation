@@ -50,27 +50,27 @@ Notes:
 import warnings
 from functools import reduce
 
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import abs as fabs
-from pyspark.sql.functions import col, concat, countDistinct, desc, lit
-from pyspark.sql.functions import max as fmax
-from pyspark.sql.functions import sum as fsum
-from pyspark.sql.functions import when, avg, row_number
-from pyspark.sql.window import Window
-
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+from pemember_dna.pipelines.assignment.lib.assn_utils import (
     calc_avg_basket,
+    deterministic_df,
     filter_rows,
     map_under_threshold,
     mapping,
-    deterministic_df,
 )
-from pe_member_dna.pipelines.assignment.lib.ingest import _broadcast_cross_join
-from pe_member_dna.pipelines.lib.spark_util import (
+from pemember_dna.pipelines.assignment.lib.ingest import _broadcast_cross_join
+from pemember_dna.pipelines.lib.spark_util import (
     get_logger,
     union_with_mismatched_columns,
 )
-from pe_member_dna.pipelines.lib.utils import top_n
+from pemember_dna.pipelines.lib.utils import top_n
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import abs as fabs
+from pyspark.sql.functions import avg, col, concat, countDistinct, desc, lit
+from pyspark.sql.functions import max as fmax
+from pyspark.sql.functions import row_number
+from pyspark.sql.functions import sum as fsum
+from pyspark.sql.functions import when
+from pyspark.sql.window import Window
 
 slot_functions = {}
 

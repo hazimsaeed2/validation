@@ -1,17 +1,17 @@
-from pe_member_dna.pipelines.assignment.lib.assn_io import (
+from pemember_dna.pipelines.assignment.lib.assn_io import (
     calculate_filepaths,
     dump_config,
     load_config,
 )
-from pe_member_dna.pipelines.assignment.lib.checks import (
+from pemember_dna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
-from pe_member_dna.pipelines.lib.iotools import (
+from pemember_dna.pipelines.lib.iotools import (
     get_filename,
     s3_copy,
     split_path_bucket_key,
 )
-from pe_member_dna.pipelines.lib.spark_util import get_logger
+from pemember_dna.pipelines.lib.spark_util import get_logger
 
 log = get_logger("create_debug_files")
 
