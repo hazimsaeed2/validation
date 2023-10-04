@@ -4,19 +4,19 @@ from functools import reduce
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
-from pemember_dna.pipelines.assignment.lib.assn_utils import deterministic_df
-from pemember_dna.pipelines.assignment.lib.schemas.coupon_schemas import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.assn_utils import deterministic_df
+from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
     CAP_CLOSURE_COUPON_SCHEMA,
 )
-from pemember_dna.pipelines.lib.iotools import (
+from pe_memberdna.pipelines.lib.iotools import (
     is_s3_file,
     is_s3_path,
     s3_copy,
     split_path_bucket_key,
 )
-from pemember_dna.pipelines.lib.spark_util import truncate_history
-from pemember_dna.pipelines.lib.utils import apply_unionall
+from pe_memberdna.pipelines.lib.spark_util import truncate_history
+from pe_memberdna.pipelines.lib.utils import apply_unionall
 from pyspark.sql.window import Window
 
 STARTING_SEED = None

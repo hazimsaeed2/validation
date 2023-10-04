@@ -4,12 +4,12 @@ from datetime import datetime
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     deterministic_df,
     update_categories,
 )
-from pemember_dna.pipelines.lib.spark_util import get_logger
-from pemember_dna.pipelines.lib.utils import top_n, trips_only
+from pe_memberdna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.pipelines.lib.utils import top_n, trips_only
 from pyspark.sql.functions import (
     col,
     concat,

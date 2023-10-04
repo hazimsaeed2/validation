@@ -11,22 +11,22 @@ import pe_memberdna.pipelines.assignment.lib.input_checks.longitudinal_design_ch
 import pe_memberdna.pipelines.assignment.lib.validators as validators
 import xmlrunner
 from mock import Mock, patch
-from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
-from pemember_dna.pipelines.assignment.lib.input_checks.campaign_check import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.input_checks.campaign_check import (
     check_campaign,
 )
-from pemember_dna.pipelines.assignment.lib.input_checks.cells_check import (
+from pe_memberdna.pipelines.assignment.lib.input_checks.cells_check import (
     check_cells_csv,
 )
-from pemember_dna.pipelines.assignment.lib.input_checks.checker import Check
-from pemember_dna.pipelines.assignment.lib.input_checks.json_check import (
+from pe_memberdna.pipelines.assignment.lib.input_checks.checker import Check
+from pe_memberdna.pipelines.assignment.lib.input_checks.json_check import (
     check_jsons,
     converts_to_json,
     get_jsons,
     has_correct_static_data,
     name_matches_id,
 )
-from pemember_dna.pipelines.assignment.lib.input_checks.path_check import (
+from pe_memberdna.pipelines.assignment.lib.input_checks.path_check import (
     check_paths,
 )
 

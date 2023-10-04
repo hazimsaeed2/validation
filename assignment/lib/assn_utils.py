@@ -12,9 +12,9 @@ import pe_memberdna.pipelines.assignment.lib.checks as checks
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 from dateutil import parser
-from pemember_dna.pipelines.lib.iotools import read_s3_to_local
-from pemember_dna.pipelines.lib.spark_util import get_logger
-from pemember_dna.pipelines.lib.utils import (
+from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+from pe_memberdna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.pipelines.lib.utils import (
     convert_id_cols_to_str,
     next_fiscal_week_end,
 )

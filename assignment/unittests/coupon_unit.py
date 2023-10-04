@@ -5,8 +5,8 @@ from datetime import datetime
 import pandas
 import xmlrunner
 from mock import Mock, patch
-from pemember_dna.pipelines.assignment.lib.checks import check_prod_status
-from pemember_dna.pipelines.assignment.lib.coupon_utils import (
+from pe_memberdna.pipelines.assignment.lib.checks import check_prod_status
+from pe_memberdna.pipelines.assignment.lib.coupon_utils import (
     clean_cpg_coupon_file,
     remove_exclusions,
 )

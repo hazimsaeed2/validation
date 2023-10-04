@@ -7,8 +7,8 @@ import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 import xmlrunner
 from mock import Mock, patch
-from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
-from pemember_dna.pipelines.assignment.lib.qctests import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.qctests import (
     QCTestRunner,
     check_sensitive_content,
     count_null_estimated_sizes,

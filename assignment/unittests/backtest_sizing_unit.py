@@ -1,13 +1,13 @@
 import unittest
 
 import xmlrunner
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     read_subset_and_cast,
 )
-from pemember_dna.pipelines.assignment.scripts.backtest_sizing import (
+from pe_memberdna.pipelines.assignment.scripts.backtest_sizing import (
     _flag_qualifiers,
 )
-from pemember_dna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.pipelines.lib.spark_util import get_logger
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, count, countDistinct, date_add, lit

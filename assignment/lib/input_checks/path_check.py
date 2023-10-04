@@ -1,15 +1,15 @@
 import warnings
 
-from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
-from pemember_dna.pipelines.assignment.lib.input_checks.checker import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.input_checks.checker import (
     Check,
     print_summary,
 )
-from pemember_dna.pipelines.assignment.lib.input_checks.exceptions import (
+from pe_memberdna.pipelines.assignment.lib.input_checks.exceptions import (
     AssignmentInputError,
     AssignmentInputWarning,
 )
-from pemember_dna.pipelines.lib.iotools import (
+from pe_memberdna.pipelines.lib.iotools import (
     is_s3_file,
     is_s3_path,
     split_path_bucket_key,

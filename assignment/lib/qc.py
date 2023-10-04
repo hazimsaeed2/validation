@@ -8,14 +8,14 @@ import itertools
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     calc_overlapping_cols,
     cap_top_percentile,
     deterministic_sample,
 )
-from pemember_dna.pipelines.assignment.lib.campaign import Campaign
-from pemember_dna.pipelines.assignment.lib.ingest import join_category_agnostic
-from pemember_dna.pipelines.lib.spark_util import (
+from pe_memberdna.pipelines.assignment.lib.campaign import Campaign
+from pe_memberdna.pipelines.assignment.lib.ingest import join_category_agnostic
+from pe_memberdna.pipelines.lib.spark_util import (
     count_nulls,
     crosstab_pct,
     grouped_percentiles,

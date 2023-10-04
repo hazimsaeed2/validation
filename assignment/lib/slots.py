@@ -50,19 +50,19 @@ Notes:
 import warnings
 from functools import reduce
 
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     calc_avg_basket,
     deterministic_df,
     filter_rows,
     map_under_threshold,
     mapping,
 )
-from pemember_dna.pipelines.assignment.lib.ingest import _broadcast_cross_join
-from pemember_dna.pipelines.lib.spark_util import (
+from pe_memberdna.pipelines.assignment.lib.ingest import _broadcast_cross_join
+from pe_memberdna.pipelines.lib.spark_util import (
     get_logger,
     union_with_mismatched_columns,
 )
-from pemember_dna.pipelines.lib.utils import top_n
+from pe_memberdna.pipelines.lib.utils import top_n
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import abs as fabs
 from pyspark.sql.functions import avg, col, concat, countDistinct, desc, lit

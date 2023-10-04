@@ -1,8 +1,8 @@
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     read_subset_and_cast,
 )
-from pemember_dna.pipelines.assignment.lib.ingest import _generate_cross_join
-from pemember_dna.pipelines.assignment.lib.slots import (
+from pe_memberdna.pipelines.assignment.lib.ingest import _generate_cross_join
+from pe_memberdna.pipelines.assignment.lib.slots import (
     hardest,
     rank_by_agg_col,
 )

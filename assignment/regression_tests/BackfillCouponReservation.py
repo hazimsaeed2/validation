@@ -1,9 +1,9 @@
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pemember_dna.pipelines.assignment.lib.assn_io import ConfigManager
-from pemember_dna.pipelines.assignment.lib.campaign import Campaign
-from pemember_dna.pipelines.assignment.lib.slots import rank_by_agg_trips
-from pemember_dna.pipelines.lib.spark_util import truncate_history
+from pe_memberdna.pipelines.assignment.lib.assn_io import ConfigManager
+from pe_memberdna.pipelines.assignment.lib.campaign import Campaign
+from pe_memberdna.pipelines.assignment.lib.slots import rank_by_agg_trips
+from pe_memberdna.pipelines.lib.spark_util import truncate_history
 
 import pe_memberdna.testing_support.regression_framework.regression as regression
 

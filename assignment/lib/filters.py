@@ -4,7 +4,7 @@ import re
 import warnings
 
 import pyspark.sql.functions as sqlf
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN_EXT,
     CONSTRUCT_COLUMN_EXT_BACKFILL,
     calc_avg_basket,

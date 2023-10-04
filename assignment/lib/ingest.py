@@ -6,9 +6,9 @@ TODO:
 """
 import warnings
 
-from pemember_dna.pipelines.assignment.lib.assn_utils import deterministic_df
-from pemember_dna.pipelines.lib.spark_util import get_logger
-from pemember_dna.pipelines.lib.utils import top_n
+from pe_memberdna.pipelines.assignment.lib.assn_utils import deterministic_df
+from pe_memberdna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.pipelines.lib.utils import top_n
 
 # Do NOT import the max function as it will collide with a use later
 # Do NOT import the max function as it will collide with a use later

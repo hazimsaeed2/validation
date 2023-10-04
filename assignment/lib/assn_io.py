@@ -18,7 +18,7 @@ import sys
 from datetime import datetime
 
 import yaml
-from pemember_dna.pipelines.lib.iotools import (
+from pe_memberdna.pipelines.lib.iotools import (
     is_s3_file,
     list_s3_dir,
     read_s3_to_local,
@@ -27,7 +27,7 @@ from pemember_dna.pipelines.lib.iotools import (
     write_local_to_s3,
     write_yaml_to_s3,
 )
-from pemember_dna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.pipelines.lib.spark_util import get_logger
 
 log = get_logger("assn_io")
 
@@ -623,13 +623,13 @@ class DataManager:
         This will put all schemas by name into the
         DataManagers schemas attribute.
         """
-        from pemember_dna.pipelines.assignment.lib.schemas.assn_schemas import (
+        from pe_memberdna.pipelines.assignment.lib.schemas.assn_schemas import (
             ASSIGNMENTS,
         )
-        from pemember_dna.pipelines.assignment.lib.schemas.cdsa_schemas import (
+        from pe_memberdna.pipelines.assignment.lib.schemas.cdsa_schemas import (
             CDSA,
         )
-        from pemember_dna.pipelines.assignment.lib.schemas.coupon_schemas import (
+        from pe_memberdna.pipelines.assignment.lib.schemas.coupon_schemas import (
             COUPONS,
         )
 

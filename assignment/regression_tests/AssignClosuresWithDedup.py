@@ -1,11 +1,11 @@
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-from pemember_dna.pipelines.assignment.scripts.assign_closure import (
+from pe_memberdna.pipelines.assignment.scripts.assign_closure import (
     CAT_HRRCHY,
     CAT_LIST,
     ClosureMethod,
 )
-from pemember_dna.pipelines.lib.iotools import (
+from pe_memberdna.pipelines.lib.iotools import (
     s3_copy,
     s3_delete,
     split_path_bucket_key,

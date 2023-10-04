@@ -7,17 +7,17 @@ import operator
 import os
 
 import pandas as pd
-from pemember_dna.pipelines.assignment.lib.assn_io import JobManager
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN,
     calc_overlapping_cols,
 )
-from pemember_dna.pipelines.lib.iotools import (
+from pe_memberdna.pipelines.lib.iotools import (
     is_s3_path,
     split_path_bucket_key,
 )
-from pemember_dna.pipelines.lib.spark_util import truncate_history
-from pemember_dna.pipelines.lib.utils import lowercase_col_names
+from pe_memberdna.pipelines.lib.spark_util import truncate_history
+from pe_memberdna.pipelines.lib.utils import lowercase_col_names
 from pyspark import StorageLevel
 from pyspark.sql.functions import count, countDistinct, lit
 from pyspark.sql.functions import max as fmax

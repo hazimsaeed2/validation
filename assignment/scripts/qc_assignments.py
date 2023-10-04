@@ -1,20 +1,20 @@
 """Spark job to QC an assignment run and generate a QC report for inspection."""
 
 
-from pemember_dna.pipelines.assignment.lib.assn_io import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import (
     JobManager,
     move_to_outbound,
 )
-from pemember_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     has_coupons,
     subset_by_time,
 )
-from pemember_dna.pipelines.assignment.lib.checks import (
+from pe_memberdna.pipelines.assignment.lib.checks import (
     check_execution_overwrite,
 )
-from pemember_dna.pipelines.assignment.lib.excelreport import write_report
-from pemember_dna.pipelines.assignment.lib.qc import *
-from pemember_dna.pipelines.assignment.lib.qctests import QCTestRunner
+from pe_memberdna.pipelines.assignment.lib.excelreport import write_report
+from pe_memberdna.pipelines.assignment.lib.qc import *
+from pe_memberdna.pipelines.assignment.lib.qctests import QCTestRunner
 
 
 def main(conf_path_in=None):
