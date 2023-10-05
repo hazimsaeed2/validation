@@ -3,7 +3,8 @@ import unittest
 
 import pandas as pd
 import xmlrunner
-from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+
+from pe_memberdna.lib.iotools import read_s3_to_local
 
 
 class TestCoupon(unittest.TestCase):

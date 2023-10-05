@@ -8,19 +8,17 @@ from collections import defaultdict
 from datetime import datetime
 from random import sample, seed
 
-import pe_memberdna.pipelines.assignment.lib.checks as checks
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 from dateutil import parser
-from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
-from pe_memberdna.pipelines.lib.spark_util import get_logger
-from pe_memberdna.pipelines.lib.utils import (
-    convert_id_cols_to_str,
-    next_fiscal_week_end,
-)
 from pyspark.ml.feature import QuantileDiscretizer
 from pyspark.sql import SparkSession
 from pyspark.sql.window import Window
+
+import pe_memberdna.assignment.lib.checks as checks
+from pe_memberdna.lib.iotools import read_s3_to_local
+from pe_memberdna.lib.spark_util import get_logger
+from pe_memberdna.lib.utils import convert_id_cols_to_str, next_fiscal_week_end
 
 spark = SparkSession.builder.getOrCreate()
 sparkContext = spark.sparkContext

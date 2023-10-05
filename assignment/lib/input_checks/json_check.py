@@ -4,16 +4,13 @@ Spark job to perform json input checks.
 import json
 import warnings
 
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
-from pe_memberdna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.assn_utils import (
     decompose_construct,
     decompose_segment,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks import (
-    checker,
-    exceptions,
-)
-from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+from pe_memberdna.assignment.lib.input_checks import checker, exceptions
+from pe_memberdna.lib.iotools import read_s3_to_local
 
 
 def converts_to_json(to_check, is_file=False):

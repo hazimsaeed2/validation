@@ -1,11 +1,9 @@
 import warnings
 
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
-from pe_memberdna.pipelines.assignment.lib.input_checks import checker
-from pe_memberdna.pipelines.assignment.lib.validators import (
-    check_column_duplicates,
-)
-from pe_memberdna.pipelines.lib.iotools import read_s3_to_local
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.input_checks import checker
+from pe_memberdna.assignment.lib.validators import check_column_duplicates
+from pe_memberdna.lib.iotools import read_s3_to_local
 
 
 def check_dups_membership(job):

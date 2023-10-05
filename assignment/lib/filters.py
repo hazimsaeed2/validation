@@ -4,7 +4,9 @@ import re
 import warnings
 
 import pyspark.sql.functions as sqlf
-from pe_memberdna.pipelines.assignment.lib.assn_utils import (
+from pyspark.sql import SparkSession
+
+from pe_memberdna.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN_EXT,
     CONSTRUCT_COLUMN_EXT_BACKFILL,
     calc_avg_basket,
@@ -13,7 +15,6 @@ from pe_memberdna.pipelines.assignment.lib.assn_utils import (
     map_under_threshold,
     mapping,
 )
-from pyspark.sql import SparkSession
 
 log = get_logger("filters")
 

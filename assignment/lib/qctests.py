@@ -4,16 +4,17 @@ import functools
 import operator
 
 import pandas as pd
-import pe_memberdna.pipelines.assignment.lib.qc as qc
-import pe_memberdna.pipelines.lib.iotools as iotools
 import pyspark.sql.functions as sqlf
-from pe_memberdna.pipelines.assignment.lib.campaign import Campaign
-from pe_memberdna.pipelines.lib.spark_util import get_logger
 from pyspark.sql.functions import avg, coalesce, col, countDistinct
 from pyspark.sql.functions import lower as flower
 from pyspark.sql.functions import max as fmax
 from pyspark.sql.functions import min as fmin
 from pyspark.sql.functions import when
+
+import pe_memberdna.assignment.lib.qc as qc
+import pe_memberdna.lib.iotools as iotools
+from pe_memberdna.assignment.lib.campaign import Campaign
+from pe_memberdna.lib.spark_util import get_logger
 
 # ---- Helpers ---- #
 

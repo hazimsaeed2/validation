@@ -1,13 +1,6 @@
 import unittest
 
 import xmlrunner
-from pe_memberdna.pipelines.assignment.lib.assn_utils import (
-    read_subset_and_cast,
-)
-from pe_memberdna.pipelines.assignment.scripts.backtest_sizing import (
-    _flag_qualifiers,
-)
-from pe_memberdna.pipelines.lib.spark_util import get_logger
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, count, countDistinct, date_add, lit
@@ -15,6 +8,10 @@ from pyspark.sql.functions import max as fmax
 from pyspark.sql.functions import regexp_replace
 from pyspark.sql.functions import sum as fsum
 from pyspark.sql.functions import when
+
+from pe_memberdna.assignment.lib.assn_utils import read_subset_and_cast
+from pe_memberdna.assignment.scripts.backtest_sizing import _flag_qualifiers
+from pe_memberdna.lib.spark_util import get_logger
 
 
 class BacksizeTesting(unittest.TestCase):

@@ -3,8 +3,9 @@ from datetime import datetime
 
 import pandas as pd
 import pyspark.sql.functions as sqlf
-from pe_memberdna.pipelines.assignment.lib.assn_io import get_run_args
-from pe_memberdna.pipelines.lib.iotools import (
+
+from pe_memberdna.assignment.lib.assn_io import get_run_args
+from pe_memberdna.lib.iotools import (
     is_s3_file,
     is_s3_path,
     read_s3_to_local,

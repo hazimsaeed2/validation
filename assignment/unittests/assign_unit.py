@@ -6,9 +6,8 @@ import unittest
 import pandas as pd
 import xmlrunner
 from mock import Mock, patch
-from pe_memberdna.pipelines.assignment.lib.checks import (
-    check_execution_overwrite,
-)
+
+from pe_memberdna.assignment.lib.checks import check_execution_overwrite
 
 
 class TestUtils2(unittest.TestCase):
@@ -2210,12 +2209,15 @@ if __name__ == "__main__":
     findspark.init()
     import copy
 
-    from pe_memberdna.pipelines.assignment.lib.assn_io import (
+    from pyspark.sql import Row, SparkSession
+    from pyspark.sql import functions as F
+
+    from pe_memberdna.assignment.lib.assn_io import (
         calculate_filepaths,
         dump_config,
         load_config,
     )
-    from pe_memberdna.pipelines.assignment.lib.assn_utils import (
+    from pe_memberdna.assignment.lib.assn_utils import (
         apply_offer_recency,
         calc_avg_basket,
         calc_overlapping_cols,
@@ -2241,7 +2243,7 @@ if __name__ == "__main__":
         read_subset_and_cast,
         update_categories,
     )
-    from pe_memberdna.pipelines.assignment.lib.filters import (
+    from pe_memberdna.assignment.lib.filters import (
         ROI_positive,
         avg_basket,
         construct_satisfied,
@@ -2256,7 +2258,7 @@ if __name__ == "__main__":
         tenure,
         trial,
     )
-    from pe_memberdna.pipelines.assignment.lib.slots import (
+    from pe_memberdna.assignment.lib.slots import (
         basket,
         cf,
         cf_combined,
@@ -2269,11 +2271,7 @@ if __name__ == "__main__":
         stretch_spend,
         waterfall_slots,
     )
-    from pe_memberdna.pipelines.lib.spark_util import (
-        union_with_mismatched_columns,
-    )
-    from pyspark.sql import Row, SparkSession
-    from pyspark.sql import functions as F
+    from pe_memberdna.lib.spark_util import union_with_mismatched_columns
 
     name = "assign_unit_test"
 

@@ -2,7 +2,8 @@ import argparse
 import os
 
 import yaml
-from pe_memberdna.pipelines.lib.iotools import (
+
+from pe_memberdna.lib.iotools import (
     is_s3_file,
     is_s3_path,
     s3_copy,
