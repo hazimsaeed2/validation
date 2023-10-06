@@ -6,11 +6,10 @@ and their eligability/ineligibility
 
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
-
 from pyspark.sql.window import Window
 
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.assn_utils import update_categories
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.assn_utils import update_categories
 
 CAT_LIST = "closure_ah5_cd"
 CAT_HRRCHY = "AH5_CD"

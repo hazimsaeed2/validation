@@ -11,8 +11,8 @@ import unittest
 import pyspark.sql.functions as sqlf
 import xmlrunner
 
-import pe_memberdna.pipelines.assignment.scripts.create_closure as create_closure
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
+import pe_memberdna.assignment.scripts.create_closure as create_closure
+from pe_memberdna.assignment.lib.assn_io import JobManager
 
 
 class TestCreateClosure(unittest.TestCase):

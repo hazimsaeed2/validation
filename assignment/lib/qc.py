@@ -12,22 +12,20 @@ from pyspark import StorageLevel
 from pyspark.sql import SparkSession
 from pyspark.sql.window import Window
 
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.assignment.lib.assn_utils import (
     calc_overlapping_cols,
     cap_top_percentile,
     deterministic_sample,
 )
-from pe_member_dna.pipelines.assignment.lib.campaign import Campaign
-from pe_member_dna.pipelines.assignment.lib.ingest import (
-    join_category_agnostic,
-)
-from pe_member_dna.pipelines.lib.spark_util import (
+from pe_memberdna.assignment.lib.campaign import Campaign
+from pe_memberdna.assignment.lib.ingest import join_category_agnostic
+from pe_memberdna.lib.spark_util import (
     count_nulls,
     crosstab_pct,
     grouped_percentiles,
     pct_flagged,
-    union_with_mismatched_columns,
     safe_join,
+    union_with_mismatched_columns,
 )
 
 spark = SparkSession.builder.getOrCreate()
