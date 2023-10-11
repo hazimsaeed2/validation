@@ -1097,6 +1097,7 @@ class Campaign:
         #     subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
         # )
         # read in mbr dna to prep for sampling
+        print("\n\n\n\n inside  ingest_member_data \n\n\n\n")
         dna_cols = ["MBRSHP_SID", "DAYS_SINCE_LAST_TRIP", "TENURE"] + [
             self.parameters["sampling_weeks_rev_columns"]
         ]
@@ -1173,6 +1174,7 @@ class Campaign:
         #     "parquet",
         #     subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
         # )
+        print("\n\n\n\n inside  ingest_offer_data \n\n\n\n")
         join_col = calc_overlapping_cols(mbr_data, self.mbr_lkup)
         mbr_data = mbr_data.join(self.mbr_lkup, join_col, "left")
         mbr = mbr_data.select("MBRSHP_NBR", "MBRSHP_SID")
