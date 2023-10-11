@@ -627,12 +627,8 @@ class DataManager:
         from pe_memberdna.assignment.lib.schemas.assn_schemas import (
             ASSIGNMENTS,
         )
-        from pe_memberdna.assignment.lib.schemas.cdsa_schemas import (
-            CDSA,
-        )
-        from pe_memberdna.assignment.lib.schemas.coupon_schemas import (
-            COUPONS,
-        )
+        from pe_memberdna.assignment.lib.schemas.cdsa_schemas import CDSA
+        from pe_memberdna.assignment.lib.schemas.coupon_schemas import COUPONS
 
         schemas = CDSA.copy()
         schemas.update(ASSIGNMENTS)

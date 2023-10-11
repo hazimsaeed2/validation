@@ -1,7 +1,6 @@
 import pyspark.sql.functions as sqlf
 
-import pe_memberdna.pipelines.assignment.lib.filters as filters
-
+import pe_memberdna.assignment.lib.filters as filters
 import pe_memberdna.testing_support.regression_framework.regression as regression
 
 

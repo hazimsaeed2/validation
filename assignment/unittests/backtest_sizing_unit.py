@@ -9,13 +9,9 @@ from pyspark.sql.functions import regexp_replace
 from pyspark.sql.functions import sum as fsum
 from pyspark.sql.functions import when
 
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
-    read_subset_and_cast,
-)
-from pe_member_dna.pipelines.assignment.scripts.backtest_sizing import (
-    _flag_qualifiers,
-)
-from pe_member_dna.pipelines.lib.spark_util import get_logger
+from pe_memberdna.assignment.lib.assn_utils import read_subset_and_cast
+from pe_memberdna.assignment.scripts.backtest_sizing import _flag_qualifiers
+from pe_memberdna.lib.spark_util import get_logger
 
 
 class BacksizeTesting(unittest.TestCase):

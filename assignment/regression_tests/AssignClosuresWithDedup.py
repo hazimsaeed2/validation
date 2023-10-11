@@ -1,18 +1,13 @@
 import pyspark.sql.functions as sqlf
 import pyspark.sql.types as sqlt
 
-from pe_member_dna.pipelines.lib.iotools import (
-    s3_copy,
-    split_path_bucket_key,
-    s3_delete,
-)
-from pe_member_dna.pipelines.assignment.scripts.assign_closure import (
-    ClosureMethod,
+import pe_memberdna.testing_support.regression_framework.regression as regression
+from pe_memberdna.assignment.scripts.assign_closure import (
     CAT_HRRCHY,
     CAT_LIST,
+    ClosureMethod,
 )
-
-import pe_memberdna.testing_support.regression_framework.regression as regression
+from pe_memberdna.lib.iotools import s3_copy, s3_delete, split_path_bucket_key
 
 
 class AssignClosuresWithDedup(regression.RegressionTest):

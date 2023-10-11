@@ -1,15 +1,15 @@
 import warnings
 
-from pe_member_dna.pipelines.assignment.lib.assn_io import JobManager
-from pe_member_dna.pipelines.assignment.lib.input_checks.checker import (
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.input_checks.checker import (
     Check,
     print_summary,
 )
-from pe_member_dna.pipelines.assignment.lib.input_checks.exceptions import (
+from pe_memberdna.assignment.lib.input_checks.exceptions import (
     AssignmentInputError,
     AssignmentInputWarning,
 )
-from pe_member_dna.pipelines.lib.iotools import read_s3_to_local
+from pe_memberdna.lib.iotools import read_s3_to_local
 
 
 def check_campaign(job):

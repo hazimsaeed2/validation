@@ -9,36 +9,36 @@ TODO: Refactor parsing and ingestion along construct/segment lines (i.e. ingest/
 
 """
 import copy
-from collections import OrderedDict
 import functools
 import itertools
 import re
+from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-
+import pyspark.sql.functions as sqlf
 from pyspark import StorageLevel
 from pyspark.sql import SparkSession
-import pyspark.sql.functions as sqlf
 from pyspark.sql.window import Window as W
 
 import pe_memberdna.assignment.lib.checks as checks
 import pe_memberdna.assignment.lib.ingest as ig
+import pe_memberdna.assignment.lib.schemas.cdsa_schemas as cdsa_schemas
 from pe_memberdna.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN_EXT,
     CONSTRUCT_COLUMN_EXT_BACKFILL,
     LAYOUT_ID_MATCH,
     apply_offer_recency,
+    at_least_one_filter,
     calc_overlapping_cols,
     calc_sampling_seg,
     calc_sampling_value,
     decompose_construct,
     decompose_segment,
-    at_least_one_filter,
-    group_filters_by_segment,
     deterministic_sample,
     downsample_rows,
     get_all_of_key,
+    group_filters_by_segment,
     load_past_longitudinal_mbrs,
     palindrome_sample,
     read_subset_and_cast,
@@ -48,11 +48,7 @@ from pe_memberdna.assignment.lib.ingest import (
     broadcast_filter,
     join_category_agnostic,
 )
-import pe_memberdna.assignment.lib.schemas.cdsa_schemas as cdsa_schemas
-from pe_memberdna.assignment.lib.slots import (
-    fill_slot,
-    offer_data_to_list,
-)
+from pe_memberdna.assignment.lib.slots import fill_slot, offer_data_to_list
 from pe_memberdna.lib.iotools import (
     read_s3_to_local,
     split_path_bucket_key,
@@ -65,8 +61,8 @@ from pe_memberdna.lib.spark_util import (
 )
 from pe_memberdna.lib.utils import (
     apply_unionall,
-    stack,
     convert_id_cols_to_str,
+    stack,
 )
 
 spark = SparkSession.builder.getOrCreate()

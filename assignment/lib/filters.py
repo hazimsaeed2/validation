@@ -3,10 +3,10 @@
 import re
 import warnings
 
-from pyspark.sql import SparkSession
 import pyspark.sql.functions as sqlf
+from pyspark.sql import SparkSession
 
-from pe_member_dna.pipelines.assignment.lib.assn_utils import (
+from pe_memberdna.assignment.lib.assn_utils import (
     CONSTRUCT_COLUMN_EXT,
     CONSTRUCT_COLUMN_EXT_BACKFILL,
     calc_avg_basket,

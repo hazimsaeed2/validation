@@ -16,7 +16,6 @@ import pe_memberdna.lib.iotools as iotools
 from pe_memberdna.assignment.lib.campaign import Campaign
 from pe_memberdna.lib.spark_util import get_logger
 
-
 # ---- Helpers ---- #
 
 
