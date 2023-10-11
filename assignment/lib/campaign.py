@@ -1059,6 +1059,16 @@ class Campaign:
         self.offer_list = filter(lambda x: x is not None, self.offer_list)
         self.offer_sources_df = {}
 
+        self.mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
+        self.mbr_data.persist(StorageLevel.DISK_ONLY)
+
+        self.mbr_lkup = read_subset_and_cast(
+            self.paths["RAW_MEMBER"],
+            "parquet",
+            subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
+        )
+        self.mbr_lkup.persist(StorageLevel.DISK_ONLY)
+
     def ingest_member_data(self):
         """Dynamic member data ingestion.
 
@@ -1075,17 +1085,17 @@ class Campaign:
             data (pyspark.sql.DataFrame): ingested aand joined member data for assignment
         """
         # read in base data
-        mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
+        # mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
         mbr_data = deterministic_sample(
-            mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
+            self.mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
         ).cache()
 
         # read in ID lookup table to prep for join
-        mbr_lkup = read_subset_and_cast(
-            self.paths["RAW_MEMBER"],
-            "parquet",
-            subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
-        )
+        # mbr_lkup = read_subset_and_cast(
+        #     self.paths["RAW_MEMBER"],
+        #     "parquet",
+        #     subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
+        # )
         # read in mbr dna to prep for sampling
         dna_cols = ["MBRSHP_SID", "DAYS_SINCE_LAST_TRIP", "TENURE"] + [
             self.parameters["sampling_weeks_rev_columns"]
@@ -1105,8 +1115,8 @@ class Campaign:
 
         # create base mbr data
         # join with mbr lookup
-        join_col = calc_overlapping_cols(mbr_data, mbr_lkup)
-        mbr_lkup = mbr_lkup.dropDuplicates(subset=join_col)
+        join_col = calc_overlapping_cols(mbr_data, self.mbr_lkup)
+        mbr_lkup = self.mbr_lkup.dropDuplicates(subset=join_col)
         mbr_data = mbr_data.join(mbr_lkup, join_col, "left").cache()
 
         # join with dna and calculate sampling value and segements
@@ -1152,19 +1162,19 @@ class Campaign:
             assignment_pools, coupon_pools (list(dict)):
              ingested and joined offer data for assignment and coupons
         """
-        mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
+        # mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
         mbr_data = deterministic_sample(
-            mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
+            self.mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
         ).cache()
 
         # read in ID lookup table to prep for join
-        mbr_lkup = read_subset_and_cast(
-            self.paths["RAW_MEMBER"],
-            "parquet",
-            subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
-        )
-        join_col = calc_overlapping_cols(mbr_data, mbr_lkup)
-        mbr_data = mbr_data.join(mbr_lkup, join_col, "left")
+        # mbr_lkup = read_subset_and_cast(
+        #     self.paths["RAW_MEMBER"],
+        #     "parquet",
+        #     subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
+        # )
+        join_col = calc_overlapping_cols(mbr_data, self.mbr_lkup)
+        mbr_data = mbr_data.join(self.mbr_lkup, join_col, "left")
         mbr = mbr_data.select("MBRSHP_NBR", "MBRSHP_SID")
 
         # 2. Read in all data
