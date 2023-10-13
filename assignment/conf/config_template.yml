@@ -14,59 +14,51 @@ paths:
       ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
       LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
       ### UPDATE PER CAMPAIGN
-      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2023-09-11/' # use most recently available date
+      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2019-01-07/customer_cube' # use most recently available date
       # --------- end of fairly static ------------ #
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
-      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2023_09_11/trip_spend_predictions_2023-09-09.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2023-09-11/20220909-20230909-combined/preds-20230911-combined/PARQUET/'
+      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/trip_spend_predictions/trip_spend_predictions_2018-12-29.csv' # use most recently available date
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/preds-20190215-combined_ah4_yt_April/PARQUET/'  # CF model predictions with seasonality aligned to campaign in home dates
       # Member related inputs - UPDATE PER CAMPAIGN
-      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY24/MMPC15FY24/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
-      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY24/MMPC15FY24/input_mail_list/'
-      # AGE: 's3://memberanalytics-data-out-prod/USERDATA/sbrestin/CUBES/intermediates/acquisition_MMPC14_09052020/'
-      BACKTEST_MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/PROD/FY21/BBM11FY21/final_2020-06-15/final_mailhouse/' #no file found for BACKTEST_MAIL_LIST # deprecated since no selffunded offers in this campaign
-      # MUHH: 's3://memberanalytics-data-in-prod/ASSIGNMENTS/inbound/MUHH_FILE.dat'
-      # BBM_SCORED: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY21/MMPC18FY21/BBM_SCORED/'
+      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_mail_list' # legacy; Set same as MAIL_LIST
+      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_mail_list' # if MAIL_LIST is not set the engine will use the campaign name format(MMPC14FY21) to generate a path
+      BACKTEST_MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_mail_list'
+      MUHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/MUHH'
+      BBM_SCORED: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/BBM_SCORED'
       # RAW_MEMBER_LISTS: # raw data files used to create MAIL_LIST, if applicable
-      # - 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY20/BBM8FY20/BBM8_Clearwater_221_No_Canada.dat'
+            # - 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY20/BBM8FY20/BBM8_Clearwater_221_No_Canada.dat'
       # Coupon Inputs - Include path value if applicable - UPDATE PER CAMPAIGN
-      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY24/MMPC15FY24/Coupon_Input/Article_GF15.csv'
-      # CATEGORY_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC11FY22/Coupon_Input/category_pc11.csv'
-      # BASKET_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY24/MMPC04FY24/Coupon_Input/Basket_GF4.csv'
-      # EXTRA_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC5FY22/Coupon_Input/enriched_flag_pc5.csv"
+      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/article.csv'
+      CATEGORY_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/category.csv'
+      BASKET_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/basket.csv'
       # CLOSURE_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/cap_closure_coupons.csv'
-      # EXTRA_INFO_CLOSURE_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/cap_closure_coupons_test.csv"
+      # EXTRA_INFO_CLOSURE_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_coupon_list/cap_closure_lookup.csv"
       # BBM Only - Include path value if applicable - UPDATE PER CAMPAIGN
-      # VERSION_MAP: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY21/BBM12FY21/Coupon_Input/version map bbm12.csv'
+      VERSION_MAP: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/campaign/input_version_map'
+      # COUPON_PRICE_PATH: # Contains min-max retail prices for article coupons
       # Assignment Outputs - OPTIONAL (calculated by engine, input only if needed)
-      INPUT_ASSIGNMENTS: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/DEV/MMPC12FY21/est_2020-07-08/assignments/'
-      INPUT_CONSTRUCTS: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/DEV/MMPC12FY21/est_2020-07-08/assignments_allconstructs/'
+      INPUT_ASSIGNMENTS: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/bbm_or_mmpc/test_2018-02-05/assignments'
+      INPUT_CONSTRUCTS: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/bbm_or_mmpc/test_2018-02-05/assignments_allconstructs'
       INPUT_MAILHOUSE : # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/bbm_or_mmpc/test_2018-02-05/final_mailhouse'
       # BBM: change to match INPUT_ASSIGNMENTS - MMPC: change to mail_subset - OPTIONAL (calculated by engine, input only if needed)
-      MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/DEV/MMPC12FY21/est_2020-07-08/assignments/'
+      MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output//bbm_or_mmpc/test_2018-02-05/mail_subset'
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
-      experiment: 194 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC15FY24_BAU_RAVINDRA_SECOND' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'dev' # accepts 'prod' 'dev' 'test'
+      experiment: 1 # Maps to experiment_id in cells.csv
+      campaign: 'mmpc_bbm' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'test' # Good for making runs with different configurations within the same campaign
+      run_type: 'test' # accepts 'prod' 'dev' 'test'
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2023-10-11' # On Final run, should be updated to be near the final updated date
+      assignment_date: '2018-02-05' # On Final run, should be updated to be near the final updated date
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
-      s3_bucket: 'memberanalytics-data-out-prod'
 coupon_creation: # create_coupons.py
-      coupon_inhome_date: '2023-10-25' # Date in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
+      coupon_inhome_date: '2018-02-05' # Date in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
       excluded_coupons_force_back_in:
       backfill:
             cpn_exclusion: # A list of coupons that will be excluded from backfill
-                        - 2157111
-                        - 2154781
-                        - 2158290
-                        - 2157162
-                        - 2157161
-                        - 2157240
-                           # Above two are from PC14
+                  -
             substitutable_MCH3_exclusion: # a list of MCH3 that will be limited to 1 coupon max within each AH5 level
                   - SUNDRIES
                   - GENERAL MERCHANDISE
@@ -88,12 +80,12 @@ coupon_creation: # create_coupons.py
       coupon_start_date:  # Deprecated
       coupon_end_date:  # Deprecated
 assignment: # assign_offers.py
-      replace_with_null: ['PLACEHOLDER_NA']
+      replace_with_null: []
       downsample_coupons:
-            # - cpn_nbr: 2066598 # no more than count of 70,164
-            #  ratio: .6
-            # - cpn_nbr: 2066603 # no more than count of 35,890
-            #  ratio: .6
+            #- cpn_nbr: 211902
+            #  ratio: .2
+            #- cpn_nbr: 211735
+            #  ratio: .01
       backfill_method: # For each coupon type, what function to use for default backfill.  Found in ingest.py
             category: 'rank_by_agg_cf'  # accepts 'same' 'random' 'hardest' 'static' 'rank_by_cf' 'rank_by_agg_cf'  -  Do not use 'same','static' without further testing
             basket: 'hardest' # accepts 'same' 'random' 'hardest' 'static' 'rank_by_cf' -  Do not use 'same','static' without further testing
@@ -102,8 +94,8 @@ assignment: # assign_offers.py
             article_hero: # Deprecated
       backfill_priority: 'low' # 'high'
 sizing: # backtest_sizing.py
-      min_cpn_start_date: '2023-10-26' # The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
-      max_cpn_end_date: '2023-11-19' # The maximum of the self-funded coupon end dates
+      min_cpn_start_date: '2018-02-05' # The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
+      max_cpn_end_date: '2018-02-05' # The maximum of the self-funded coupon end dates
       ### Items below this line typically should not be changed
       num_days_backwards: 364 # The number of days backwards to backtest - typically 364 to look at prior year
       article_red_over_qual_rate: 0.37 # Expected redemption over qualified rate for articles - do not change without data
@@ -114,10 +106,10 @@ sizing: # backtest_sizing.py
       basket_cann_rate: 0.6 # Cannibalization rate for basket coupons - do not change without data
       basket_sales_lift_per_capita: 1.10 # Sales lift per redemption - do not change without data
 subset: # subsample_population.py and generate_msmt_input.py
-      sample_size: 0 # When subsampling, every time we subsample a segment (new members, decile 5, etc), how many members to sample. Currently sample 5 segments: Deciles 1-4(together),Decile 5,Decile 6, Decile 7, New members (<150 days excluding trials)
-      force_in_new: FALSE # Whether or not to force in and Sample new members into PC circulation
+      sample_size: 50000 # When subsampling, every time we subsample a segment (new members, decile 5, etc), how many members to sample. Currently sample 5 segments: Deciles 1-4(together),Decile 5,Decile 6, Decile 7, New members (<150 days excluding trials)
+      force_in_new: TRUE # Whether or not to force in and Sample new members into PC circulation
       force_in_cells: # A list of cells that will be forced into the mail circulation
-      force_out_cells: [1525] # A list of cells that will be forced out of the mail circulation
+      force_out_cells: # A list of cells that will be forced out of the mail circulation
       error: 75 # allowable error in circulation in units of people
       max_decile_6: # Deprecated
 qc: # qc_assignments.py
@@ -127,20 +119,20 @@ qc: # qc_assignments.py
             # group_by must be column in basedata; warning will be thrown and
             # that group_by skipped if it isn't.
             renewal:
-                  include: True
-                  group_by: ['cell_id'] # Choose strategically. Each adds ~90 seconds to run time at 20 nodes
+                  include: False
+                  group_by: ['cell_id', 'version', 'cpn_nbr'] # Choose strategically. Each adds ~90 seconds to run time at 20 nodes
                   slot_nbr: []
             descriptive:
-                  include: True
-                  group_by: ['cell_id' ]
+                  include: False
+                  group_by: ['cell_id', 'version', 'cpn_nbr']
                   slot_nbr: []
             personalized_content:
-                  include: True
-                  group_by: ['cell_id']
-                  slot_nbr: [13] # only valid when group_by = 'cpn_nbr' , list of integers to filter by slot number(s)
+                  include: False
+                  group_by: ['cell_id', 'version', 'cpn_nbr']
+                  slot_nbr: [] # only valid when group_by = 'cpn_nbr' , list of integers to filter by slot number(s)
             savings_content:
                   include: False
-                  version_letter: ['A', 'B'] # version letter(s) associated with savings_content
+                  version_letter: ['A'] # version letter(s) associated with savings_content
                   slot_content_map: # mapping of which slot each content is in
                         version_slot: 13
                         savings: 15
@@ -151,20 +143,20 @@ qc: # qc_assignments.py
                   group_by: [] # A single CPN_NBR column is not present in final mailhouse hence it's exclusion.
                   slot_nbr: []
             compare:
-                  group_by: ['cell_id'] # cell_id is a forced-in key regardless of its mention in the list
+                  group_by: ['cell_id', 'version', 'cpn_nbr', ['cell_id', 'version']] # cell_id is a forced-in key regardless of its mention in the list
                   slot_nbr: []
       # These are the parameters to create the tabs in the qc file.  The order that they appear
       # is the order that they are listed below.
       aggregation_params:
       # This is just a label to keep it organized, doesn't matter what the name is as long as its unique
-      # - coupon:
-              # tab_names: ['cell-cpn-bfill'] # Names that will appear for the tabs in excel
-              # group_by: ['cell_id', 'cpn_type', 'is_backfill'] # What you want to group the 'base' table by to give counts.  You can see base table schema here qc_assignments.generate_full_basedata
-              # aggs: [['*', 'count']] # This version of pyspark has limited support for the feature I used, so for now this is always the same but in future versions more than 'count' is supported
-      # - more_coupon:
-              # tab_names: ['cell-backfill']
-              # group_by: ['cell_id', 'is_backfill']
-              # aggs: [['*', 'count']]
+      - coupon:
+              tab_names: ['cell-cpn-bfill', 'cpn-slot-bfill'] # Names that will appear for the tabs in excel
+              group_by: [['cell_id', 'cpn_type', 'is_backfill'], ['cpn_type', 'slot_nbr', 'is_backfill']] # What you want to group the 'base' table by to give counts.  You can see base table schema here qc_assignments.generate_full_basedata
+              aggs: [['*', 'count']] # This version of pyspark has limited support for the feature I used, so for now this is always the same but in future versions more than 'count' is supported
+      - more_coupon:
+              tab_names: ['cell-backfill', 'cell-slot-backfill']
+              group_by: [['cell_id', 'is_backfill'], ['cell_id', 'slot_nbr', 'is_backfill']]
+              aggs: [['*', 'count']]
       - full:
               tab_names: ['full']
               group_by: [['cell_id', 'cpn_type', 'slot_nbr', 'is_backfill']]
