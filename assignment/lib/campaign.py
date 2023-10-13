@@ -1085,7 +1085,6 @@ class Campaign:
             data (pyspark.sql.DataFrame): ingested aand joined member data for assignment
         """
         # read in base data
-        # mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
         mbr_data = deterministic_sample(
             self.mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
         ).cache()
