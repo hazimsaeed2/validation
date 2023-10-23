@@ -44,6 +44,7 @@ paths:
       # BBM: change to match INPUT_ASSIGNMENTS - MMPC: change to mail_subset - OPTIONAL (calculated by engine, input only if needed)
       MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output//bbm_or_mmpc/test_2018-02-05/mail_subset'
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
+      CHECKPOINTING: 's3://memberanalytics-data-out-prod/checkpoint/assig_offer'
 shared: # This section is shared among all scripts - UPDATE PER RUN
       experiment: 1 # Maps to experiment_id in cells.csv
       campaign: 'mmpc_bbm' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
