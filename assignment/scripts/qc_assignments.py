@@ -1,17 +1,9 @@
 """Spark job to QC an assignment run and generate a QC report for inspection."""
 
 
-from pe_memberdna.assignment.lib.assn_io import (
-    JobManager,
-    move_to_outbound,
-)
-from pe_memberdna.assignment.lib.assn_utils import (
-    has_coupons,
-    subset_by_time,
-)
-from pe_memberdna.assignment.lib.checks import (
-    check_execution_overwrite,
-)
+from pe_memberdna.assignment.lib.assn_io import JobManager, move_to_outbound
+from pe_memberdna.assignment.lib.assn_utils import has_coupons, subset_by_time
+from pe_memberdna.assignment.lib.checks import check_execution_overwrite
 from pe_memberdna.assignment.lib.excelreport import write_report
 from pe_memberdna.assignment.lib.qc import *
 from pe_memberdna.assignment.lib.qctests import QCTestRunner
