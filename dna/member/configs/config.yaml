@@ -36,7 +36,7 @@ paths:
             AH5_custumer_facing_desc_path: 'bcg_maps/AH5_custumer_facing_desc/AH5_custumer_facing_desc.csv'
 
             acq_dna_path: "s3://memberacquisition-data-out-prod/member_dna/recent/"
-            mbr_basic_path: "s3://memberanalytics-data-in-prod/Code_and_Data_repo/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
+            mbr_basic_path: "s3://memberanalytics-data-in-prod/Membership/PE_Membership_Mstr_YYYYmmdd.csv"
 
       output:
             # dir is not prepended to s3_stat_path
