@@ -6,8 +6,8 @@ import pandas
 import xmlrunner
 from mock import Mock, patch
 
-from pe_memberdna.assignment.lib.checks import check_prod_status
-from pe_memberdna.assignment.lib.coupon_utils import (
+from pe_memberdna.pipelines.assignment.lib.checks import check_prod_status
+from pe_memberdna.pipelines.assignment.lib.coupon_utils import (
     clean_cpg_coupon_file,
     remove_exclusions,
 )
@@ -194,9 +194,9 @@ class TestCheckProdStatus(unittest.TestCase):
             ],
         )
 
-    @patch("memberdna.assignment.lib.checks.get_datetime_now")
-    @patch("memberdna.assignment.lib.checks.write_local_to_s3")
-    @patch("memberdna.assignment.lib.checks.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.checks.get_datetime_now")
+    @patch("memberdna.pipelines.assignment.lib.checks.write_local_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.checks.read_s3_to_local")
     def test_last_job_is_finished(
         self, read_s3_to_local, write_local_to_s3, get_datetime_now
     ):
@@ -231,9 +231,9 @@ class TestCheckProdStatus(unittest.TestCase):
             "this.log",
         )
 
-    @patch("memberdna.assignment.lib.checks.get_datetime_now")
-    @patch("memberdna.assignment.lib.checks.write_local_to_s3")
-    @patch("memberdna.assignment.lib.checks.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.checks.get_datetime_now")
+    @patch("memberdna.pipelines.assignment.lib.checks.write_local_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.checks.read_s3_to_local")
     def test_last_job_rerun(
         self, read_s3_to_local, write_local_to_s3, get_datetime_now
     ):
@@ -268,10 +268,10 @@ class TestCheckProdStatus(unittest.TestCase):
             "this.log",
         )
 
-    @patch("memberdna.assignment.lib.checks.get_datetime_now")
-    @patch("memberdna.assignment.lib.checks.warnings.warn")
-    @patch("memberdna.assignment.lib.checks.write_local_to_s3")
-    @patch("memberdna.assignment.lib.checks.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.checks.get_datetime_now")
+    @patch("memberdna.pipelines.assignment.lib.checks.warnings.warn")
+    @patch("memberdna.pipelines.assignment.lib.checks.write_local_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.checks.read_s3_to_local")
     def test_last_job_is_dead(
         self, read_s3_to_local, write_local_to_s3, log, get_datetime_now
     ):
@@ -311,8 +311,8 @@ class TestCheckProdStatus(unittest.TestCase):
             " minutes ago without reaching to the end"
         )
 
-    @patch("memberdna.assignment.lib.checks.write_local_to_s3")
-    @patch("memberdna.assignment.lib.checks.read_s3_to_local")
+    @patch("memberdna.pipelines.assignment.lib.checks.write_local_to_s3")
+    @patch("memberdna.pipelines.assignment.lib.checks.read_s3_to_local")
     def test_job_collision(self, read_s3_to_local, write_local_to_s3):
         read_s3_to_local.return_value = self.coupon_log_for_collision
         job = Mock(

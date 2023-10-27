@@ -10,8 +10,8 @@ from mock import Mock, patch
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
-from pe_memberdna.assignment.lib.assn_io import JobManager
-from pe_memberdna.assignment.lib.qctests import (
+from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
+from pe_memberdna.pipelines.assignment.lib.qctests import (
     QCTestRunner,
     check_sensitive_content,
     count_null_estimated_sizes,
@@ -305,8 +305,8 @@ class SensitiveContentTestCase(unittest.TestCase):
             ]
         ).toDF(["MBRSHP_SID", "CATEGORY_LVL", "CATEGORY_ID", "PREDICTION"])
 
-    @patch("memberdna.lib.iotools.is_s3_path")
-    @patch("memberdna.lib.iotools.s3_delete")
+    @patch("memberdna.pipelines.lib.iotools.is_s3_path")
+    @patch("memberdna.pipelines.lib.iotools.s3_delete")
     def test_cleanup_delete(self, s3_delete, is_s3_path):
         "Test that old assignment is deleted when nothing is passed"
         is_s3_path.return_value = True
@@ -334,8 +334,8 @@ class SensitiveContentTestCase(unittest.TestCase):
             "bucket", "key", allowed_paths=output_path
         )
 
-    @patch("memberdna.lib.iotools.is_s3_path")
-    @patch("memberdna.lib.iotools.s3_delete")
+    @patch("memberdna.pipelines.lib.iotools.is_s3_path")
+    @patch("memberdna.pipelines.lib.iotools.s3_delete")
     def test_no_sensitive_exclusions(self, s3_delete, is_s3_path):
         """
         Test that old output is deleted when no sensitive exclusions exist and
@@ -367,7 +367,7 @@ class SensitiveContentTestCase(unittest.TestCase):
             "bucket", "key", allowed_paths=output_path
         )
 
-    @patch("memberdna.lib.iotools.is_s3_path")
+    @patch("memberdna.pipelines.lib.iotools.is_s3_path")
     def test_no_sensitive_assignments(self, is_s3_path):
         """
         Test that no action is taken and test returns 'NA' when there are no
@@ -384,8 +384,8 @@ class SensitiveContentTestCase(unittest.TestCase):
         rtn = check_sensitive_content(self.job)
         self.assertEqual(rtn, "NA")
 
-    @patch("memberdna.lib.iotools.is_s3_path")
-    @patch("memberdna.lib.iotools.s3_delete")
+    @patch("memberdna.pipelines.lib.iotools.is_s3_path")
+    @patch("memberdna.pipelines.lib.iotools.s3_delete")
     def test_pass_with_cf_eligible(self, s3_delete, is_s3_path):
         """
         Test for no sensitive assignments after CF eligible is accounted for
@@ -405,8 +405,8 @@ class SensitiveContentTestCase(unittest.TestCase):
             "bucket", "key", allowed_paths=output_path
         )
 
-    @patch("memberdna.lib.iotools.is_s3_path")
-    @patch("memberdna.lib.iotools.s3_delete")
+    @patch("memberdna.pipelines.lib.iotools.is_s3_path")
+    @patch("memberdna.pipelines.lib.iotools.s3_delete")
     def test_pass_has_bought(self, s3_delete, is_s3_path):
         """
         Test for sensitive assignments which has purchases in the last 52 weeks
@@ -456,8 +456,8 @@ class SensitiveContentTestCase(unittest.TestCase):
             output_path, header=True, mode="overwrite"
         )
 
-    @patch("memberdna.lib.iotools.is_s3_path")
-    @patch("memberdna.lib.iotools.s3_delete")
+    @patch("memberdna.pipelines.lib.iotools.is_s3_path")
+    @patch("memberdna.pipelines.lib.iotools.s3_delete")
     def test_exclusion_rules_are_optional(self, s3_delete, is_s3_path):
         """
         Test that EXCLUSIONS can be NULL

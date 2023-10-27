@@ -7,7 +7,7 @@ import pandas as pd
 import pyspark.sql.functions as sqlf
 import xmlrunner
 
-from pe_memberdna.assignment.lib.campaign import (
+from pe_memberdna.pipelines.assignment.lib.campaign import (
     Campaign,
     _clean_constructs,
     _parse_constructs,
@@ -178,7 +178,7 @@ class TestCampaign(unittest.TestCase):
             [0, None, None, 5],
         )
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
     def test_parse_constructs_construct_not_in_list(self, read_s3_to_local):
         """
         Construct_id 10006 does not exist in construct list.
@@ -206,8 +206,8 @@ class TestCampaign(unittest.TestCase):
                 cells, self.paths, self.backfill_default_constructs
             )
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
-    @mock.patch("memberdna.assignment.lib.campaign.write_json_to_s3")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.write_json_to_s3")
     def test_parse_constructs_constructs_do_not_match(
         self, write_json_to_s3, read_s3_to_local
     ):
@@ -234,8 +234,8 @@ class TestCampaign(unittest.TestCase):
                 cells, self.paths, self.backfill_default_constructs
             )
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
-    @mock.patch("memberdna.assignment.lib.campaign.write_json_to_s3")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.write_json_to_s3")
     def test_parse_constructs(self, write_json_to_s3, read_s3_to_local):
         """
         Test format of parse_constructs
@@ -302,7 +302,7 @@ class TestCampaign(unittest.TestCase):
         self.assertEqual(lambda_list, [10, 30])
         write_json_to_s3.assert_called()
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
     def test_parse_constructs_dedupe_sources(self, read_s3_to_local):
         """
         # note: Adding construct 10003 which extends columns for
@@ -378,7 +378,7 @@ class TestCampaign(unittest.TestCase):
         clean_constr_list = _clean_constructs(cell_constructs)
         self.assertEqual(clean_constr_list, expected)
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
     def test_parse_segments_segment_not_in_list(self, read_s3_to_local):
         """
         Segment_id 10005 not in segments list.
@@ -393,8 +393,8 @@ class TestCampaign(unittest.TestCase):
         ):
             _parse_segments(cells=cells, paths=self.paths)
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
-    @mock.patch("memberdna.assignment.lib.campaign.write_json_to_s3")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.write_json_to_s3")
     def test_parse_segments(self, write_json_to_s3, read_s3_to_local):
         """
         Test format of parse_segments
@@ -472,7 +472,7 @@ class TestCampaign(unittest.TestCase):
 
         self._assert_sources(source_list, expected_source_list)
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
     def test_parse_segments_dedupe_sources(self, read_s3_to_local):
         """
         Test segments deduplication by adding segment 10004 with additional
@@ -528,15 +528,15 @@ class TestCampaign(unittest.TestCase):
         constructs = decompose_construct(construct="10001_1011u")
         self.assertEqual(constructs, [None])
 
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
     @mock.patch(
-        "memberdna.assignment.lib.campaign._read_and_subset_exp_csv"
+        "memberdna.pipelines.assignment.lib.campaign._read_and_subset_exp_csv"
     )
     @mock.patch(
-        "memberdna.assignment.lib.campaign._parse_campaign_details"
+        "memberdna.pipelines.assignment.lib.campaign._parse_campaign_details"
     )
     @mock.patch(
-        "memberdna.assignment.lib.campaign.read_subset_and_cast"
+        "memberdna.pipelines.assignment.lib.campaign.read_subset_and_cast"
     )
     def test_ingest_offer_data(
         self,
@@ -1277,15 +1277,15 @@ class TestCampaign(unittest.TestCase):
         )
 
     @mock.patch(
-        "memberdna.assignment.lib.campaign."
+        "memberdna.pipelines.assignment.lib.campaign."
         "load_past_longitudinal_mbrs"
     )
-    @mock.patch("memberdna.assignment.lib.campaign.read_s3_to_local")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign.read_s3_to_local")
     @mock.patch(
-        "memberdna.assignment.lib.campaign._read_and_subset_exp_csv"
+        "memberdna.pipelines.assignment.lib.campaign._read_and_subset_exp_csv"
     )
     @mock.patch(
-        "memberdna.assignment.lib.campaign._parse_campaign_details"
+        "memberdna.pipelines.assignment.lib.campaign._parse_campaign_details"
     )
     def test_find_past_longitudinal_mbrs(
         self,
@@ -1469,7 +1469,7 @@ class TestCalculateOffers(unittest.TestCase):
             seed,
         ]
 
-    @mock.patch("memberdna.assignment.lib.campaign._run_slot")
+    @mock.patch("memberdna.pipelines.assignment.lib.campaign._run_slot")
     def call_calculate_offers(
         self, fill_type, run_slot, *, check_run_slots=True
     ):
