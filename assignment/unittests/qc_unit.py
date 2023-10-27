@@ -10,8 +10,8 @@ from mock import Mock, patch
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
-from pe_memberdna.pipelines.assignment.lib.qctests import (
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.qctests import (
     QCTestRunner,
     check_sensitive_content,
     count_null_estimated_sizes,

@@ -11,6 +11,7 @@ from pe_memberdna.dna.member.lib.coupon_digital_features import (
 )
 
 
+
 class CouponDigitalFeaturesTestCase(unittest.TestCase):
     """Unit test for coupon digital features"""
 

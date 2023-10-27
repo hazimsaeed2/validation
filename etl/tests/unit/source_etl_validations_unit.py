@@ -15,7 +15,6 @@ from pe_member_dna.pipelines.lib.iotools import (
 
 import pe_memberdna.etl.utils.validations_ETL as validations
 from pe_member_dna.testing_support.lib.utility import *
-
 parser = ArgumentParser()
 parser.add_argument(
     "--tmp_stats", help="s3 path to temporarily place unit test stats"

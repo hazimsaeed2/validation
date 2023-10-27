@@ -7,8 +7,7 @@ import pandas as pd
 import xmlrunner
 from mock import Mock, patch
 
-from pe_memberdna.pipelines.assignment.lib.checks import check_execution_overwrite
-
+from pe_memberdna.assignment.lib.checks import check_execution_overwrite
 
 class TestUtils2(unittest.TestCase):
     """Unit tests for util functions."""

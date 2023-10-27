@@ -9,25 +9,25 @@ import pandas
 import xmlrunner
 from mock import Mock, patch
 
-import pe_memberdna.pipelines.assignment.lib.input_checks.exceptions as excp
-import pe_memberdna.pipelines.assignment.lib.input_checks.longitudinal_design_check as ldc
-import pe_memberdna.pipelines.assignment.lib.validators as validators
-from pe_memberdna.pipelines.assignment.lib.assn_io import JobManager
-from pe_memberdna.pipelines.assignment.lib.input_checks.campaign_check import (
+import pe_memberdna.assignment.lib.input_checks.exceptions as excp
+import pe_memberdna.assignment.lib.input_checks.longitudinal_design_check as ldc
+import pe_memberdna.assignment.lib.validators as validators
+from pe_memberdna.assignment.lib.assn_io import JobManager
+from pe_memberdna.assignment.lib.input_checks.campaign_check import (
     check_campaign,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks.cells_check import (
+from pe_memberdna.assignment.lib.input_checks.cells_check import (
     check_cells_csv,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks.checker import Check
-from pe_memberdna.pipelines.assignment.lib.input_checks.json_check import (
+from pe_memberdna.assignment.lib.input_checks.checker import Check
+from pe_memberdna.assignment.lib.input_checks.json_check import (
     check_jsons,
     converts_to_json,
     get_jsons,
     has_correct_static_data,
     name_matches_id,
 )
-from pe_memberdna.pipelines.assignment.lib.input_checks.path_check import check_paths
+from pe_memberdna.assignment.lib.input_checks.path_check import check_paths
 
 
 class CampaignCheckTestCase(unittest.TestCase):

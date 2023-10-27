@@ -5,10 +5,11 @@ import os
 import re
 import time
 import unittest
+import xmlrunner
+
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
 
-import xmlrunner
 from pyspark.sql.functions import col, concat
 from pyspark.sql.functions import hash as fhash
 from pyspark.sql.functions import lit, lpad

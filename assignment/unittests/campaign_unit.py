@@ -7,7 +7,7 @@ import pandas as pd
 import pyspark.sql.functions as sqlf
 import xmlrunner
 
-from pe_memberdna.pipelines.assignment.lib.campaign import (
+from pe_memberdna.assignment.lib.campaign import (
     Campaign,
     _clean_constructs,
     _parse_constructs,
