@@ -31,7 +31,11 @@ Output_path = args.Output_path
 
 
 #read files in for process the input file for execution
-mbr =spark.read.csv(Rec_file_path, header = True).withColumnRenamed('BBM Decile (Member DNA)', 'DECILE').withColumnRenamed('BBM Score (Member DNA)', 'score')
+mbr = (
+        spark.read.csv(Rec_file_path, header=True)
+        .withColumnRenamed("BBM Decile (Member DNA)", "DECILE")
+        .withColumnRenamed("BBM Score (Member DNA)", "score")
+    )
 DNA = spark.read.parquet(DNA_path).select('mbrshp_sid', 'cpn_channel')
 
 print(f"Count of the Eligible REC file : {mbr.count()}")
