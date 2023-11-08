@@ -34,11 +34,11 @@ Output_path = args.Output_path
 mbr =spark.read.csv(Rec_file_path, header = True).withColumnRenamed('BBM Decile (Member DNA)', 'DECILE').withColumnRenamed('BBM Score (Member DNA)', 'score')
 DNA = spark.read.parquet(DNA_path).select('mbrshp_sid', 'cpn_channel')
 
-print(f"mbr.count() : {mbr.count()}")
+print(f"Count of the Eligible REC file : {mbr.count()}")
 
-print(f"mbr.dtypes : {mbr.dtypes}")
+print(f"Checking dtypes of Eligible REC file : {mbr.dtypes}")
 
-print("mbr.show(5)")
+print("Showing top 5 records of REC file")
 mbr.show(5)
 
 print("mbr.groupBy('DECILE').count().show()")
@@ -62,10 +62,9 @@ mbr = mbr.dropna(subset='MBRSHP_NBR')
 
 print(f"check count after dropping na and duplicates in mbr : {mbr.count()}")
 
-#purge(LONGINITIDUNAL TEST)
-BBM11_purge= spark.read.csv(BBM11_purge_path, header = True )#.select('MBRSHP_SID', 'MBRSHP_NBR')
+BBM11_purge= spark.read.csv(BBM11_purge_path, header = True )
 
-mbr.join(BBM11_purge, 'MBRSHP_NBR').count() #CHECK IF 0, LONGITIDINAL COUNT SHOULD BE == 0
+mbr.join(BBM11_purge, 'MBRSHP_NBR').count()
 
 print(f"BBM11_purge.count() : {BBM11_purge.count()}")
 
