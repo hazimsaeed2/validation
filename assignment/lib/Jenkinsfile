@@ -1,0 +1,67 @@
+pipeline {
+    agent none
+    stages {
+        stage('Clone Source') {
+            agent { node env.node_1 }
+            steps {
+                dir('memberdna') {
+                    git branch: env.branch,
+                        credentialsId: 'bitbucket-service-account',
+                        url: 'https://bitbucket.bjs.com/scm/an/pe_memberdna.git'
+                }
+            }
+        }
+        stage('Scaling up cluster -1') {
+            agent { node env.node_1 }
+                steps {
+                    script {
+                            sh  '''
+                                wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                                export PYTHONPATH=$wrkspce:
+                                python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt $ondemand_node_count --spot_node_cnt $spot_node_count --wait 120
+                            '''
+                                echo "Scaled up cluster-1"
+                    }
+                }
+        }
+
+        stage('Starting input generation') {
+            agent { node env.node_1 }
+            steps {
+                echo "RUNNING INPUT GENERATION"
+                sh '''
+                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$WORKSPACE:
+                    export SPARK_OPTIONS=" --archives ../../../pyspark_venv.tar.gz#environment"
+                    export PYSPARK_PYTHON=environment/bin/python
+                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+
+                    python3 -m venv pyspark_venv
+                    source pyspark_venv/bin/activate
+                    pyspark_venv/bin/pip install --upgrade pip --no-cache-dir
+                    python3 -m ensurepip --upgrade
+                    pyspark_venv/bin/pip install -r memberdna/requirements.txt --no-cache-dir
+                    venv-pack -o pyspark_venv.tar.gz
+
+                    cd pe_memberdna/assignment/scripts/
+                    spark-submit input_mbr_generation.py ${Rec_file_path} ${DNA_path} ${BBM11_purge_path} ${Output_path}
+                '''
+                echo "COMPLETED RUNNING INPUT GENERATION"
+            }
+        }
+
+        stage('Scaling down the cluster-1') {
+            agent { node env.node_1 }
+            steps {
+                echo "Scaling down cluster-1"
+                sh '''
+                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                    export PYTHONPATH=$wrkspce:
+                    python3 memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                    rm -rf $wrkspce/*
+                '''
+                echo "Scaled down cluster-1"
+            }
+        }
+    }
+}
