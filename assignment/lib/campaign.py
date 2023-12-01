@@ -1073,7 +1073,6 @@ class Campaign:
         bbmprop_cols = ["MBRSHP_NBR", "decile"]
         bbmprop = read_subset_and_cast(self.paths["MAIL_LIST"], "csv", bbmprop_cols)
 
-
         # join with dna and calculate sampling value and segements
         join_col = calc_overlapping_cols(self.mbr_data, dna)
         dna = dna.dropDuplicates(subset=join_col)
@@ -1117,12 +1116,6 @@ class Campaign:
             assignment_pools, coupon_pools (list(dict)):
              ingested and joined offer data for assignment and coupons
         """
-        # mbr_data = deterministic_sample(
-        #     self.mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
-        # ).cache()
-
-        # join_col = calc_overlapping_cols(mbr_data, self.mbr_lkup)
-        # mbr_data = mbr_data.join(mbr_lkup, join_col, "left")
         mbr = self.mbr_data.select("MBRSHP_NBR", "MBRSHP_SID")
 
         # 2. Read in all data
