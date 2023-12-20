@@ -152,7 +152,6 @@ def _exclude_exp(df, exld_exp_channel, exld_exp_days):
     )
 
     if (len(exld_exp_channel) > 0) & (exld_exp_days is not None):
-
         df = df.withColumn("last_exp_days", global_min(df[exld_exp_channel]))
         no_exp = df.last_exp_days.isNull()
         beyond_threshold_exp = df.last_exp_days > exld_exp_days
@@ -240,9 +239,7 @@ def _run_slot(
         seed,
         dedupe=(slot_group["pool_type"] == Campaign.PoolType.LAYOUT),
     )
-    filled_slot = filled_slot.withColumn(
-        "cpn_nbr", filled_slot.cpn_nbr.cast("string")
-    )
+    filled_slot = filled_slot.withColumn("cpn_nbr", filled_slot.cpn_nbr.cast("string"))
 
     if "is_backfill" not in filled_slot.columns:
         if not backfill:
@@ -352,11 +349,7 @@ def _slot_size_error_catch(slot, str_construct):
         slot["slot_size"]
     except KeyError as e:
         print(
-            (
-                "Construct_id {0} does not have a specified {1}".format(
-                    str_construct, e
-                )
-            )
+            ("Construct_id {0} does not have a specified {1}".format(str_construct, e))
         )
         raise
     if slot is None:
@@ -427,9 +420,7 @@ def _build_construct_structure(construct, paths):
             key=lambda slot_group: slot_group["slot_num"],
         )
         for group in slots:
-            group["pool_type"] = group.get(
-                "pool_type", Campaign.PoolType.LAYOUT
-            )
+            group["pool_type"] = group.get("pool_type", Campaign.PoolType.LAYOUT)
             group["parent_construct"] = int(construct_id)
 
         # using both eval and str the map can be passed
@@ -460,9 +451,7 @@ def _build_construct_structure(construct, paths):
         )
 
     # update user input into the default slot mapping
-    number_of_slots = sum(
-        [int(x["slot_size"]) for x in construct_structure["slots"]]
-    )
+    number_of_slots = sum([int(x["slot_size"]) for x in construct_structure["slots"]])
     default_slot_map = {slot: slot for slot in range(1, number_of_slots + 1)}
     slot_map = dict(default_slot_map)
     slot_map.update(construct_structure["slot_map"])
@@ -479,9 +468,7 @@ def _build_construct_structure(construct, paths):
     if set(slot_map.keys()) != set(slot_map.values()):
         raise Exception(
             "Construct {construct} slot_map is incomplete. Each mapping must"
-            " be specified as a pair: {{a:b, b:a}}.".format(
-                construct=construct
-            )
+            " be specified as a pair: {{a:b, b:a}}.".format(construct=construct)
         )
 
     is_default_mapping = slot_map == default_slot_map
@@ -539,9 +526,7 @@ def _check_constructs(constructs_to_check, master_constructs_list):
         if constr_id in master_constructs_list:
             continue
         else:
-            raise ValueError(
-                "{0} is not an existing construct_id!".format(constr_id)
-            )
+            raise ValueError("{0} is not an existing construct_id!".format(constr_id))
     log.info("All construct_id's exist")
 
 
@@ -597,9 +582,7 @@ def _parse_constructs(cells, paths, backfill_default_constructs):
         source_list (list[obj]): list of sources for joining to offers
         slot_list (list[obj]): list of slots to fill for all constructs
     """
-    constr_list = cells[
-        ["cell_id", "construct_id", "bf_construct_id"]
-    ].values.tolist()
+    constr_list = cells[["cell_id", "construct_id", "bf_construct_id"]].values.tolist()
 
     clean_constr_list = _clean_constructs(constr_list)
 
@@ -622,12 +605,8 @@ def _parse_constructs(cells, paths, backfill_default_constructs):
     for cell_id, construct_pair in clean_constr_list:
         for construct in construct_pair:
             if construct and construct not in constructs:
-                constructs[construct] = _build_construct_structure(
-                    construct, paths
-                )
-                log.info(
-                    "added construct {} to construct_list".format(construct)
-                )
+                constructs[construct] = _build_construct_structure(construct, paths)
+                log.info("added construct {} to construct_list".format(construct))
                 construct_structure = constructs[construct]
                 if len(construct_structure["data_sources"]) > 0:
                     source_list += construct_structure["data_sources"]
@@ -644,9 +623,7 @@ def _parse_constructs(cells, paths, backfill_default_constructs):
                 offer_data = bf_slot_group.get("offer_data")
                 if isinstance(offer_data, list):
                     offer_data = offer_data[0]
-                bf_slot_group["slot_type"] = backfill_default_constructs[
-                    offer_data
-                ]
+                bf_slot_group["slot_type"] = backfill_default_constructs[offer_data]
 
         construct_pair = (
             construct_structure["construct_id"],
@@ -686,9 +663,7 @@ def _parse_constructs(cells, paths, backfill_default_constructs):
             lambda_list += get_all_of_key(parsed_group)
             lambda_list += get_all_of_key(parsed_bf_group)
 
-            parsed_group["construct_id"] = str(
-                construct_structure["construct_id"]
-            )
+            parsed_group["construct_id"] = str(construct_structure["construct_id"])
             parsed_group["layout_id"] = layout_id
 
             parsed_bf_group["construct_id"] = str(
@@ -721,9 +696,7 @@ def _parse_constructs(cells, paths, backfill_default_constructs):
                 "groups": slot_set,
                 "sort": construct_structure["sort"],
                 "slot_map": construct_structure["slot_map"],
-                "is_default_mapping": construct_structure[
-                    "is_default_mapping"
-                ],
+                "is_default_mapping": construct_structure["is_default_mapping"],
             }
         )
 
@@ -757,9 +730,7 @@ def _build_segment_structure(segment, paths):
 
         for filt in filters:
             filt["segment_id"] = str(segment_id)
-            filt["filter_id"] = (
-                "s" + filt["segment_id"] + "f" + str(filt["filter_num"])
-            )
+            filt["filter_id"] = "s" + filt["segment_id"] + "f" + str(filt["filter_num"])
 
         if segment_structure is None:
             segment_structure = single_json_data
@@ -822,9 +793,7 @@ def _check_segments(segments_to_check, master_segments_list):
         if segment_id in master_segments_list:
             continue
         else:
-            raise ValueError(
-                "{0} is not an existing segment_id!".format(segment_id)
-            )
+            raise ValueError("{0} is not an existing segment_id!".format(segment_id))
     log.info("All segments_id's exist")
 
 
@@ -1037,9 +1006,7 @@ class Campaign:
         self.segments, self.member_sources, self.filters = _parse_segments(
             self.cells, self.paths
         )
-        self.offer_list = [
-            source.get("offer_data") for source in self.offer_sources
-        ]
+        self.offer_list = [source.get("offer_data") for source in self.offer_sources]
 
         self.offer_list += [
             slot_type.get("offer_data")
@@ -1059,6 +1026,23 @@ class Campaign:
         self.offer_list = filter(lambda x: x is not None, self.offer_list)
         self.offer_sources_df = {}
 
+        self.mbr_lkup = read_subset_and_cast(
+            self.paths["RAW_MEMBER"],
+            "parquet",
+            subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
+        )
+        self.mbr_lkup.persist(StorageLevel.DISK_ONLY)
+
+        mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
+        mbr_data.persist(StorageLevel.DISK_ONLY)
+        # read in base data
+        mbr_data = deterministic_sample(
+            mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
+        ).cache()
+
+        join_col = calc_overlapping_cols(mbr_data, self.mbr_lkup)
+        self.mbr_data = mbr_data.join(self.mbr_lkup, join_col, "left").cache()
+
     def ingest_member_data(self):
         """Dynamic member data ingestion.
 
@@ -1074,19 +1058,7 @@ class Campaign:
         Returns:
             data (pyspark.sql.DataFrame): ingested aand joined member data for assignment
         """
-        # read in base data
-        mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
-        mbr_data = deterministic_sample(
-            mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
-        ).cache()
-
         # read in ID lookup table to prep for join
-        mbr_lkup = read_subset_and_cast(
-            self.paths["RAW_MEMBER"],
-            "parquet",
-            subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
-        )
-        # read in mbr dna to prep for sampling
         dna_cols = ["MBRSHP_SID", "DAYS_SINCE_LAST_TRIP", "TENURE"] + [
             self.parameters["sampling_weeks_rev_columns"]
         ]
@@ -1099,22 +1071,14 @@ class Campaign:
         )
         # read in bbm score to prep for sampling
         bbmprop_cols = ["MBRSHP_NBR", "decile"]
-        bbmprop = read_subset_and_cast(
-            self.paths["MAIL_LIST"], "csv", bbmprop_cols
-        )
-
-        # create base mbr data
-        # join with mbr lookup
-        join_col = calc_overlapping_cols(mbr_data, mbr_lkup)
-        mbr_lkup = mbr_lkup.dropDuplicates(subset=join_col)
-        mbr_data = mbr_data.join(mbr_lkup, join_col, "left").cache()
+        bbmprop = read_subset_and_cast(self.paths["MAIL_LIST"], "csv", bbmprop_cols)
 
         # join with dna and calculate sampling value and segements
-        join_col = calc_overlapping_cols(mbr_data, dna)
+        join_col = calc_overlapping_cols(self.mbr_data, dna)
         dna = dna.dropDuplicates(subset=join_col)
-        sampling_input = mbr_data.join(dna, join_col, "left")
+        sampling_input = self.mbr_data.join(dna, join_col, "left")
 
-        join_col = calc_overlapping_cols(mbr_data, bbmprop)
+        join_col = calc_overlapping_cols(self.mbr_data, bbmprop)
         bbmprop = bbmprop.dropDuplicates(subset=join_col)
         sampling_input = sampling_input.join(bbmprop, join_col, "left")
 
@@ -1123,7 +1087,7 @@ class Campaign:
         )
         sampling_seg = calc_sampling_seg(sampling_input)
 
-        mbr_data = mbr_data.join(sampling_value, "MBRSHP_SID", "left")
+        mbr_data = self.mbr_data.join(sampling_value, "MBRSHP_SID", "left")
         mbr_data = mbr_data.join(sampling_seg, "MBRSHP_SID", "left")
 
         # read in other data sources and join
@@ -1152,29 +1116,14 @@ class Campaign:
             assignment_pools, coupon_pools (list(dict)):
              ingested and joined offer data for assignment and coupons
         """
-        mbr_data = read_subset_and_cast(self.paths["MAIL_LIST"], "csv")
-        mbr_data = deterministic_sample(
-            mbr_data, self.parameters["run_size"], ["mbrshp_sid"]
-        ).cache()
-
-        # read in ID lookup table to prep for join
-        mbr_lkup = read_subset_and_cast(
-            self.paths["RAW_MEMBER"],
-            "parquet",
-            subset_cols=["MBRSHP_NBR", "MBRSHP_SID"],
-        )
-        join_col = calc_overlapping_cols(mbr_data, mbr_lkup)
-        mbr_data = mbr_data.join(mbr_lkup, join_col, "left")
-        mbr = mbr_data.select("MBRSHP_NBR", "MBRSHP_SID")
+        mbr = self.mbr_data.select("MBRSHP_NBR", "MBRSHP_SID")
 
         # 2. Read in all data
         coups = read_subset_and_cast(self.paths["COUPON_BANK"], "csv")
         coups_quals = read_subset_and_cast(self.paths["COUPON_QUALS"], "csv")
         coups_map = read_subset_and_cast(self.paths["COUPON_MAP"], "csv")
         if self.paths.get("COUPON_DISCOUNT"):
-            discounts = read_subset_and_cast(
-                self.paths["COUPON_DISCOUNT"], "csv"
-            )
+            discounts = read_subset_and_cast(self.paths["COUPON_DISCOUNT"], "csv")
         else:
             discounts = None
 
@@ -1210,14 +1159,10 @@ class Campaign:
         article_map = article_map.dropDuplicates()
         article_map = article_map.filter(article_map.article_nbr.isNotNull())
         coups_article_map = coups_map.drop("ah4_cd", "ah5_cd")
-        coups_article_map = coups_article_map.join(
-            article_map, "article_nbr", "left"
-        )
+        coups_article_map = coups_article_map.join(article_map, "article_nbr", "left")
         coups_article_map = coups_article_map.select(coups_map.columns)
         coups_article_map = coups_article_map.union(coups_map)
-        coups_article_map = coups_article_map.select(
-            "cpn_nbr", "ah4_cd", "ah5_cd"
-        )
+        coups_article_map = coups_article_map.select("cpn_nbr", "ah4_cd", "ah5_cd")
         coups_article_map = coups_article_map.dropDuplicates()
         coups = coups.join(coups_article_map, "cpn_nbr", "left")
 
@@ -1230,11 +1175,7 @@ class Campaign:
             "CATEGORY_LVL",
             "CATEGORY_NAME",
         ] + list(["hs_ind_lambda{}".format(x) for x in self.lambdas])
-        log.info(
-            "Subsetting collaborative filter columns to {}".format(
-                core_columns
-            )
-        )
+        log.info("Subsetting collaborative filter columns to {}".format(core_columns))
         cf_pred = cf_pred.select(core_columns)
         cf_pred = broadcast_filter(cf_pred, mbr, ["MBRSHP_SID"])
         cf_pred = broadcast_filter(
@@ -1295,9 +1236,7 @@ class Campaign:
                         assignment_pool, "cpn_nbr", j["cpn_nbr"], j["ratio"]
                     )
 
-            assignment_pool = assignment_pool.repartition(
-                "MBRSHP_SID", "cpn_nbr"
-            )
+            assignment_pool = assignment_pool.repartition("MBRSHP_SID", "cpn_nbr")
 
             assignment_pools[offer_data_type] = truncate_history(
                 assignment_pool, cache=True
@@ -1446,9 +1385,7 @@ class Campaign:
             else:
                 total_coupons = group_size_with_buffer
 
-            groups = [
-                slot_group[fill_type] for slot_group in slot_set["groups"]
-            ]
+            groups = [slot_group[fill_type] for slot_group in slot_set["groups"]]
 
             if not is_backfill:
                 filled_groups = groups
@@ -1504,9 +1441,7 @@ class Campaign:
         Returns:
             memberdata (pyspark.sql.DataFrame): memberdata with filter columns added
         """
-        memberdata = memberdata.withColumn(
-            "experiment_id", sqlf.lit(self.experiment)
-        )
+        memberdata = memberdata.withColumn("experiment_id", sqlf.lit(self.experiment))
 
         long_ids = {}
         for segment in self.segments:
@@ -1574,9 +1509,9 @@ class Campaign:
             else:
                 memberdata = memberdata.withColumn(
                     colname,
-                    sqlf.when(
-                        memberdata.satisfy == len(grouped_filters), 1
-                    ).otherwise(0),
+                    sqlf.when(memberdata.satisfy == len(grouped_filters), 1).otherwise(
+                        0
+                    ),
                 )
 
             cols_to_drop = ["satisfy"]
@@ -1630,13 +1565,10 @@ class Campaign:
 
             colname = str(cell["segment_id"])
             cell_sample = memberdata.filter(
-                (sqlf.col(colname) == 1)
-                & (sqlf.col(f"l{long_id}_past_mbr") == 1)
+                (sqlf.col(colname) == 1) & (sqlf.col(f"l{long_id}_past_mbr") == 1)
             )
 
-            cell_sample, memberdata = _assign_cell_sample(
-                cell_sample, memberdata, cell
-            )
+            cell_sample, memberdata = _assign_cell_sample(cell_sample, memberdata, cell)
 
             log.info(
                 f"assigned {cell_sample.count()} past longitudinal members to cell"
@@ -1672,9 +1604,7 @@ class Campaign:
                     )
                 )
 
-            cell_sample, memberdata = _assign_cell_sample(
-                cell_sample, memberdata, cell
-            )
+            cell_sample, memberdata = _assign_cell_sample(cell_sample, memberdata, cell)
 
             log.info(f"assigned {cell_sample.count()} members to cell")
             cell_samples.append(cell_sample)
@@ -1700,9 +1630,7 @@ class Campaign:
                 continue
 
             slot_map = slot_set["slot_map"]
-            layout_id = slot_set["groups"][0][Campaign.FillType.FF][
-                "layout_id"
-            ]
+            layout_id = slot_set["groups"][0][Campaign.FillType.FF]["layout_id"]
 
             column_map = list()
             for key, value in slot_map.items():
@@ -1741,9 +1669,7 @@ class Campaign:
         at_least_one_sort = False
         for slot_set in self.slots:
             sort_columns = slot_set["sort"]
-            layout_id = slot_set["groups"][0][Campaign.FillType.FF][
-                "layout_id"
-            ]
+            layout_id = slot_set["groups"][0][Campaign.FillType.FF]["layout_id"]
             current_layout = assignment.filter(
                 assignment["CONSTRUCT_NAME"] == layout_id
             )
@@ -1778,9 +1704,7 @@ class Campaign:
                     },
                 )
 
-                extra_info = extra_info.filter(
-                    extra_info["cpn_type"] == offer_type
-                )
+                extra_info = extra_info.filter(extra_info["cpn_type"] == offer_type)
 
                 offer_data_with_extra_info.append(extra_info)
                 all_columns.update(extra_info.columns)
@@ -1800,14 +1724,10 @@ class Campaign:
             # if columns do not exist they are created with a NULL value
             symmetric_offer_data = list()
             for offer_data in offer_data_with_extra_info:
-                offer_data_columns = {
-                    column.lower() for column in offer_data.columns
-                }
+                offer_data_columns = {column.lower() for column in offer_data.columns}
                 for column in all_columns:
                     if column.lower() not in offer_data_columns:
-                        offer_data = offer_data.withColumn(
-                            column, sqlf.lit(None)
-                        )
+                        offer_data = offer_data.withColumn(column, sqlf.lit(None))
                 offer_data = offer_data.select(*all_columns)
 
                 symmetric_offer_data.append(offer_data)
@@ -1828,9 +1748,7 @@ class Campaign:
             ]
             w = W.partitionBy("MBRSHP_SID").orderBy(*sort_columns)
             current_layout = (
-                current_layout.withColumn(
-                    "NEW_SLOT_NBR", sqlf.row_number().over(w)
-                )
+                current_layout.withColumn("NEW_SLOT_NBR", sqlf.row_number().over(w))
                 .drop("SLOT_NBR")
                 .withColumnRenamed("NEW_SLOT_NBR", "SLOT_NBR")
             )
@@ -1867,9 +1785,7 @@ class Campaign:
             if column not in source_df["merge_col"]
         ]
 
-        new_data = source_df["data"].select(
-            *(new_columns + source_df["merge_col"])
-        )
+        new_data = source_df["data"].select(*(new_columns + source_df["merge_col"]))
 
         # Removing data with duplicate merge_col
         seed = 1
@@ -1885,9 +1801,7 @@ class Campaign:
         extra_info = extra_info.join(new_data, source_df["merge_col"], "left")
 
         v1_columns = [column for column in extra_info_columns]
-        v2_columns = [
-            column for column in new_data.columns if column.endswith("_v2")
-        ]
+        v2_columns = [column for column in new_data.columns if column.endswith("_v2")]
 
         for v2_column in v2_columns:
             v1_column = v2_column.replace("_v2", "")
@@ -1897,9 +1811,7 @@ class Campaign:
                     sqlf.coalesce(sqlf.col(v1_column), sqlf.col(v2_column)),
                 )
             else:
-                extra_info = extra_info.withColumn(
-                    v1_column, sqlf.col(v2_column)
-                )
+                extra_info = extra_info.withColumn(v1_column, sqlf.col(v2_column))
 
         extra_info = extra_info.drop(*v2_columns)
 
@@ -1934,9 +1846,7 @@ class Campaign:
         # deduplication at slot group level should not be needed
         # because a single slot function should not allow duplicates
         current_group = (
-            current_pool.filter(
-                current_pool["SLOT_GRP"] == sqlf.lit(group["slot_num"])
-            )
+            current_pool.filter(current_pool["SLOT_GRP"] == sqlf.lit(group["slot_num"]))
             .filter(current_pool["IS_BACKFILL"].isin(*include))
             .withColumn("group_size", sqlf.lit(group["slot_size"]))
         )
@@ -1946,16 +1856,12 @@ class Campaign:
             # was used (frontfill slot function + backfill slot function)
             # this is required when apply backfill to a slot group
             w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy("IS_BACKFILL")
-            current_group = current_group.withColumn(
-                "rank", sqlf.row_number().over(w)
-            )
+            current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
             current_group = current_group.filter(current_group["rank"] == 1)
             current_group = current_group.drop("rank")
 
         w = W.partitionBy("MBRSHP_SID").orderBy("IS_BACKFILL", "SLOT_NBR")
-        current_group = current_group.withColumn(
-            "rank", sqlf.row_number().over(w)
-        )
+        current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
 
         current_group = current_group.filter(
             current_group.rank <= current_group.group_size
@@ -1988,8 +1894,7 @@ class Campaign:
 
                 if per_layout_assignment is None:
                     per_layout_assignment = partitioned_assignment.filter(
-                        partitioned_assignment["CONSTRUCT_NAME"]
-                        == group["layout_id"]
+                        partitioned_assignment["CONSTRUCT_NAME"] == group["layout_id"]
                     )
 
                 current_group = self._fit_slot_group(
@@ -2009,16 +1914,12 @@ class Campaign:
                 if frontfill_assignment is None:
                     frontfill_assignment = current_group
                 else:
-                    frontfill_assignment = frontfill_assignment.union(
-                        current_group
-                    )
+                    frontfill_assignment = frontfill_assignment.union(current_group)
 
         backfill = partitioned_assignment.filter(
             per_layout_assignment["IS_BACKFILL"] == self.FillTypeValue.BF
         )
-        assignments = backfill.union(
-            frontfill_assignment.select(*backfill.columns)
-        )
+        assignments = backfill.union(frontfill_assignment.select(*backfill.columns))
 
         assignments = self._frontfill_backfill_slotgroup(assignments)
 
@@ -2049,8 +1950,7 @@ class Campaign:
 
                 if per_layout_assignment is None:
                     per_layout_assignment = partitioned_assignment.filter(
-                        partitioned_assignment["CONSTRUCT_NAME"]
-                        == group["layout_id"]
+                        partitioned_assignment["CONSTRUCT_NAME"] == group["layout_id"]
                     )
 
                 current_group = self._fit_slot_group(
@@ -2085,15 +1985,11 @@ class Campaign:
                                                 segmentation
         """
 
-        assignment = member_data.withColumn(
-            "EXPERIMENT_ID", sqlf.lit(self.experiment)
-        )
+        assignment = member_data.withColumn("EXPERIMENT_ID", sqlf.lit(self.experiment))
 
         assignment = assignment.withColumn(
             "CONSTRUCT_NAME",
-            sqlf.regexp_extract(
-                assignment["slot_structure"], CONSTRUCT_COLUMN_EXT, 1
-            ),
+            sqlf.regexp_extract(assignment["slot_structure"], CONSTRUCT_COLUMN_EXT, 1),
         )
         assignment = assignment.withColumn(
             "SLOT_NBR",
@@ -2137,35 +2033,25 @@ class Campaign:
         # 2. frontfill the slot set and then backfill the slot set. This will
         # give frontfill higher priority than backfill between slot groups.
         log.info(
-            "Backfill with {priority} priority".format(
-                priority=self.backfill_priority
-            )
+            "Backfill with {priority} priority".format(priority=self.backfill_priority)
         )
 
         # repartition the dataframe according to the join criteria to
         # help out Spark.
         # without repartitioning joining two dataframes as big as these
         # will slow down Spark or even kill the job.
-        partitioned_assignment = assignment.repartition(
-            "MBRSHP_SID", "cpn_nbr"
-        )
-        partitioned_assignment = truncate_history(
-            partitioned_assignment, cache=True
-        )
+        partitioned_assignment = assignment.repartition("MBRSHP_SID", "cpn_nbr")
+        partitioned_assignment = truncate_history(partitioned_assignment, cache=True)
 
         if self.backfill_priority == Campaign.BackfillPriority.HIGH:
             final_assignment = self._frontfill_backfill_slotgroup(
                 partitioned_assignment
             )
         else:
-            final_assignment = self._frontfill_backfill_slotset(
-                partitioned_assignment
-            )
+            final_assignment = self._frontfill_backfill_slotset(partitioned_assignment)
 
         # convert the local slot group rank to a global slot number
-        w = W.partitionBy("MBRSHP_SID", "CONSTRUCT_NAME").orderBy(
-            "SLOT_GRP", "rank"
-        )
+        w = W.partitionBy("MBRSHP_SID", "CONSTRUCT_NAME").orderBy("SLOT_GRP", "rank")
         final_assignment = final_assignment.withColumn(
             "SLOT_NBR", sqlf.row_number().over(w)
         )
@@ -2216,9 +2102,7 @@ class Campaign:
 
         all_slots = list()
         for slot_set in self.slots:
-            layout_id = slot_set["groups"][0][Campaign.FillType.FF][
-                "layout_id"
-            ]
+            layout_id = slot_set["groups"][0][Campaign.FillType.FF]["layout_id"]
             start = 0
             for slot_group in slot_set["groups"]:
                 group = slot_group[Campaign.FillType.FF]
@@ -2301,9 +2185,7 @@ class Campaign:
         unpivoted_assignment = unpivoted_assignment.withColumnRenamed(
             "key", "CONSTRUCT"
         )
-        unpivoted_assignment = unpivoted_assignment.withColumnRenamed(
-            "val", "CPN_NBR"
-        )
+        unpivoted_assignment = unpivoted_assignment.withColumnRenamed("val", "CPN_NBR")
 
         unpivoted_assignment = unpivoted_assignment.withColumn(
             "CONSTRUCT_NAME",
@@ -2390,9 +2272,7 @@ class Campaign:
             "pool_type", sqlf.lit(Campaign.PoolType.LAYOUT)
         )
         for slot_set in self.slots:
-            layout_id = slot_set["groups"][0][Campaign.FillType.FF][
-                "layout_id"
-            ]
+            layout_id = slot_set["groups"][0][Campaign.FillType.FF]["layout_id"]
 
             for slot_group in slot_set["groups"]:
                 ff_group = slot_group[Campaign.FillType.FF]
@@ -2411,9 +2291,7 @@ class Campaign:
                 memberdata["IS_BACKFILL"] == 1,
                 sqlf.concat(
                     sqlf.lit("c"),
-                    sqlf.regexp_extract(
-                        memberdata["CONSTRUCT"], LAYOUT_ID_MATCH, 2
-                    ),
+                    sqlf.regexp_extract(memberdata["CONSTRUCT"], LAYOUT_ID_MATCH, 2),
                     sqlf.lit("s"),
                     memberdata["SLOT_NBR"],
                 ),
@@ -2424,9 +2302,7 @@ class Campaign:
             "CONSTRUCT",
             sqlf.concat(
                 sqlf.lit("c"),
-                sqlf.regexp_extract(
-                    memberdata["CONSTRUCT"], LAYOUT_ID_MATCH, 1
-                ),
+                sqlf.regexp_extract(memberdata["CONSTRUCT"], LAYOUT_ID_MATCH, 1),
                 sqlf.lit("s"),
                 memberdata["SLOT_NBR"],
             ),
@@ -2448,12 +2324,8 @@ class Campaign:
         memberdata = memberdata.withColumn(
             "bf_construct", memberdata.BF_CONSTRUCT.cast("string")
         )
-        memberdata = memberdata.withColumn(
-            "cpn_nbr", memberdata.CPN_NBR.cast("string")
-        )
-        memberdata = memberdata.withColumn(
-            "slot_nbr", memberdata.SLOT_NBR.cast("long")
-        )
+        memberdata = memberdata.withColumn("cpn_nbr", memberdata.CPN_NBR.cast("string"))
+        memberdata = memberdata.withColumn("slot_nbr", memberdata.SLOT_NBR.cast("long"))
         memberdata = memberdata.withColumn(
             "is_backfill", memberdata.IS_BACKFILL.cast("long")
         )
@@ -2514,9 +2386,7 @@ class Campaign:
             long_col = f"l{long_id}_past_mbr"
             long_mbrs = long_mbrs.withColumn(long_col, sqlf.lit(1))
 
-            memberdata = memberdata.join(
-                long_mbrs, on="mbrshp_sid", how="left"
-            )
+            memberdata = memberdata.join(long_mbrs, on="mbrshp_sid", how="left")
 
             long_cols.append(long_col)
 
