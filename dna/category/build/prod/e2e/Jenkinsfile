@@ -86,8 +86,6 @@ import yaml
 config_path_input = "pe_memberdna/dna/category/configs/reqs.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/reqs.yaml"
 
-git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
-
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -107,7 +105,7 @@ config_data['exclusion']['path'] = config_data['exclusion']['path'].replace(
     'Code_and_Data_repo/exclusions', f'Code_and_Data_repo/prod/exclusions'
 )
 config_data['out']['path'] = config_data['out']['path'].replace(
-    'Code_and_Data_repo/CATEGORY_DNA', f'Code_and_Data_repo/prodCATEGORY_DNA'
+    'Code_and_Data_repo/CATEGORY_DNA', f'Code_and_Data_repo/prod/CATEGORY_DNA'
 )
 
 config_data['recency_lookback_duration']['global'] = 0
@@ -120,8 +118,6 @@ with open(config_path_output, "w") as file:
 
 config_path_input = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
-
-git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
 
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -205,8 +201,6 @@ with open(config_path_output, "w") as file:
 config_path_input = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
 config_path_output = "pe_memberdna/dna/category/configs/brand_excl_conf.yaml"
 
-git_branch = "branch/" + os.getenv('GIT_BRANCH').replace("origin/", "")
-
 with open(config_path_input) as file:
     config_data = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -262,7 +256,7 @@ with open(config_path_output, "w") as file:
                             source pyspark_venv/bin/activate
                             python3 _config_cluster_1.py
                             cd pe_memberdna/dna/category
-                            spark-submit ${SPARK_OPTIONS} scripts/brand_exclusions.py --config_path "./configs/brand_excl_conf.yaml" > brand_exclusions_prod.log 2>&1
+                            spark-submit ${SPARK_OPTIONS} scripts/brand_exclusions.py --config_path "./configs/brand_excl_conf.yaml"
                         '''
                         echo "Ran step-1 cluster-1 script"
                     }

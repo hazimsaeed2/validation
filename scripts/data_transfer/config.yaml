@@ -1,0 +1,8 @@
+data_paths:
+  input:
+    dna_path: "s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/CUBES/customer_cube_full/customer_cube"
+    trip_prop_path: "s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/"
+
+  output:
+    edw_dna_path: "s3://bjs-enterprise-data-lake-stage/Personalization_Engine/inbound/Member_DNA/"
+    edw_trip_prop_path: "s3://bjs-enterprise-data-lake-stage/Personalization_Engine/inbound/Trip_Propensity/"

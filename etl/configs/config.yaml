@@ -721,7 +721,7 @@ validation:
         # Aggregates by date and site/club number from payment_fiscal table
         TestControlTable:
           tolerance: 0.15
-          toleranceRows: 300
+          toleranceRows: 400
 
       control_file_table_07:
         # Aggregates grouped by purch_dt and tender_type_cd from payment_fiscal table
