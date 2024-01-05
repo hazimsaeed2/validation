@@ -1,115 +1,125 @@
 pipeline {
-    agent { node env.Node }
+    agent any
     stages {
         stage('Environment setup') {
-            steps {
-                sh '''
-                    aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
-                    aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
-                    mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
-                '''
-                echo "Ran environemnt setup on cluster"
+            node(env.node) {
+                steps {
+                    sh '''
+                        aws s3 cp --recursive s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/code/pe_memberdna pe_memberdna
+                        aws s3 cp s3://memberanalytics-data-out-prod/Code_and_Data_repo/prod/venv/pyspark_venv.tar.gz pyspark_venv.tar.gz
+                        mkdir -p pyspark_venv && tar -xf pyspark_venv.tar.gz -C pyspark_venv
+                    '''
+                    echo "Ran environemnt setup on cluster"
+                }
             }
         }
         stage('Prepare environment') {
-            steps {
-                script {
-                    def content = """
-import os
-import yaml
+            node(env.node) {
+                steps {
+                    script {
+                        def content = """
+    import os
+    import yaml
 
-config_path_input = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
-config_path_output = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
+    config_path_input = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
+    config_path_output = f"pe_memberdna/model/trip_spend_model/conf/config.yml"
 
-with open(config_path_input) as file:
-    config_data = yaml.load(file, Loader=yaml.FullLoader)
+    with open(config_path_input) as file:
+        config_data = yaml.load(file, Loader=yaml.FullLoader)
 
-for path in config_data["shared"].keys():
-    if isinstance(config_data["shared"][path], str):
-        config_data["shared"][path] = config_data["shared"][path].replace(
-            "Code_and_Data_repo", f"Code_and_Data_repo/prod"
-        )
+    for path in config_data["shared"].keys():
+        if isinstance(config_data["shared"][path], str):
+            config_data["shared"][path] = config_data["shared"][path].replace(
+                "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+            )
 
-for path in config_data["etl"].keys():
-    if path in ["BBM_weeks_path", "lookup_path"]:
-        config_data["etl"][path] = config_data["etl"][path].replace(
-            "Code_and_Data_repo", f"Code_and_Data_repo/prod"
-        )
+    for path in config_data["etl"].keys():
+        if path in ["BBM_weeks_path", "lookup_path"]:
+            config_data["etl"][path] = config_data["etl"][path].replace(
+                "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+            )
 
-config_data["grid_search"]["output_path"] = config_data["grid_search"]["output_path"].replace(
-    "Code_and_Data_repo", f"Code_and_Data_repo/prod"
-)
+    config_data["grid_search"]["output_path"] = config_data["grid_search"]["output_path"].replace(
+        "Code_and_Data_repo", f"Code_and_Data_repo/prod"
+    )
 
-with open(config_path_output, "w") as file:
-    documents = yaml.dump(config_data, file)
-                    """
-                writeFile file: '_config_step.py', text: content
+    with open(config_path_output, "w") as file:
+        documents = yaml.dump(config_data, file)
+                        """
+                    writeFile file: '_config_step.py', text: content
+                    }
+                    sh '''
+                        WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                        export PYTHONPATH=$WORKSPACE:
+
+                        source pyspark_venv/bin/activate
+                        python3 _config_step.py
+                        deactivate
+                    '''
                 }
-                sh '''
-                    WORKSPACE="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$WORKSPACE:
-
-                    source pyspark_venv/bin/activate
-                    python3 _config_step.py
-                    deactivate
-                '''
             }
         }
         stage('Check cluster status before step - 1'){
-            agent{ 'built-in' }
-			    steps {
+            steps {
+                node('built-in') {
                     sh '''
                         wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
                         export PYTHONPATH=$wrkspce:
                         sh pe_memberdna/scripts/cluster_spinup.sh $NODE
                     '''
                 }
+            }
         }
         stage('Scaling up') {
             steps {
-                script {
-                    echo "Scaling up"
-                    sh '''
-                        wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                        export PYTHONPATH=$wrkspce:
-                        python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --spot_node_cnt 10 --wait 120
-                    '''
-                    echo "Scaled up"
+                node(env.node) {
+                    script {
+                        echo "Scaling up"
+                        sh '''
+                            wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
+                            export PYTHONPATH=$wrkspce:
+                            python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --spot_node_cnt 10 --wait 120
+                        '''
+                        echo "Scaled up"
+                    }
                 }
             }
         }
         stage('Setup Config') {
             steps {
-                sh '''
-                    export PYTHONPATH=$WORKSPACE:
-                    source pyspark_venv/bin/activate
-                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} prod none
-                '''
+                node(env.node) {
+                    sh '''
+                        export PYTHONPATH=$WORKSPACE:
+                        source pyspark_venv/bin/activate
+                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_config_setup.py ${inHomeDate} ${cubePath} prod none
+                    '''
+                }
             }
         }
         stage('Propensity Model ETL') {
             steps {
-                echo "RUNNING PROPENSITY MODEL ETL"
-                sh '''
-                    export PYTHONPATH=$WORKSPACE:
-                    export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
-                    export PYSPARK_PYTHON=environment/bin/python
-                    export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
-                    spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config.yml
-                '''
-                echo "PROPENSITY MODEL ETL FINISHED"
+                node(env.node) {
+                    echo "RUNNING PROPENSITY MODEL ETL"
+                    sh '''
+                        export PYTHONPATH=$WORKSPACE:
+                        export SPARK_OPTIONS=" --archives ../../pyspark_venv.tar.gz#environment"
+                        export PYSPARK_PYTHON=environment/bin/python
+                        export PYSPARK_DRIVER_PYTHON=$WORKSPACE/pyspark_venv/bin/python
+                        spark-submit  $WORKSPACE/pe_memberdna/model/trip_spend_model/scripts/ETL.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config.yml
+                    '''
+                    echo "PROPENSITY MODEL ETL FINISHED"
+                }
             }
-        }
-        stage('Scaling down') {
-            steps {
-                echo "Scaling down"
-                sh '''
-                    wrkspce="$(cut -d'@' -f1 <<<$WORKSPACE)"
-                    export PYTHONPATH=$wrkspce:
-                    python3 pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
-                    rm -rf $wrkspce/*
-                '''
-                echo "Scaled down"
+            post {
+                always {
+                    node(env.node) {
+                        sh '''
+                            export PYTHONPATH=$WORKSPACE:
+                            echo "scaling down"
+                            python3 $WORKSPACE/pe_memberdna/scripts/cluster_scaling/scale_by_name.py --target_cluster $NODE_NAME --ondemand_node_cnt 0 --spot_node_cnt 0 --wait 120
+                        '''
+                    }
+                }
             }
         }
         stage('Setup EC2') {
@@ -128,48 +138,52 @@ with open(config_path_output, "w") as file:
             }
         }
         stage('Run Trip Propensity') {
-            steps {
-                withCredentials([
-                    sshUserPrivateKey(
-                        credentialsId: 'SSH-PROD-hadoop',
-                        keyFileVariable: 'ssh_key_file',
-                        passphraseVariable: 'ssh_pass',
-                        usernameVariable: 'ssh_username'),
-                    usernamePassword(credentialsId: 'bitbucket-service-account',
-                        usernameVariable: 'bitbucket_username',
-                        passwordVariable: 'bitbucket_pass')
-                    ])
-                {
-                    echo "$ssh_username"
-                    echo "RUNNING PROPENSITY MODEL"
-                    sh '''
-                        export PYTHONPATH=$WORKSPACE:
-                        source pyspark_venv/bin/activate
-                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config.yml prod none
-                        deactivate
-                    '''
-                    echo "PROPENSITY MODEL FINISHED"
-                }
-            }
-            post {
-                always {
-                    node('built-in') {
+            node(env.node) {
+                steps {
+                    withCredentials([
+                        sshUserPrivateKey(
+                            credentialsId: 'SSH-PROD-hadoop',
+                            keyFileVariable: 'ssh_key_file',
+                            passphraseVariable: 'ssh_pass',
+                            usernameVariable: 'ssh_username'),
+                        usernamePassword(credentialsId: 'bitbucket-service-account',
+                            usernameVariable: 'bitbucket_username',
+                            passwordVariable: 'bitbucket_pass')
+                        ])
+                    {
+                        echo "$ssh_username"
+                        echo "RUNNING PROPENSITY MODEL"
                         sh '''
-                            export AWS=/usr/local/bin/aws
-                            $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query "Reservations[*].Instances[*].[InstanceId]" --filters "Name=tag:Name,Values=ue00mdaapp01_prod" --output text`
+                            export PYTHONPATH=$WORKSPACE:
+                            source pyspark_venv/bin/activate
+                            python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/jenkins_model_run.py ./conf/config.yml prod none
+                            deactivate
                         '''
+                        echo "PROPENSITY MODEL FINISHED"
+                    }
+                }
+                post {
+                    always {
+                        node('built-in') {
+                            sh '''
+                                export AWS=/usr/local/bin/aws
+                                $AWS ec2 terminate-instances --region us-east-1 --instance-ids `$AWS ec2 describe-instances --region us-east-1 --query "Reservations[*].Instances[*].[InstanceId]" --filters "Name=tag:Name,Values=ue00mdaapp01_prod" --output text`
+                            '''
+                        }
                     }
                 }
             }
         }
 		stage('Propensity Model QC') {
-            steps {
-                echo "RUNNING PROPENSITY MODEL QC"
-                sh '''
-                    export PYTHONPATH=$WORKSPACE:
-                    python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config.yml ${qc_save}
-                '''
-                echo "PROPENSITY MODEL QC FINISHED"
+            node(env.node) {
+                steps {
+                    echo "RUNNING PROPENSITY MODEL QC"
+                    sh '''
+                        export PYTHONPATH=$WORKSPACE:
+                        python3 $WORKSPACE/pe_memberdna/model/trip_spend_model/QC/trip_propensity_qc.py $WORKSPACE/pe_memberdna/model/trip_spend_model/conf/config.yml ${qc_save}
+                    '''
+                    echo "PROPENSITY MODEL QC FINISHED"
+                }
             }
         }
     }
