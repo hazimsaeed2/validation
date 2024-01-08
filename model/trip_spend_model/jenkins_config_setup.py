@@ -1,10 +1,11 @@
 import argparse
 import datetime
 import os
+
 import yaml
 
-from pe_memberdna.lib.utility import get_max_file_date, get_next_file_date
 import pe_memberdna.lib.misc as misc
+from pe_memberdna.lib.utility import get_max_file_date, get_next_file_date
 
 parser = argparse.ArgumentParser(description="Update config file.")
 parser.add_argument("in_home_date", action="store", help="In Home Date")
