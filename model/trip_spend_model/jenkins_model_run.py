@@ -1,31 +1,53 @@
-import time
+import argparse
 import os
 import subprocess
-import argparse
+import time
+
 import boto3
 import paramiko
 
 
 def execute_ssh_command(ssh_key_path, host, username, command):
-    k = paramiko.RSAKey.from_private_key_file(ssh_key_path)
+    # k = paramiko.RSAKey.from_private_key_file(ssh_key_path)
     for i in range(0, 10):
         print(f"SSH command execution: iteration {i+1}")
-        c = paramiko.SSHClient()
-        c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        print(f"Trying to connect to TP Model EC2 machine: {host} ")
-        c.connect(hostname=host, username=username, pkey=k)
-        print(f"Connected to TP Model EC2 machine: {host} ")
+        cmd = [
+            "ssh",
+            "-o StrictHostKeyChecking=no",
+            "-i",
+            "bi-emr2.pem",
+            "ec2-user" + "@" + host_ip,
+            command,
+        ]
+
         print(f"Executing command {command}")
-        _, stdout, stderr = c.exec_command(command)
-        exit_code = stdout.channel.recv_exit_status()
-        stderr_str = stderr.read()
-        stdout_str = stdout.read()
-        print(f"stdout is {stdout_str}")
-        print(f"stderr is {stderr_str}")
-        print(f"exit code is {exit_code}")
-        if exit_code == 0:
+        try:
+            result = subprocess.check_output(cmd)
+            print("output: ", result)
             break
-    c.close()
+        except subprocess.CalledProcessError as e:
+            if i == 9:
+                raise Exception("error when running " + str(cmd))
+            else:
+                print("error when running " + str(cmd) + ":" + str(e.output))
+
+        # print(f"SSH command execution: iteration {i+1}")
+        # c = paramiko.SSHClient()
+        # c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # print(f"Trying to connect to TP Model EC2 machine: {host} ")
+        # c.connect(hostname=host, username=username, pkey=k)
+        # print(f"Connected to TP Model EC2 machine: {host} ")
+        # print(f"Executing command {command}")
+        # _, stdout, stderr = c.exec_command(command)
+        # exit_code = stdout.channel.recv_exit_status()
+        # stderr_str = stderr.read()
+        # stdout_str = stdout.read()
+        # print(f"stdout is {stdout_str}")
+        # print(f"stderr is {stderr_str}")
+        # print(f"exit code is {exit_code}")
+        # if exit_code == 0:
+        #     break
+    # c.close()
 
 
 def ping_test(host):
@@ -109,21 +131,23 @@ while n < 24:
 command_list = [
     "sudo yum install git -y",
     "sudo yum install python3-pip -y",
-    "sudo python3 -m pip install pyarrow==8.0.0",
-    "sudo python3 -m pip install joblib==1.1.0",
-    "sudo python3 -m pip install boto3==1.26.5",
-    "sudo python3 -m pip install numpy==1.21.6",
-    "sudo python3 -m pip install s3io==0.1.1",
-    "sudo python3 -m pip install pyaml==21.10.1",
-    "sudo python3 -m pip install pandas==1.3.5",
-    "sudo python3 -m pip install scikit-learn==0.24.2",
+    "python3 -m venv myenv",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com pyarrow==8.0.0",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com joblib==1.1.0",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com boto3==1.26.5",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com numpy==1.21.6",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com s3io==0.1.1",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com pyaml==21.10.1",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com pandas==1.3.5",
+    "source myenv/bin/activate && python3 -m pip install --index-url=https://nexus.bjs.com/repository/pypi-group/simple/ --trusted-host nexus.bjs.com scikit-learn==0.24.2",
 ]
 
-ssh_command = " && ".join(command_list)
-
 if ping_test(host_ip):
-    execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
+    print("Executing new command")
+    for ssh_command in command_list:
+        execute_ssh_command("bi-emr2.pem", host_ip, "ec2-user", ssh_command)
 else:
+    print("Ping test failed")
     raise Exception(f"EC2 machine {host_ip} is not reachable ")
 
 scp_command = [

@@ -5,10 +5,7 @@ import os
 import yaml
 
 import pe_memberdna.lib.misc as misc
-from pe_memberdna.lib.utility import (
-    get_max_file_date,
-    get_next_file_date,
-)
+from pe_memberdna.lib.utility import get_max_file_date, get_next_file_date
 from pe_memberdna.model.cf_model.lib.cf_utils import get_latest_prop_path
 
 parser = argparse.ArgumentParser(description="Update config file.")
@@ -41,9 +38,11 @@ if run_type == "stage" or run_type == "dev":
     config_suffix = f"_{run_type}"
     s3_input_prefix = f"{run_type}/ref/"
     s3_output_prefix = f"{run_type}/{git_branch}/"
+else:
+    s3_input_prefix = f"{run_type}/"
+    s3_output_prefix = f"{run_type}/"
 
 for AH_type in ["AH4", "AH5"]:
-
     yaml_path = curr_dir + f"/conf/config_{AH_type}{config_suffix}.yml"
 
     with open(yaml_path) as config_file:
