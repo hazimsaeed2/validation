@@ -33,6 +33,8 @@ def check_cells_csv(job):
     current_experiment_cells = cells[
         cells["experiment_id"] == str(job.config.params["experiment"])
     ]
+    print("Config id = ", str(job.config.params["experiment"]))
+    print("Cells csv id = ", cells["experiment_id"])
     if len(current_experiment_cells) == 0:
         raise AssignmentInputError(
             "The current experiment_id is not present" "in the cells.csv"
