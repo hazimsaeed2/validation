@@ -18,8 +18,8 @@ paths:
       # --------- end of fairly static ------------ #
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
-      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2024_07_28/trip_spend_predictions_2024-07-27.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2024_07_28/20230728-20240727-combined/preds-20240729-combined/PARQUET/'
+      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2024_08_04/trip_spend_predictions_2024-08-03.csv'
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2024_08_04/20230804-20240803-combined/preds-20240806-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
       FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY25/MMPC13FY25/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
       MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY25/MMPC13FY25/input_mail_list/'
@@ -47,11 +47,11 @@ paths:
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
       experiment: 212 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC13FY25_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'dev' # accepts 'prod' 'dev' 'test'
+      campaign: 'MMPC13FY25_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
+      run_type: 'prod' # accepts 'prod' 'dev' 'test'
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2024-08-06' # On Final run, should be updated to be near the final updated date
+      assignment_date: '2024-08-13' # On Final run, should be updated to be near the final updated date
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
