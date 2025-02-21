@@ -14,15 +14,15 @@ paths:
       ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
       LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
       ### UPDATE PER CAMPAIGN
-      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-02-04/' # use most recently available date
+      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-02-17/' # use most recently available date
       # --------- end of fairly static ------------ #
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
-      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_02_02/trip_spend_predictions_2025-02-01.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_02_02/20240202-20250201-combined/preds-20250205-combined/PARQUET/'
+      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_02_16/trip_spend_predictions_2025-02-15.csv'
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_02_16/20240216-20250215-combined/preds-20250218-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
-      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC04FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
-      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC04FY26/input_mail_list/'
+      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC05FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
+      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC05FY26/input_mail_list/'
       # AGE: 's3://memberanalytics-data-out-prod/USERDATA/sbrestin/CUBES/intermediates/acquisition_MMPC14_09052020/'
       BACKTEST_MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/PROD/FY21/BBM11FY21/final_2020-06-15/final_mailhouse/' #no file found for BACKTEST_MAIL_LIST # deprecated since no selffunded offers in this campaign
       # MUHH: 's3://memberanalytics-data-in-prod/ASSIGNMENTS/inbound/MUHH_FILE.dat'
@@ -30,7 +30,7 @@ paths:
       # RAW_MEMBER_LISTS: # raw data files used to create MAIL_LIST, if applicable
       # - 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY20/BBM8FY20/BBM8_Clearwater_221_No_Canada.dat'
       # Coupon Inputs - Include path value if applicable - UPDATE PER CAMPAIGN
-      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC04FY26/Coupon_Input/Article_GF4.csv'
+      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC05FY26/Coupon_Input/Article_GF5.csv'
       # CATEGORY_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC11FY22/Coupon_Input/category_pc11.csv'
       # BASKET_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY25/MMPC04FY25/Coupon_Input/Basket_GF4.csv'
       # EXTRA_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC5FY22/Coupon_Input/enriched_flag_pc5.csv"
@@ -46,25 +46,24 @@ paths:
       MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/DEV/MMPC12FY21/est_2020-07-08/assignments/'
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
-      experiment: 223 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC04FY26_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'prod' # accepts 'prod' 'dev' 'test'
+      experiment: 224 # Maps to experiment_id in cells.csv
+      campaign: 'MMPC05FY26_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
+      run_type: 'dev' # accepts 'prod' 'dev' 'test'
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-02-11' # On Final run, should be updated to be near the final updated date
+      assignment_date: '2025-02-21' # On Final run, should be updated to be near the final updated date
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
 coupon_creation: # create_coupons.py
-      coupon_inhome_date: '2025-03-19' # Date in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
+      coupon_inhome_date: '2025-04-09' # Date in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
       excluded_coupons_force_back_in:
       backfill:
             cpn_exclusion: # A list of coupons that will be excluded from backfill
-                        - 2195608
-                        - 2195611
-                        - 2196077
-                        - 2196204
-                        - 2196261
+                        - 2197833
+                        - 2197885
+                        - 2198454
+                        - 2198576
                            # Above two are from PC14
             substitutable_MCH3_exclusion: # a list of MCH3 that will be limited to 1 coupon max within each AH5 level
                   - SUNDRIES
@@ -101,8 +100,8 @@ assignment: # assign_offers.py
             article_hero: # Deprecated
       backfill_priority: 'low' # 'high'
 sizing: # backtest_sizing.py
-      min_cpn_start_date: '2025-03-20' # The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
-      max_cpn_end_date: '2025-04-02' # The maximum of the self-funded coupon end dates
+      min_cpn_start_date: '2025-04-10' # The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
+      max_cpn_end_date: '2025-04-27' # The maximum of the self-funded coupon end dates
       ### Items below this line typically should not be changed
       num_days_backwards: 364 # The number of days backwards to backtest - typically 364 to look at prior year
       article_red_over_qual_rate: 0.37 # Expected redemption over qualified rate for articles - do not change without data
