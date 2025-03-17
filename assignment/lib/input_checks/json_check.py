@@ -28,6 +28,7 @@ def converts_to_json(to_check, is_file=False):
     """
 
     try:
+        print(f"###printing  to_check value in converts_to_json###", to_check)
         if is_file:
             _ = read_s3_to_local(to_check, ftype="json")
         else:
@@ -216,6 +217,7 @@ def check_jsons(job):
             desc_nm = stack["desc_nm"].format(fname=fname)
             path = job.config.paths[stack["BANK"]] + fname
             for check_name, check_call, kwargs, exception in stack["checks"]:
+                print(f"######printing the path###", path)
                 is_valid, details = check_call(path, **kwargs)
                 checks.append(
                     checker.Check(check_name, desc_nm, is_valid, details)
