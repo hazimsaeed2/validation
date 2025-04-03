@@ -47,7 +47,7 @@ paths:
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
       experiment: 226 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC07FY26_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      campaign: 'MMPC07FY26_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
       run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
       run_type: 'dev' # accepts 'prod' 'dev' 'test'
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
@@ -100,7 +100,7 @@ assignment: # assign_offers.py
             article_hero: # Deprecated
       backfill_priority: 'low' # 'high'
 sizing: # backtest_sizing.py
-      min_cpn_start_date: '2025-05-25' #YYYY-MM-DD The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
+      min_cpn_start_date: '2025-05-20' #YYYY-MM-DD The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
       max_cpn_end_date: '2025-06-15' #YYYY-MM-DD The maximum of the self-funded coupon end dates
       ### Items below this line typically should not be changed
       num_days_backwards: 364 # The number of days backwards to backtest - typically 364 to look at prior year
