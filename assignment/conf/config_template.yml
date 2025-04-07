@@ -60,10 +60,13 @@ coupon_creation: # create_coupons.py
       excluded_coupons_force_back_in:
       backfill:
             cpn_exclusion: # A list of coupons that will be excluded from backfill
-                        - 2203657
-                        - 2199319
-                        - 2199537
-                        - 2200286
+                        - 2201834
+                        - 2201784
+                        - 2201777
+                        - 2201923
+                        - 2201869
+                        - 2202187
+                        - 2201233
                            # Above two are from PC14
             substitutable_MCH3_exclusion: # a list of MCH3 that will be limited to 1 coupon max within each AH5 level
                   - SUNDRIES
