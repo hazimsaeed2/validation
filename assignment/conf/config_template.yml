@@ -14,12 +14,12 @@ paths:
       ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
       LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
       ### UPDATE PER CAMPAIGN
-      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-05-15/' # use most recently available date
+      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-05-20/' # use most recently available date
       # --------- end of fairly static ------------ #
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
-      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_05_11/trip_spend_predictions_2025-05-10.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_05_11/20240510-20250510-combined/preds-20250517-combined/PARQUET/'
+      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_05_18/trip_spend_predictions_2025-05-17.csv'
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_05_18/20240517-20250517-combined/preds-20250521-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
       FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC09FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
       MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC09FY26/input_mail_list/'
