@@ -21,8 +21,8 @@ paths:
       PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_05_18/trip_spend_predictions_2025-05-17.csv'
       PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_05_18/20240517-20250517-combined/preds-20250521-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
-      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC09FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
-      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC09FY26/input_mail_list/'
+      FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC10FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
+      MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC10FY26/input_mail_list/' #for now added path for both but have to run both scripts to generate this 
       # AGE: 's3://memberanalytics-data-out-prod/USERDATA/sbrestin/CUBES/intermediates/acquisition_MMPC14_09052020/'
       BACKTEST_MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/PROD/FY21/BBM11FY21/final_2020-06-15/final_mailhouse/' #no file found for BACKTEST_MAIL_LIST # deprecated since no selffunded offers in this campaign
       # MUHH: 's3://memberanalytics-data-in-prod/ASSIGNMENTS/inbound/MUHH_FILE.dat'
@@ -30,7 +30,7 @@ paths:
       # RAW_MEMBER_LISTS: # raw data files used to create MAIL_LIST, if applicable
       # - 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY20/BBM8FY20/BBM8_Clearwater_221_No_Canada.dat'
       # Coupon Inputs - Include path value if applicable - UPDATE PER CAMPAIGN
-      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC09FY26/Coupon_Input/Article_GF9.csv'
+      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC09FY26/Coupon_Input/Article_GF10.csv' #for now added pathbut have to upload this 
       # CATEGORY_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC11FY22/Coupon_Input/category_pc11.csv'
       # BASKET_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY25/MMPC04FY25/Coupon_Input/Basket_GF4.csv'
       # EXTRA_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC5FY22/Coupon_Input/enriched_flag_pc5.csv"
@@ -46,12 +46,12 @@ paths:
       MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/DEV/MMPC12FY21/est_2020-07-08/assignments/'
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
-      experiment: 228 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC09FY26_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'prod' # accepts 'prod' 'dev' 'test'
+      experiment: 229 # Maps to experiment_id in cells.csv
+      campaign: 'MMPC10FY26_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
+      run_type: 'dev' # accepts 'prod' 'dev' 'test'
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-05-20' #YYYY-MM-DD On Final run, should be updated to be near the final updated date
+      assignment_date: '2025-05-22' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
@@ -59,7 +59,7 @@ coupon_creation: # create_coupons.py
       coupon_inhome_date: '2025-06-11' # Date(YYYY-MM-DD) in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
       excluded_coupons_force_back_in:
       backfill:
-            cpn_exclusion: # A list of coupons that will be excluded from backfill
+            cpn_exclusion: # A list of coupons that will be excluded from backfill (update before next run with inputs from susan)
                         - 2204172
                         - 2204254
                         - 2204362
