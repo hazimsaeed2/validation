@@ -56,7 +56,7 @@ shared: # This section is shared among all scripts - UPDATE PER RUN
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
 coupon_creation: # create_coupons.py
-      coupon_inhome_date: '2025-06-11' # Date(YYYY-MM-DD) in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
+      coupon_inhome_date: '2025-07-16' # Date(YYYY-MM-DD) in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN
       excluded_coupons_force_back_in:
       backfill:
             cpn_exclusion: # A list of coupons that will be excluded from backfill (update before next run with inputs from susan)
@@ -100,8 +100,8 @@ assignment: # assign_offers.py
             article_hero: # Deprecated
       backfill_priority: 'low' # 'high'
 sizing: # backtest_sizing.py
-      min_cpn_start_date: '2025-06-26' #YYYY-MM-DD The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
-      max_cpn_end_date: '2025-07-20' #YYYY-MM-DD The maximum of the self-funded coupon end dates
+      min_cpn_start_date: '2025-07-17' #YYYY-MM-DD The minimum of the self-funded coupon start dates. Leave blank if no coupons and to skip sizing - UPDATE PER CAMPAIGN
+      max_cpn_end_date: '2025-08-10' #YYYY-MM-DD The maximum of the self-funded coupon end dates
       ### Items below this line typically should not be changed
       num_days_backwards: 364 # The number of days backwards to backtest - typically 364 to look at prior year
       article_red_over_qual_rate: 0.37 # Expected redemption over qualified rate for articles - do not change without data
