@@ -30,7 +30,7 @@ paths:
       # RAW_MEMBER_LISTS: # raw data files used to create MAIL_LIST, if applicable
       # - 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY20/BBM8FY20/BBM8_Clearwater_221_No_Canada.dat'
       # Coupon Inputs - Include path value if applicable - UPDATE PER CAMPAIGN
-      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC12FY26/Coupon_Input/Article_GF13.csv' #for now added pathbut have to upload this 
+      CPG_COUPON_LIST_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC13FY26/Coupon_Input/Article_GF13.csv' #for now added pathbut have to upload this 
       # CATEGORY_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC11FY22/Coupon_Input/category_pc11.csv'
       # BASKET_COUPON_PATH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY25/MMPC04FY25/Coupon_Input/Basket_GF4.csv'
       # EXTRA_COUPON_LOOKUP_PATH: "s3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY22/MMPC5FY22/Coupon_Input/enriched_flag_pc5.csv"
