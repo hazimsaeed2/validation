@@ -51,7 +51,7 @@ shared: # This section is shared among all scripts - UPDATE PER RUN
       run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
       run_type: 'prod' # accepts 'prod' 'dev' 'test'        
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-08-12' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
+      assignment_date: '2025-08-13' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
