@@ -46,7 +46,7 @@ paths:
       MAIL_POPULATION_ASSIGNMENT: # 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/DEV/MMPC12FY21/est_2020-07-08/assignments/'
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
-      experiment: 235 # Maps to experiment_id in cells.csv
+      experiment: 234 # Maps to experiment_id in cells.csv
       campaign: 'MMPC15FY26_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
       run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
       run_type: 'prod' # accepts 'prod' 'dev' 'test'        
