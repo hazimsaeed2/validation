@@ -19,7 +19,7 @@ paths:
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
       PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_09_21/trip_spend_predictions_2025-09-20.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod-2020-02-19/20190215-20200215-combined/preds-20200220-combined/PARQUET/'
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_09_21/20240920-20250920-combined/preds-20250923-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
       FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC16FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
       MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC16FY26/input_mail_list/' #for now added path for both but have to run both scripts to generate this 
@@ -51,7 +51,7 @@ shared: # This section is shared among all scripts - UPDATE PER RUN
       run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
       run_type: 'dev' # accepts 'prod' 'dev' 'test'        
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-09-29' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
+      assignment_date: '2025-09-30' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
@@ -60,9 +60,8 @@ coupon_creation: # create_coupons.py
       excluded_coupons_force_back_in:
       backfill:
             cpn_exclusion: # A list of coupons that will be excluded from backfill (update before next run with inputs from susan)
-                        - 2215415 
-                        - 2214652
-                        - 2214658
+                        - 2219063
+                        
                       
                         
                            # Above two are from PC14
