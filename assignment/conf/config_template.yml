@@ -47,11 +47,11 @@ paths:
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
       experiment: 236 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC17FY26_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'dev' # accepts 'prod' 'dev' 'test'        
+      campaign: 'MMPC17FY26_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
+      run_type: 'prod' # accepts 'prod' 'dev' 'test'        
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-10-15' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
+      assignment_date: '2025-10-16' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
