@@ -14,12 +14,12 @@ paths:
       ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
       LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
       ### UPDATE PER CAMPAIGN
-      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-10-27/' # use most recently available date
+      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-11-03/' # use most recently available date
       # --------- end of fairly static ------------ #
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
-      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_10_26/trip_spend_predictions_2025-10-25.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_10_26/20241025-20251025-combined/preds-20251028-combined/PARQUET/'
+      PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_11_02/trip_spend_predictions_2025-11-01.csv'
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_11_02/20241101-20251101-combined/preds-20251103-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
       FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC18FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
       MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC18FY26/input_mail_list/' #for now added path for both but have to run both scripts to generate this 
@@ -47,11 +47,11 @@ paths:
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
       experiment: 237 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC18FY26_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'dev' # accepts 'prod' 'dev' 'test'        
+      campaign: 'MMPC18FY26_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
+      run_type: 'prod' # accepts 'prod' 'dev' 'test'        
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-10-29' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
+      assignment_date: '2025-11-05' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
