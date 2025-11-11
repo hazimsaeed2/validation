@@ -64,6 +64,7 @@ coupon_creation: # create_coupons.py
                         - 2221218
                         - 2221172
                         - 2221224
+                        - 2221098
                       
                            # Above two are from PC14
             substitutable_MCH3_exclusion: # a list of MCH3 that will be limited to 1 coupon max within each AH5 level
