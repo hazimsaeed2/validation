@@ -19,7 +19,7 @@ paths:
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
       PROPENSITY: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_12_07/trip_spend_predictions_2025-12-06.csv'
-      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_11_30/20241129-20251129-combined/preds-20251203-combined/PARQUET/'
+      PRED_LIST: 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/prod_2025_12_07/20241206-20251206-combined/preds-20251209-combined/PARQUET/'
       # Member related inputs - UPDATE PER CAMPAIGN
       FHH: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC20FY26/input_mail_list/' # legacy; Set same as MAIL_LIST, will be generated after running notebook
       MAIL_LIST: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/campaigns/FY26/MMPC20FY26/input_mail_list/' #for now added path for both but have to run both scripts to generate this 
