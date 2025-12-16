@@ -1,0 +1,91 @@
+resources:
+  jobs:
+    personalization__model__trip_spend:
+      name: de_wf_ds__Personalization__model__trip_spend
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+      # schedule:
+      #   quartz_cron_expression: 0 0 2 * * ?
+      #   timezone_id: America/New_York
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: config_file_setup
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/config_setup.ipynb 
+            base_parameters:
+              in_home_date: "automatic" 
+
+        - task_key: propensity_model_etl_step1
+          depends_on:
+            - task_key: config_file_setup
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/ETL_step1_serverless.ipynb   
+
+        - task_key: propensity_model_etl_step2
+          depends_on:
+            - task_key: propensity_model_etl_step1
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/ETL_step2_ml_cluster.ipynb   
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: run_trip_propensity_model
+          depends_on:
+            - task_key: propensity_model_etl_step2
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/sklearn_trip_propensity_model.ipynb
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id} 
+
+        - task_key: run_trip_spend_model
+          depends_on:
+            - task_key: propensity_model_etl_step2
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/sklearn_spend_model.ipynb
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}
+          
+        - task_key: run_predict
+          depends_on:
+            - task_key: run_trip_propensity_model
+            - task_key: run_trip_spend_model
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/predict.ipynb
+            base_parameters:
+              week: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+
+        - task_key: propensity_model_qc
+          depends_on:
+            - task_key: run_predict  
+          notebook_task:
+            notebook_path: ../src/model/trip_spend_model/QC/trip_propensity_qc.ipynb 
+

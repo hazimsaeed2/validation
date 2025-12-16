@@ -1,0 +1,79 @@
+etl:
+  BBM_weeks_path: propensity_model_for_trips/input_files/mailer_cm_map.csv
+  bbm: false
+  bbm_week_window: 3
+  end_date: '2025-10-11'
+  outlier_column: FW_SPEND_IN_STORE
+  start_date: '2024-09-10'
+  start_week_windows:
+  - 1
+  - 4
+  - 6
+  weeks_to_sample: 2
+grid_search:
+  max_depths:
+  - 10
+  - 20
+  - 30
+  - none
+  max_features:
+  - 0.2
+  - 0.8
+  - 1.0
+  - auto
+  min_leaf_size:
+  - 100
+  - 1000
+  - 5000
+  model: bin
+  number_of_trees:
+  - 100
+  - 500
+  - 1000
+  output_path: /MODELDATA/TRIP_SPEND_MODELS/LOGS/
+predict:
+  spend_model_date: '20251017'
+  trip_model_date: '20251017'
+  weeks_to_predict:
+  - '2025-10-11'
+shared:
+  ad_hoc_output_path: AD_HOC
+  base_path: MODELDATA
+  bucket: memberanalytics-data-out-prod
+  cube_path: Code_and_Data_repo/CUBES/customer_cube_2019-12-02/customer_cube
+  current_metric: QC/TRIP_PROPENSITY/rf_metrics.csv
+  dataset_path: DATASETS/TRIP_SPEND_MODELS
+  etl_path: etl
+  high_frequency_visit_threshold: 12
+  low_frequency_visit_threshold: 0
+  model_path: MODELS/TRIP_SPEND_MODELS
+  prediction_path: PREDICTIONS/TRIP_SPEND_MODELS
+  read_only_bucket: memberanalytics-data-in-prod
+  run_name: dev_2025_10_12 
+  sample_rate: 0.2
+  split_rate: 0.8
+spend:
+  end_window: 3
+  max_depth: 15
+  max_features: 0.5
+  metrics:
+  - median_absolute_error
+  - mean_squared_error
+  - r2_score
+  min_sample_leaf: 1000
+  model: rf
+  number_of_trees: 1000
+  start_window: 1
+trip:
+  end_window: 8
+  max_depth: 15
+  max_features: 0.5
+  metrics:
+  - roc_auc_score
+  - accuracy_score
+  - precision_score
+  - recall_score
+  min_sample_leaf: 1000
+  model: rf
+  number_of_trees: 1000
+  start_window: 6

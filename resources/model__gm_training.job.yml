@@ -1,0 +1,83 @@
+resources:
+  jobs:
+    personalization__model__gm_training:
+      name: de_wf_ds__Personalization__model__gm_training
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+      schedule:
+        quartz_cron_expression: 0 0 3 31 8 ? *
+        timezone_id: America/New_York
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: etl_train
+          notebook_task:
+            notebook_path: ../src/model/GM_model/ETL.ipynb 
+            base_parameters:
+              train: "True" 
+              muhh_path: "" 
+
+        - task_key: feature_engineering_tenured
+          depends_on:
+            - task_key: etl_train
+          notebook_task:
+            notebook_path: ../src/model/GM_model/feature_engineering.ipynb 
+            base_parameters:
+              tenure_group: "tenured" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: feature_engineering_new
+          depends_on:
+            - task_key: etl_train
+          notebook_task:
+            notebook_path: ../src/model/GM_model/feature_engineering.ipynb 
+            base_parameters:
+              tenure_group: "new" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}
+
+        - task_key: gm_model_training_tenured
+          depends_on:
+            - task_key: feature_engineering_tenured
+          notebook_task:
+            notebook_path: ../src/model/GM_model/gm_model_training.ipynb 
+            base_parameters:
+              tenure_group: "tenured" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: gm_model_training_new
+          depends_on:
+            - task_key: feature_engineering_new
+          notebook_task:
+            notebook_path: ../src/model/GM_model/gm_model_training.ipynb 
+            base_parameters:
+              tenure_group: "new" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}

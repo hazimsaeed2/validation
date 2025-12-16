@@ -1,0 +1,54 @@
+resources:
+  jobs:
+    personalization__job_summary_report:
+      name: de_wf_ds__Personalization__job_summary_report
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: build_report
+          notebook_task:
+            notebook_path: ../src/job_summary/build_report.ipynb 
+            base_parameters:
+              run_train_or_inference: "inference"
+         
+
+        - task_key: send_report_by_email
+          depends_on:
+            - task_key: build_report
+          notebook_task:
+            notebook_path: ../src/job_summary/send_report_by_email.ipynb 
+            base_parameters:
+              attachment_file_path: "{{tasks.build_report.values.output_file_path}}"
+              target_emails: dgarayalde@bjs.com # 'smeshram@bjs.com,akanth1@bjs.com,rbod@bjs.com,rbisa@bjs.com,ckrishna@bjs.com,gparmar@bjs.com,hsaeed@bjs.com,sfeng@bjs.com,pprzybyszewski@bjs.com,cling@bjs.com,skarunanithi1@bjs.com,atrivedi1@bjs.com,hsaeed@bjs.com,achatterjee5@bjs.com',
+              subject: "${bundle.target} - Summary of PE Data Pipeline"
+              body: "Hi Team, \nThe weekly data load has completed.Please find attached the summary of execution. \nGap between jobs could occur due to reasons like: \n1. Offshore team availability due to the timezone difference. \n2. Reruns due to spot node availability. \n3. Unencountered issues which may take time to fix. \n4. Some jobs might have outdated metadata, it's occurs when we run the job part by part manually \n \nThis is an auto generated mail, kindly do not reply. \n \nThanks, Genpact Team"

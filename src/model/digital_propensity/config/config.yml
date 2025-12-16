@@ -1,0 +1,7 @@
+params:
+      min_purchase_date: "2022-01-01"
+      sales_channels: [10, 30, 60]
+      merchandise_ctgry: ['03','01']
+      mch3_codes: ['100000000', '200000000', '300000000', '400000000']
+      membership_stat: "AM"
+      membership_expiry_days: 95

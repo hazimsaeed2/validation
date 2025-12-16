@@ -1,0 +1,158 @@
+# This is a Databricks asset bundle definition for ds_personaliztion_engine.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: de_dab_ds_personaliztion_engine
+  uuid: 6e92b74c-547d-4422-994c-9cc5616fee94
+
+
+
+include:
+  - resources/clusters.yml # this will deploy a dedicated ML cluster to be used by some tasks
+  - resources/pe_engine_orchestration.job.yml  
+  - resources/model__deployment.job.yml
+  - resources/pe_artifact_creation.job.yml
+  - resources/model__import_models_from_s3.job.yml
+  - resources/pe_s3_files_to_volume.job.yml
+  
+  - resources/etl.job.yml         
+  - resources/etl_run_sources.job.yml
+  - resources/member_dna.job.yml    
+  - resources/category_dna.job.yml  
+  - resources/assignment.job.yml
+  - resources/model__trip_spend.job.yml
+  - resources/model__trip_spend_grid_search.job.yml
+  - resources/model__cf_model.job.yml
+  - resources/model__bbm.job.yml
+  - resources/model__gm_training.job.yml
+  - resources/model__gm_execution.job.yml
+  - resources/model__digital_propensity.job.yml
+  - resources/run_job_summary_report.job.yml
+
+#--------------------------------------------------------------------------------------------------
+targets:
+
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    # mode: production
+    mode: development 
+
+    default: true
+    workspace:
+      host: https://dbc-ad8c0ca0-6db0.cloud.databricks.com
+      # root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+      # while in dev it may be useful to config mode: development and use this:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      # then the notebooks and python files are pulled directly from your workspace and not duplicated into .bundle
+  
+
+    variables:
+      env:
+        description: The run environment, its mainly used to parametrize names
+        default: Dev
+      catalog:
+        description: Catalog to use
+        default: datascience_ea_dev
+      budget_policy_id:
+        description: Budget policy to be used in the jobs
+        default: ca0f2f3f-69c1-4e08-ba93-2c452dc0f60d # PolicyDS-PE
+      cluster_policy_id_for_ml:
+        description: The cluster policy id for the ML related clusters
+        default: 000D9763DBAA9058  # PE_Dev_ModelTraining_Cluster_Compute_Policy 
+      service_principal:
+        description: Service principal for deployment
+        default: ce0f4d1c-421f-45d6-8169-244653bc84d7 # named: svc_ds_pe_dev
+      job_cluster_policy_id:
+        description: The job cluster policy id
+        default: 000B99C28D480B81
+  
+  qa:
+    mode: production
+    workspace:
+      host: https://dbc-816f582c-c3a4.cloud.databricks.com
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    
+    variables:
+      env:
+        description: The run environment, its mainly used to parametrize names
+        default: QA
+      catalog:
+        description: Catalog to use
+        default: datascience_ea_qa
+      budget_policy_id:
+        description: Budget policy to be used in the jobs
+        default: ca0f2f3f-69c1-4e08-ba93-2c452dc0f60d # PolicyDS-PE
+      cluster_policy_id_for_ml:
+        description: The cluster policy id for the ML related clusters
+        default: 000F079D94A96945  # PE_QA_ModelTraining_Cluster_Compute_Policy 
+      service_principal:
+        description: Service principal for QA
+        default: 727a1a65-8a0d-471e-9940-4ef38f5cbed3 # named: svc_ds_pe_qa 
+      job_cluster_policy_id:
+        description: The job cluster policy id
+        default: 0011B5252D6BDE19
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-3b3c53e4-564b.cloud.databricks.com/
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    
+    variables:
+      env:
+        description: The run environment, its mainly used to parametrize names
+        default: Prod
+      catalog:
+        description: Catalog to use
+        default: datascience_ea_prod
+      budget_policy_id:
+        description: Budget policy to be used in the jobs
+        default: ca0f2f3f-69c1-4e08-ba93-2c452dc0f60d # PolicyDS-PE
+      cluster_policy_id_for_ml:
+        description: The cluster policy id for the ML related clusters
+        default: 001130A579C0E50C # PE_Prod_ModelTraining_Cluster_Compute_Policy
+      service_principal:
+        description: Service principal for PROD
+        default: cd55aa06-2cb7-40fa-8c5b-692f4ca053fa # named: svc_ds_pe_prod
+      job_cluster_policy_id:
+        description: The job cluster policy id
+        default: 001F452BCFA0506C
+        
+#--------------------------------------------------------------------------------------------------
+# Default configs
+variables:
+  env:
+    description: The run environment
+    default: Dev
+  catalog:
+    description: Catalog to use
+    default: datascience_dev 
+  budget_policy_id:
+    description: Budget policy to be used in the jobs
+    default: ca0f2f3f-69c1-4e08-ba93-2c452dc0f60d # PolicyDS-PE 
+  cluster_policy_id_for_ml:
+    description: The cluster policy id for the ML related clusters
+    default: 000D9763DBAA9058  # PE_Dev_ModelTraining_Cluster_Compute_Policy 
+  #   default: 000F079D94A96945  # PE_QA_ModelTraining_Cluster_Compute_Policy 
+  #   default: 001130A579C0E50C  # PE_Prod_ModelTraining_Cluster_Compute_Policy 
+
+  service_principal:
+    description: Service principal that runs the workflow
+    default: ce0f4d1c-421f-45d6-8169-244653bc84d7 # named: svc_ds_pe_dev
+  job_cluster_policy_id:
+        description: The job cluster policy id
+        default: 000B99C28D480B81
+
+permissions:
+- user_name: ${workspace.current_user.userName}  
+  level: CAN_MANAGE  
+- service_principal_name: ${var.service_principal}
+  level: CAN_MANAGE
+- group_name: Databricks-${var.env}-Lovelytics-Users
+  level: CAN_MANAGE
+- group_name: Databricks-${var.env}-DS-PE-Users
+  level: CAN_MANAGE
+- group_name: Databricks-${var.env}-DS-PE-Admins
+  level: CAN_MANAGE

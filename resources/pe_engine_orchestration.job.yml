@@ -1,0 +1,121 @@
+resources:
+  jobs:
+    personalization__pe_engine_orchestration:
+      name: de_wf_ds__Personalization__pe_engine_orchestration
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+      trigger:
+        pause_status: UNPAUSED
+        file_arrival:
+          url: s3://memberanalytics-data-in-prod/Membership/trigger_folder/Membership/
+
+        # The file arrival trigger will monitor for any new file  matching this prefix under the URL.
+          # prefix:  pers_eng_main_trigger_
+        # wait_after_last_write_minutes: 5   # Time to wait for subsequent files before starting the job.
+        # schedule:  # Optional: If you need a scheduled fallback in case events are missed
+        #   quartz_cron_expression: "0 0 10 * * ?"
+        #   timezone_id: "America/Los_Angeles"
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+                  
+        - task_key: current_trial_file_check
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/input_file_check_for_recent_saturday.ipynb  
+            base_parameters:
+              target_emails: dgarayalde@bjs.com #, hsaeed@bjs.com  #, nmiya@bjs.com, gparmar@bjs.com, atrivedi1@bjs.com, pborpujari@bjs.com, achatterjee5@bjs.com
+              subject: "${bundle.target} - File Check Results: PE weekly refresh"
+              body: "Hi, Kindly find below the complete file integrity check report: \n \n{output_report_str} \n \nKind Regards, Team Genpact"
+
+
+        - task_key: etl
+          depends_on:
+            - task_key: current_trial_file_check
+          run_job_task:
+            job_id: ${resources.jobs.personalization__etl.id} 
+        
+        - task_key: member_dna # 8) member-dna-run-prod
+          depends_on:
+            - task_key: etl
+          run_job_task:
+            job_id: ${resources.jobs.personalization__member_dna.id}    
+        
+        - task_key: category_dna # 9) category-dna-run-prod
+          depends_on:
+            - task_key: member_dna
+          run_job_task:
+            job_id: ${resources.jobs.personalization__category_dna.id} 
+
+        - task_key: model__trip_spend  # 10) tp-model-run
+          depends_on:
+            - task_key: category_dna
+          run_job_task:
+            job_id: ${resources.jobs.personalization__model__trip_spend.id}
+
+        - task_key: model__cf_model  # 11) cf-model-run
+          depends_on:
+            - task_key: model__trip_spend
+          run_job_task:
+            job_id: ${resources.jobs.personalization__model__cf_model.id}
+
+        - task_key: model__trip_spend_sales   # 12) trip-spend-sales-driver-model-run
+          depends_on:
+            - task_key: model__cf_model
+          run_job_task:
+            job_id: ${resources.jobs.personalization__model__digital_propensity.id}  
+  
+        - task_key: model__bbm # it includes both the bbm etl + inference steps   
+          depends_on:
+            - task_key: model__trip_spend_sales
+          run_job_task:
+            job_id: ${resources.jobs.personalization__model__bbm.id}
+
+        - task_key: model__gm
+          depends_on:
+            - task_key: model__bbm
+          run_job_task:
+            job_id: ${resources.jobs.personalization__model__gm_execution.id}
+
+
+        # 13) member_data_foundation_file_transfer_prod   # --> not neeeded anymore as we are storing to both locations asap after building such outputs
+        #     DNA cube output is updated here:    /src/dna/member/merge
+        #     Trip prop output is uptated here:   /src/model/trip_spend_model/predict
+        #     Altought not originally in this stage the bbm output too is stored to EDW path. Its done here:   /src/model/bbm_propensity_model/bbm_propensity_model_run
+
+          
+        - task_key: run_job_summary_report_and_send_email  # 14) PE_Data_pipline_Summary_Jenkins_API 
+          depends_on:
+            - task_key: model__gm
+          run_job_task:
+            job_id: ${resources.jobs.personalization__job_summary_report.id} 
+
+        # end

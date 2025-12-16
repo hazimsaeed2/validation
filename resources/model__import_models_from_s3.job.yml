@@ -1,0 +1,60 @@
+resources:
+  jobs:
+    personalization__model__import_models_from_s3:
+      name: de_wf_ds__Personalization__model__import_models_from_s3
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+
+      performance_target: PERFORMANCE_OPTIMIZED
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: digital_propensity_model_importing_1
+          notebook_task:
+            notebook_path: ../src/model/digital_propensity/pkl_model_migration_step1.ipynb
+
+        - task_key: digital_propensity_model_importing_2
+          depends_on:
+            - task_key: digital_propensity_model_importing_1
+          notebook_task:
+            notebook_path: ../src/model/digital_propensity/pkl_model_migration_step2.ipynb
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+
+        - task_key: bbm_model_importing_1
+          notebook_task:
+            notebook_path: ../src/model/bbm_propensity_model/bbm_propensity_model_logging_step1_update_pkl_to_json.ipynb
+
+        - task_key: bbm_model_importing_2
+          depends_on:
+            - task_key: bbm_model_importing_1
+          notebook_task:
+            notebook_path: ../src/model/bbm_propensity_model/bbm_propensity_model_logging_step2_log_to_mlflow.ipynb
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+

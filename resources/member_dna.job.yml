@@ -1,0 +1,163 @@
+resources:
+  jobs:
+    personalization__member_dna:
+      name: de_wf_ds__Personalization__member_dna        
+      # #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      # max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      # queue:
+      #   enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        
+        # -- Tender_map_group ---------------------------------------------------------------------------
+        - task_key: bronze_tender_map_group
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_tender_map_group.ipynb
+
+        - task_key: tender_map_group 
+          depends_on:
+            - task_key: bronze_tender_map_group
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_tender_map_group.ipynb
+
+
+        # -- Generate Transaction  -----------------------------------------------------------------------
+        
+        - task_key: generate_transaction_1
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_transaction_1.ipynb
+
+        - task_key: generate_transaction_2
+          depends_on:
+            - task_key: generate_transaction_1
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_transaction_2.ipynb
+
+        - task_key: generate_transaction_3
+          depends_on:
+            - task_key: tender_map_group
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_transaction_3.ipynb
+
+        # -- Generate Coupon and digital  -----------------------------------------------------------------
+
+        - task_key: generate_coupon_and_digital_1
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_coupon_and_digital_1.ipynb
+
+        - task_key: generate_coupon_and_digital_2
+          depends_on:
+            - task_key: generate_coupon_and_digital_1
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_coupon_and_digital_2.ipynb
+
+        
+        # Member basic  & Generate member  &  Integrate acquisition  ---------------------------------------------------
+
+        - task_key: bronze_member_basic
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_member_basic.ipynb
+
+        - task_key: member_basic 
+          depends_on:
+            - task_key: bronze_member_basic
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_member_basic.ipynb
+
+        - task_key: generate_member
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_member.ipynb
+        
+        - task_key: integrate_acquisition
+          depends_on:
+            - task_key: member_basic
+            - task_key: generate_member
+          notebook_task:
+            notebook_path: ../src/dna/member/integrate_acquisition.ipynb
+      
+
+        # AH5 customer facing desc  &  Generate most shopped  --------------------------------------------------------------------
+
+        - task_key: bronze_AH5_customer_facing_desc
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_AH5_customer_facing_desc.ipynb
+
+        - task_key: AH5_customer_facing_desc 
+          depends_on:
+            - task_key: bronze_AH5_customer_facing_desc
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_AH5_customer_facing_desc.ipynb
+
+        - task_key: generate_most_shopped
+          depends_on:
+            - task_key: AH5_customer_facing_desc
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_most_shopped.ipynb
+
+
+        # -- Segment  &  Generate misc  -----------------------------------------------------------------------
+
+        - task_key: bronze_segment
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_segment.ipynb
+
+        - task_key: segment 
+          depends_on:
+            - task_key: bronze_segment
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_segment.ipynb
+
+
+        - task_key: generate_misc
+          depends_on:
+            - task_key: segment
+            - task_key: generate_transaction_2
+            - task_key: generate_transaction_3
+            - task_key: generate_coupon_and_digital_2
+            - task_key: integrate_acquisition
+            - task_key: generate_most_shopped
+          notebook_task:
+            notebook_path: ../src/dna/member/generate_misc.ipynb
+        
+        # -- Merge  -----------------------------------------------------------------------
+        - task_key: merge
+          depends_on:
+            - task_key: generate_misc
+          notebook_task:
+            notebook_path: ../src/dna/member/merge.ipynb
+
+
+        # -- sampling  -----------------------------------------------------------------------
+        - task_key: sampling
+          depends_on:
+            - task_key: merge
+          notebook_task:
+            notebook_path: ../src/medallion/silver/sampling.ipynb
+

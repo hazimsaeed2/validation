@@ -1,0 +1,20 @@
+recency_lookback_duration:
+  global: 3
+detail:
+  type: 'intermediate'
+  path: 'detail_isnr_fiscal'
+member:
+  type: 'master'
+  path: 'member'
+item:
+  type: 'master'
+  path: 'item_with_brand'
+member_extended:
+  type: 'master'
+  path: 'member_extended'
+exclusion:
+  type: 'master'
+  path: 'brand_exclusions'
+out:
+  type: 'out'
+  path: 'fs_'

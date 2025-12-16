@@ -1,0 +1,105 @@
+combine:
+  items:
+  - AH4
+  - AH5
+  subtype: preds
+  type: prediction
+etl:
+  sample: 1
+grid_search:
+  alphas:
+  - 0.1
+  - 0.5
+  - 1
+  - 5
+  binarys:
+  - true
+  - false
+  inputtypes:
+  - TRIPS
+  iters:
+  - 10
+  - 15
+  lambdas:
+  - 5
+  - 10
+  - 15
+  - 20
+  normalizes:
+  - true
+  - false
+  ranks:
+  - 10
+  - 15
+paths:
+  BASE: s3://memberanalytics-data-out-prod/MODELDATA/
+  BBM14_FUTURE_CAT_SALES: s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14a/
+  BBM14_PAST_CAT_SALES: s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/sales_by_membercatbbm14b/
+  CATEGORY_DNA_AH4: s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH4_CD/CATEGORY_DNA_full/PARQUET/
+  CATEGORY_DNA_AH5: s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/AH5_CD/CATEGORY_DNA_full/PARQUET/
+  CATEGORY_DNA_BRAND: s3://memberanalytics-data-out-prod/CATEGORY_DNA/PROD/BRAND_CD/CATEGORY_DNA_full/PARQUET/
+  CLUB_DNA: s3://memberanalytics-data-out-prod/pipelined_intermediates/master/club_square_with_brand/
+  COMBINE_LOG: s3://memberanalytics-data-out-prod/MODELDATA/LOGS/cf_combine_preds.csv
+  CUBE: s3://memberanalytics-data-out-prod/CUBES/customer_cube_full/customer_cube
+  DATA: s3://memberanalytics-data-out-prod/MODELDATA/DATASETS/CF_MODEL/
+  ETL_LOG: s3://memberanalytics-data-out-prod/MODELDATA/LOGS/cf_etl.csv
+  ITEM_INT: s3://memberanalytics-data-out-prod/AD_HOC/pipelined_intermediates/master/item_with_brand
+  MODEL: s3://memberanalytics-data-out-prod/MODELDATA/MODELS/CF_MODEL/
+  MODEL_SAVE: cf_model_
+  PREDICTIONS_ROOT: s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/CF_MODEL/
+  PREDICT_LOG: s3://memberanalytics-data-out-prod/MODELDATA/LOGS/cf_predict.csv
+  PROPENSITY_PREDICTIONS: s3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS/prod_2025_10_12/trip_spend_predictions_2025-10-11.csv
+  RAW_MEMBER: s3://memberanalytics-data-out-prod/pipelined_intermediates/master/member_extended
+  SCALER_SAVE: cf_scaler_
+  TRAIN_LOG: s3://memberanalytics-data-out-prod/MODELDATA/LOGS/als_train.csv
+  TRANS_INT: s3://memberanalytics-data-out-prod/pipelined_intermediates/transaction_fiscal/detail/
+  TUNE_LOG: s3://memberanalytics-data-out-prod/MODELDATA/LOGS/als_tune.csv
+predict:
+  cf_reg: 1.5
+  cutoff: null
+  hook: false
+  lambda:
+  - '5'
+  - '15'
+  - '30'
+  - '50'
+  - '80'
+  pred_date: '2026-01-07'
+  pure_lambda: true
+  recommendations: 215
+  rel_lambda: true
+  rel_weighting:
+    cycle: 0.0
+    exposure: 0
+    margin: 0
+    seasonality: 0
+  scale: false
+  score_limit: null
+  stretch: false
+  subset: null
+  trip_prop_cap: 0.95
+shared:
+  category: AH5
+  data_version: dev_2025_11_23
+  end: '2025-11-22'
+  f_end: '2025-11-22'
+  f_start: '2025-08-22'
+  model_version: dev_2025_11_23
+  num_cats: 1000
+  run_name: dev_2025_11_23
+  start: '2024-11-22'
+  test: false
+train:
+  alpha: 1
+  backtest: false
+  binary: false
+  cat_norm: true
+  eval_col: TRIPS
+  evaluate: true
+  inputtype: SALES_UNITS
+  iter: 10
+  lambda: 0.1
+  member_norm: true
+  rank: 10
+  scaler: false
+  size_norm: false

@@ -1,0 +1,57 @@
+resources:
+  jobs:
+    personalization__etl:
+      name: de_wf_ds__Personalization__etl
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: STANDARD
+    
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        
+        # Ingest all sources into bronze and promote them to silver 
+        - task_key: get_etl_run_sources 
+          run_job_task:
+            job_id: ${resources.jobs.personalization__etl_run_sources.id}
+
+
+        # -- Control files  -----------------------------------------------------------------------
+        - task_key: brz_control_files
+          depends_on:
+            - task_key: get_etl_run_sources
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_control_files.ipynb
+
+        - task_key: control_files 
+          depends_on:
+            - task_key: brz_control_files
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_control_files.ipynb

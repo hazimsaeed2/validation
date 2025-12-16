@@ -1,0 +1,314 @@
+resources:
+  jobs:
+    personalization__etl_run_sources:
+      name: de_wf_ds__Personalization__etl_run_sources
+        
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: STANDARD
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+
+        # -- Fiscal Days -----------------------------------------------------------------------
+        # This is a dependancy all across the sources so its key for it to execute first
+
+        - task_key: fiscal_days 
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_fiscal_days.ipynb
+
+
+        # -- Awards ---------------------------------------------------------------------------
+        - task_key: brz_awards 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_awards.ipynb
+
+        - task_key: awards 
+          depends_on:
+            - task_key: brz_awards
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_awards.ipynb
+        
+        - task_key: awards_fiscal
+          depends_on:
+            - task_key: awards
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_awards_fiscal.ipynb 
+        
+
+        # -- Header ---------------------------------------------------------------------------
+        - task_key: brz_header 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_header.ipynb
+
+        - task_key: header 
+          depends_on:
+            - task_key: brz_header
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_header.ipynb
+
+        - task_key: header_fiscal 
+          depends_on:
+            - task_key: header
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_header_fiscal.ipynb
+        
+        - task_key: skeleton 
+          depends_on:
+            - task_key: header_fiscal
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_skeleton.ipynb
+
+
+
+        # -- Payment ---------------------------------------------------------------------------
+        - task_key: brz_payment 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_payment.ipynb
+
+        - task_key: payment 
+          depends_on:
+            - task_key: brz_payment
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_payment.ipynb
+        
+        - task_key: payment_fiscal
+          depends_on:
+            - task_key: payment
+            - task_key: header_fiscal
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_payment_fiscal.ipynb 
+        
+
+        # -- Member  -----------------------------------------------------------------------------
+        - task_key: brz_member 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_member.ipynb
+
+        - task_key: member 
+          depends_on:
+            - task_key: brz_member
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_member.ipynb
+
+
+        # -- Member Extended ----------------------------------------------------------------------
+        - task_key: brz_member_extended 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_member_extended.ipynb
+
+        - task_key: member_extended 
+          depends_on:
+            - task_key: brz_member_extended
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_member_extended.ipynb
+
+
+        # -- Member History -----------------------------------------------------------------------
+        - task_key: brz_member_history 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_member_history.ipynb
+
+        - task_key: member_history 
+          depends_on:
+            - task_key: brz_member_history
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_member_history.ipynb
+
+
+        # -- Member tract, geo_archive and distance ------------------------------------------------
+        - task_key: brz_member_tract 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_member_tract.ipynb
+
+        - task_key: brz_member_geo_archive 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_member_geo_archive.ipynb
+        
+        - task_key: brz_distance 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_distance.ipynb    
+        
+        - task_key: census_tract 
+          depends_on:
+            - task_key: brz_member_tract
+            - task_key: brz_member_geo_archive
+            - task_key: brz_distance
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_census_tract.ipynb
+
+
+
+        # -- Email -----------------------------------------------------------------------
+        - task_key: brz_email 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_email.ipynb
+
+        - task_key: email 
+          depends_on:
+            - task_key: brz_email
+            - task_key: member_extended
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_email.ipynb
+
+        - task_key: email_fiscal 
+          depends_on:
+            - task_key: email
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_email_fiscal.ipynb
+
+
+        # -- Coupon -----------------------------------------------------------------------
+        - task_key: brz_coupon_clip 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_coupon_clip.ipynb
+        
+        - task_key: brz_coupon_clip_usercode 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_coupon_clip_usercode.ipynb
+        
+        - task_key: coupon_clip 
+          depends_on:
+            - task_key: brz_coupon_clip
+            - task_key: brz_coupon_clip_usercode
+            - task_key: member_extended
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_coupon_clip.ipynb
+
+        - task_key: coupon_clip_fiscal 
+          depends_on:
+            - task_key: coupon_clip
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_coupon_clip_fiscal.ipynb
+
+
+
+        # -- Quotient Id ------------------------------------------------------------------
+        - task_key: brz_quotient_id 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_quotient_id.ipynb
+
+        - task_key: quotient_id 
+          depends_on:
+            - task_key: brz_quotient_id
+            - task_key: member_extended
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_quotient_id.ipynb
+
+
+        # -- Item  -----------------------------------------------------------------------------
+        - task_key: brz_item 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_item.ipynb
+
+        - task_key: item 
+          depends_on:
+            - task_key: brz_item
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_item.ipynb
+        
+
+        # -- Brand  -----------------------------------------------------------------------------
+        - task_key: brz_brand 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_brand.ipynb
+
+        - task_key: brand 
+          depends_on:
+            - task_key: brz_brand
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_brand.ipynb
+
+
+        # -- Item & Brand  -----------------------------------------------------------------------
+        - task_key: item_and_brand 
+          depends_on:
+            - task_key: item
+            - task_key: brand
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_item_brand.ipynb
+
+
+         
+        # -- Detail-----------------------------------------------------------------------------
+        - task_key: brz_transaction_detail 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_transaction_detail.ipynb
+
+        - task_key: transaction_detail 
+          depends_on:
+            - task_key: brz_transaction_detail
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_transaction_detail.ipynb
+
+        - task_key: transaction_detail_fiscal 
+          depends_on:
+            - task_key: transaction_detail
+            - task_key: fiscal_days
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_detail_fiscal.ipynb
+
+        - task_key: transaction_detail_gas_nr_fiscal 
+          depends_on:
+            - task_key: transaction_detail_fiscal
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_detail_gas_nr_fiscal.ipynb
+
+        - task_key: transaction_detail_isnr_fiscal 
+          depends_on:
+            - task_key: transaction_detail_fiscal
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_detail_isnr_fiscal.ipynb
+
+
+        # -- Club  -----------------------------------------------------------------------------
+        - task_key: brz_club 
+          notebook_task:
+            notebook_path: ../src/medallion/bronze/bronze_club.ipynb
+
+        - task_key: club 
+          depends_on:
+            - task_key: brz_club
+            - task_key: transaction_detail_fiscal
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_club.ipynb
+
+        - task_key: club_square 
+          depends_on:
+            - task_key: club
+            - task_key: transaction_detail_fiscal
+            - task_key: item_and_brand
+          notebook_task:
+            notebook_path: ../src/medallion/silver/silver_club_square.ipynb

@@ -1,0 +1,183 @@
+resources:
+  jobs:
+    personalization__model__cf_model:
+      name: de_wf_ds__Personalization__model__cf_model
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+
+      performance_target: PERFORMANCE_OPTIMIZED
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: config_setup
+          notebook_task:
+            notebook_path: ../src/model/cf_model/config_setup.ipynb 
+            base_parameters:
+              in_home_date: "automatic" 
+              lambdas: "5,15,30,50,80"
+
+        - task_key: cf_etl_ah4
+          depends_on:
+            - task_key: config_setup
+          notebook_task:
+            notebook_path: ../src/model/cf_model/cf_etl.ipynb 
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: ""
+              rmse: ""
+              test: ""
+
+        - task_key: cf_etl_ah4_future
+          depends_on:
+            - task_key: config_setup
+          notebook_task:
+            notebook_path: ../src/model/cf_model/cf_etl.ipynb 
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: True
+              rmse: ""
+              test: ""
+
+        - task_key: cf_etl_ah5
+          depends_on:
+            - task_key: config_setup
+          notebook_task:
+            notebook_path: ../src/model/cf_model/cf_etl.ipynb 
+            base_parameters:
+              config_path: "./config/config_AH5.yml" 
+              future: ""
+              rmse: ""
+              test: ""
+
+        - task_key: cf_etl_ah5_future
+          depends_on:
+            - task_key: config_setup
+          notebook_task:
+            notebook_path: ../src/model/cf_model/cf_etl.ipynb 
+            base_parameters:
+              config_path: "./config/config_AH5.yml" 
+              future: True
+              rmse: ""
+              test: ""
+
+        - task_key: als_train_ah4
+          depends_on:
+            - task_key: cf_etl_ah4
+          notebook_task:
+            notebook_path: ../src/model/cf_model/als_train.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: ""
+              rmse: ""
+              test: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: als_train_ah4_rmse
+          depends_on:
+            - task_key: cf_etl_ah4_future
+          notebook_task:
+            notebook_path: ../src/model/cf_model/als_train.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: ""
+              rmse: True
+              test: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: cf_predict_ah4
+          depends_on:
+            - task_key: als_train_ah4
+          notebook_task:
+            notebook_path: ../src/model/cf_model/cf_predict.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: ""
+              rmse: ""
+              test: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: als_train_ah5
+          depends_on:
+            - task_key: cf_etl_ah5
+          notebook_task:
+            notebook_path: ../src/model/cf_model/als_train.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH5.yml" 
+              future: ""
+              rmse: ""
+              test: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}
+
+        - task_key: als_train_ah5_rmse
+          depends_on:
+            - task_key: cf_etl_ah5_future
+          notebook_task:
+            notebook_path: ../src/model/cf_model/als_train.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH5.yml" 
+              future: ""
+              rmse: True
+              test: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}
+
+        - task_key: cf_predict_ah5
+          depends_on:
+            - task_key: als_train_ah5
+          notebook_task:
+            notebook_path: ../src/model/cf_model/cf_predict.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH5.yml" 
+              future: ""
+              rmse: ""
+              test: "" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}
+
+        - task_key: invalid_cf_score
+          depends_on:
+            - task_key: cf_predict_ah5
+            - task_key: cf_predict_ah4
+            - task_key: als_train_ah5_rmse
+            - task_key: als_train_ah4_rmse
+          notebook_task:
+            notebook_path: ../src/model/cf_model/invalid_cf_score.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: ""
+              rmse: ""
+              test: "" 
+
+        - task_key: top_cat
+          depends_on:
+            - task_key: invalid_cf_score
+          notebook_task:
+            notebook_path: ../src/model/cf_model/top_cat.ipynb  
+            base_parameters:
+              config_path: "./config/config_AH4.yml" 
+              future: ""
+              rmse: ""
+              test: "" 

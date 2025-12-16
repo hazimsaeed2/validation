@@ -1,0 +1,86 @@
+resources:
+  jobs:
+    personalization__model__gm_execution:
+      name: de_wf_ds__Personalization__model__gm_execution
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+
+      tags:
+        Environment: ${var.env}
+        Owner: PE
+        Project: dbx_ds_pe
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: etl_inference
+          notebook_task:
+            notebook_path: ../src/model/GM_model/ETL.ipynb 
+            base_parameters:
+              train: "False" 
+              muhh_path: "" 
+
+        - task_key: gm_scoring
+          depends_on:
+            - task_key: etl_inference
+          notebook_task:
+            notebook_path: ../src/model/GM_model/gm_scoring.ipynb 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_3.id}
+          # job_cluster_key: gm_scoring_cluster
+      # job_clusters:
+      #   - job_cluster_key: gm_scoring_cluster
+      #     new_cluster:
+      #       spark_version: 16.4.x-scala2.13
+      #       aws_attributes:
+      #         first_on_demand: 1
+      #         availability: SPOT_WITH_FALLBACK
+      #         zone_id: auto
+      #         spot_bid_price_percent: 100
+      #       node_type_id: c6id.2xlarge
+      #       driver_node_type_id: r5d.16xlarge
+      #       custom_tags:
+      #         Project: dbx_ds_pe
+      #         Owner: PE
+      #         Environment: ${var.env}
+      #       spark_env_vars:
+      #         PYSPARK_PYTHON: /databricks/python3/bin/python3
+      #       enable_elastic_disk: true
+      #       policy_id: ${var.job_cluster_policy_id}
+      #       data_security_mode: SINGLE_USER
+      #       runtime_engine: STANDARD
+      #       kind: CLASSIC_PREVIEW
+      #       use_ml_runtime: true
+      #       is_single_node: false
+      #       autoscale:
+      #         min_workers: 2
+      #         max_workers: 10
+
+      #   # - task_key: gm_execution
+      #   #   depends_on:
+      #   #     - task_key: gm_scoring
+      #   #   notebook_task:
+      #   #     notebook_path: ../src/model/GM_model/gm_execution.ipynb
+      #   #     base_parameters:
+      #   #       muhh_path: "s3://memberanalytics-data-out-prod/USERS/skarunanithi/GM_Propensity_Model/2025/S3_BF_2025_Eligible_Recs_09222025.csv" 

@@ -1,0 +1,58 @@
+resources:
+  jobs:
+    personalization__model__deployment:
+      name: de_wf_ds__Personalization__model__deployment
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: env
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+
+        - task_key: gm_model_deployment
+          notebook_task:
+            notebook_path: ../src/model/GM_model/deployment.ipynb 
+            base_parameters:
+              source_environment: "dev" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        - task_key: digital_models_deployment
+          notebook_task:
+            notebook_path: ../src/model/digital_propensity/deployment.ipynb 
+            base_parameters:
+              source_environment: "dev" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}
+
+        - task_key: bbm_model_deployment
+          notebook_task:
+            notebook_path: ../src/model/bbm_propensity_model/deployment.ipynb 
+            base_parameters:
+              source_environment: "dev" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_2.id}

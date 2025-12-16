@@ -1,0 +1,91 @@
+resources:
+  jobs:
+    personalization__assignment:
+      name: de_wf_ds__Personalization__assignment
+
+      #---- Configs -----------------------------------------------------------------------------------------------------------------------
+      max_concurrent_runs: 1  # its the equivalent of jenkins disableConcurrentBuilds()
+
+      # queue: enabled: true  --->  This means that the job is allowed to be queued if there are no available resources to run it immediately. 
+      # This ensures that the job will be executed as soon as the necessary resources become available, rather than failing or being skipped due to resource constraints.
+      queue:
+        enabled: true
+
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+  
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+      # schedule:
+      #   quartz_cron_expression: 0 0 2 * * ?
+      #   timezone_id: America/New_York
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+
+      # Please run the below scripts sequentially :
+
+      
+        - task_key: check_input_files   # 10min ?
+          notebook_task:
+            notebook_path: ../src/assignment/scripts/check_input.ipynb  
+        # build triggers:  test_token (a)
+
+      
+        - task_key: create_coupons   # 20min ?
+          depends_on:
+            - task_key: check_input_files
+          notebook_task:
+            notebook_path: ../src/assignment/scripts/create_coupons.ipynb  
+
+
+        - task_key: assign_offers   # 40min ?
+          depends_on:
+            - task_key: create_coupons
+          notebook_task:
+            notebook_path: ../src/assignment/scripts/assign_offers.ipynb
+            base_parameters:
+              allow_multi_long_tests: "False"
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}  
+
+
+        - task_key: subsample_population   # 10min ?
+          depends_on:
+            - task_key: assign_offers
+          notebook_task:
+            notebook_path: ../src/assignment/scripts/subsample_population.ipynb
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}  
+    
+
+        - task_key: generate_output_file   # 10min ?
+          depends_on:
+            - task_key: subsample_population
+          notebook_task:
+            notebook_path: ../src/assignment/scripts/generate_output_file.ipynb
+
+
+        - task_key: qc_assignments   # 30min ?
+          depends_on:
+            - task_key: generate_output_file
+          notebook_task:
+            notebook_path: ../src/assignment/scripts/qc_assignments.ipynb 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}
+
+        # end

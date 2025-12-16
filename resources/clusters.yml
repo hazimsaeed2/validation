@@ -1,0 +1,133 @@
+resources:
+  clusters:
+    pe_ml_cluster_1: # <-- this will be used as reference
+    
+      permissions:
+      - user_name: ${workspace.current_user.userName}  
+        level: CAN_MANAGE  
+      - service_principal_name: ${var.service_principal}
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-Lovelytics-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Admins
+        level: CAN_MANAGE
+
+      cluster_name: ML_Compute_PE_1
+      spark_version: 16.4.x-scala2.13
+      node_type_id: r5d.2xlarge # for couponspe was i4i.4xlarge
+      driver_node_type_id: r5d.12xlarge #  for couponspe was g6.12xlarge
+      autoscale:
+        min_workers: 1
+        max_workers: 20
+      use_ml_runtime: true
+      kind: CLASSIC_PREVIEW
+      autotermination_minutes: 15
+      enable_elastic_disk: false
+      enable_local_disk_encryption: true
+      single_user_name: ${var.service_principal}
+      is_single_node: false
+      policy_id: ${var.cluster_policy_id_for_ml} #"00057881EC561717",
+      data_security_mode: SINGLE_USER
+      runtime_engine: PHOTON # for coupons was STANDARD
+      spark_conf:
+        spark.driver.maxResultSize: 250g # for couponspe was 170g
+      aws_attributes:
+        first_on_demand: 1
+        availability: SPOT_WITH_FALLBACK
+        zone_id: auto
+        spot_bid_price_percent: 100
+      spark_env_vars:
+        PYSPARK_PIN_THREAD: false
+
+    pe_ml_cluster_2: # <-- this will be used as reference
+    
+      permissions:
+      - user_name: ${workspace.current_user.userName}  
+        level: CAN_MANAGE  
+      - service_principal_name: ${var.service_principal}
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-Lovelytics-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Admins
+        level: CAN_MANAGE
+
+      cluster_name: ML_Compute_PE_2
+      spark_version: 16.4.x-scala2.13
+      node_type_id: r5d.2xlarge # for couponspe was i4i.4xlarge
+      driver_node_type_id: r5d.12xlarge #  for couponspe was g6.12xlarge
+      autoscale:
+        min_workers: 1
+        max_workers: 20
+      use_ml_runtime: true
+      kind: CLASSIC_PREVIEW
+      autotermination_minutes: 15
+      enable_elastic_disk: false
+      enable_local_disk_encryption: true
+      single_user_name: ${var.service_principal}
+      is_single_node: false
+      policy_id: ${var.cluster_policy_id_for_ml} #"00057881EC561717",
+      data_security_mode: SINGLE_USER
+      runtime_engine: PHOTON # for coupons was STANDARD
+      spark_conf:
+        spark.driver.maxResultSize: 250g # for couponspe was 170g
+      aws_attributes:
+        first_on_demand: 1
+        availability: SPOT_WITH_FALLBACK
+        zone_id: auto
+        spot_bid_price_percent: 100
+      spark_env_vars:
+        PYSPARK_PIN_THREAD: false
+    
+    pe_ml_cluster_3: # <-- this will be used as reference
+    
+      permissions:
+      - user_name: ${workspace.current_user.userName}  
+        level: CAN_MANAGE  
+      - service_principal_name: ${var.service_principal}
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-Lovelytics-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Admins
+        level: CAN_MANAGE
+
+      cluster_name: ML_Compute_PE_3
+      spark_version: 16.4.x-scala2.13
+      node_type_id: i4i.4xlarge # for couponspe was i4i.4xlarge
+      driver_node_type_id: r5d.12xlarge #  for couponspe was g6.12xlarge
+      autoscale:
+        min_workers: 1
+        max_workers: 20
+      use_ml_runtime: true
+      kind: CLASSIC_PREVIEW
+      autotermination_minutes: 15
+      enable_elastic_disk: false
+      enable_local_disk_encryption: true
+      single_user_name: ${var.service_principal}
+      is_single_node: false
+      policy_id: ${var.cluster_policy_id_for_ml} #"00057881EC561717",
+      data_security_mode: SINGLE_USER
+      runtime_engine: PHOTON # for coupons was STANDARD
+      spark_conf:
+        spark.driver.maxResultSize: 250g # for couponspe was 170g
+      aws_attributes:
+        first_on_demand: 1
+        availability: SPOT_WITH_FALLBACK
+        zone_id: auto
+        spot_bid_price_percent: 100
+      spark_env_vars:
+        PYSPARK_PIN_THREAD: false
+    
+#------------------------------------------------------------------------------
+# How to make a task use this specific cluster:
+
+# tasks:
+# - task_key: lambda_test 
+#   notebook_task:
+#     notebook_path: ../src/digital_coupons/coupons_pipeline/lambda_test.ipynb
+#   existing_cluster_id: ${resources.clusters.pe_ml_cluster.id}  # <--- Add this line

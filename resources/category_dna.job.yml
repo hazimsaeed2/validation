@@ -1,0 +1,81 @@
+resources:
+  jobs:
+    personalization__category_dna:
+      name: de_wf_ds__Personalization__category_dna
+        
+      parameters:
+        - name: environment
+          default: "${bundle.target}"
+        - name: catalog
+          default: ${var.catalog}
+        - name: run_as_date
+          default: "{{job.trigger.time.iso_date}}"
+        - name: reqs_path
+          default: "./config/reqs.yaml"
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+
+      tags:
+        Environment: ${var.env}
+        Owner: DS
+        Project: dbx_ds
+      
+      run_as:
+        service_principal_name:  ${var.service_principal}
+      
+      budget_policy_id: ${var.budget_policy_id}    
+      
+
+      
+      #---  Tasks definitions  ---------------------------------------------------------------------------------------------------------------------
+      tasks:
+        - task_key: "brz_exclusions"
+          notebook_task:
+            notebook_path: "../src/medallion/bronze/bronze_exclusions.ipynb"
+        
+        - task_key: "slv_exclusions"
+          depends_on:
+            - task_key: "brz_exclusions"
+          notebook_task:
+            notebook_path: "../src/medallion/silver/silver_exclusions.ipynb"
+
+        - task_key: "brand_exclusions"
+          depends_on:
+            - task_key: "slv_exclusions"
+          notebook_task:
+            notebook_path: "../src/dna/category/brand_exclusions.ipynb"
+
+        - task_key: "run_AH4"
+          depends_on:
+            - task_key: "brand_exclusions"
+          notebook_task:
+            notebook_path: "../src/dna/category/run.ipynb"
+            base_parameters:
+              config_path: "./config/square_AH4.yaml"
+        
+        - task_key: "run_AH5"
+          depends_on:
+            - task_key: "brand_exclusions"
+          notebook_task:
+            notebook_path: "../src/dna/category/run.ipynb"
+            base_parameters:
+              config_path: "./config/square_AH5.yaml"
+
+        - task_key: "run_article"
+          depends_on:
+            - task_key: "brand_exclusions"
+          notebook_task:
+            notebook_path: "../src/dna/category/run.ipynb"
+            base_parameters:
+              config_path: "./config/square_article.yaml"
+
+        - task_key: "run_brand"
+          depends_on:
+            - task_key: "brand_exclusions"
+          notebook_task:
+            notebook_path: "../src/dna/category/run.ipynb"
+            base_parameters:
+              config_path: "./config/square_brand.yaml"
+
+
+     
