@@ -14,7 +14,7 @@ paths:
       ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
       LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
       ### UPDATE PER CAMPAIGN
-      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2025-12-28/' # use most recently available date
+      CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2026-01-05/' # use most recently available date
       # --------- end of fairly static ------------ #
       # ---------- campaign specific -------------- #
       # Model inputs - UPDATE PER CAMPAIGN
@@ -47,11 +47,11 @@ paths:
       EXCLUSIONS: 's3://memberanalytics-data-out-prod/exclusions/exclusions_with_brand.csv'
 shared: # This section is shared among all scripts - UPDATE PER RUN
       experiment: 241 # Maps to experiment_id in cells.csv
-      campaign: 'MMPC02FY27_BAU' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
-      run_name: 'BAU' # BAU/final Good for making runs with different configurations within the same campaign
-      run_type: 'dev' # accepts 'prod' 'dev' 'test'        
+      campaign: 'MMPC02FY27_PROD' # Generally FY20MMPC1 or FY20BBM1.  Name must contain 'bbm' or 'mmpc', for BBM and MMPC, respectively
+      run_name: 'final' # BAU/final Good for making runs with different configurations within the same campaign
+      run_type: 'prod' # accepts 'prod' 'dev' 'test'        
       run_size: 'full' # accepts 'full' or a number for your run size, in quotes, e.g. '5000'
-      assignment_date: '2025-12-31' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
+      assignment_date: '2026-01-06' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
       s3_bucket: 'memberanalytics-data-out-prod'
@@ -116,7 +116,7 @@ subset: # subsample_population.py and generate_msmt_input.py
       sample_size: 0 # When subsampling, every time we subsample a segment (new members, decile 5, etc), how many members to sample. Currently sample 5 segments: Deciles 1-4(together),Decile 5,Decile 6, Decile 7, New members (<150 days excluding trials)
       force_in_new: FALSE # Whether or not to force in and Sample new members into PC circulation
       force_in_cells: # A list of cells that will be forced into the mail circulation
-      force_out_cells: [1720] # A list of cells that will be forced out of the mail circulation
+      force_out_cells: [1720,1723,1725] # A list of cells that will be forced out of the mail circulation
       error: 75 # allowable error in circulation in units of people
       max_decile_6: # Deprecated
 qc: # qc_assignments.py
