@@ -79,7 +79,7 @@ data_paths:
 
   fiscal_days:
     start: '2012-01-01'
-    end: '2025-12-31'
+    end: '2026-12-31'
 
   recency_lookback_duration:
     global: 50
