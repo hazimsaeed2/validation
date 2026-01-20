@@ -274,7 +274,7 @@ def feature_distance(job, dna):
     print("DNA AFTER  JOINING WITH DNA AND CENSUS_TRACT :")
     # print(dna)
 
-    drive_time_cols = ["BJS_Drive_Time","WALMART_Drive_Time","COSTCO_Drive_Time","SAMS_Drive_Time",]
+    drive_time_cols = ["BJS_DRIVE_TIME","WALMART_DRIVE_TIME","COSTCO_DRIVE_TIME","SAMS_DRIVE_TIME",]
 
     print("NULL % AT THE START")
     null_percentages_atstart_dna = calculate_null_percentages(dna, drive_time_cols)
