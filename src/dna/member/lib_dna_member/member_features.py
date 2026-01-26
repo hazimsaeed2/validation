@@ -289,13 +289,13 @@ def feature_distance(job, dna):
                "SAMS_DRIVING_DISTANCE", "SAMS_DISTANCE"]
 
     # Changing from .groupBy("LATEST_HOME_ZIP_CD") to .groupBy("zip")
-    median_df_for_not_null = dna_without_nulls.groupBy("zip").agg(
+    median_df_for_not_null = dna_without_nulls.groupBy("ZIP").agg(
         *[sqlf.percentile_approx(col_name, 0.5, 100).alias(f"{col_name}") for col_name in median_cols_checks]
     )
 
     dna_with_nulls_drop_actual_col = dna_with_nulls.drop(*median_cols_checks)
 
-    dna_with_imputed_nulls = dna_with_nulls_drop_actual_col.join(median_df_for_not_null, on="zip", how="left")
+    dna_with_imputed_nulls = dna_with_nulls_drop_actual_col.join(median_df_for_not_null, on="ZIP", how="left")
 
     dna = dna_with_imputed_nulls.unionByName(dna_without_nulls)
 
