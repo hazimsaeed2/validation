@@ -191,13 +191,15 @@ def check_date_range(df, earlier_date_column, later_date_column):
             earlier_date_column,
             sqlf.coalesce(
                 sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("MM/dd/yyyy")),
-                sqlf.to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/dd/yyyy"))
+                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/dd/yyyy")),
+                sqlf.to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/d/yyyy"))
             )
         ).withColumn(
             later_date_column,
             sqlf.coalesce(
                 sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("MM/dd/yyyy")),
-                sqlf.to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/dd/yyyy"))
+                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/dd/yyyy")),
+                sqlf.to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/d/yyyy"))
             ),
         )
         num_wrong_date_range = (
