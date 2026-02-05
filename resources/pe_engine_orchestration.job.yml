@@ -25,11 +25,8 @@ resources:
       trigger:
         pause_status: UNPAUSED
         file_arrival:
-          url: s3://memberanalytics-data-in-prod/Membership/trigger_folder/Membership/
+          url: s3://memberanalytics-data-in-prod/Membership/databricks_weekly_pipeline_trigger_folder/
 
-        # The file arrival trigger will monitor for any new file  matching this prefix under the URL.
-          # prefix:  pers_eng_main_trigger_
-        # wait_after_last_write_minutes: 5   # Time to wait for subsequent files before starting the job.
         # schedule:  # Optional: If you need a scheduled fallback in case events are missed
         #   quartz_cron_expression: "0 0 10 * * ?"
         #   timezone_id: "America/Los_Angeles"
