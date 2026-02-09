@@ -1,0 +1,39 @@
+
+
+## Goal:   for the team to be able to check the process behaviour under PROD conditions without modifing current PROD process output. 
+
+## 1- Change process outputs aimed at s3 to avoid to conflict with current process:
+
+- Dataframes are stored in Delta tables now so no conflict in any env
+- Reports or logs are stored to volume with exception of any particular case listed below. 
+
+- Go into: src/config/variables.ipynb and edit these paths to a temp route so when run, it does not overwrite current prod:
+                dna_cube_edw_path  = 's3://bjs-enterprise-data-lake-stage/Personalization_Engine/inbound/Member_DNA/customer_cube/'
+                tp_score_path      = 's3://memberanalytics-data-out-prod/MODELDATA/PREDICTIONS/TRIP_SPEND_MODELS'
+                tp_score_edw_path  = 's3://bjs-enterprise-data-lake-stage/Personalization_Engine/inbound/Trip_Propensity'
+                bbm_score_path     = 's3://memberanalytics-data-out-prod/MODELDATA/BBM_PROPENSITY/BBM_SALES_SCORE/'
+                bbm_score_edw_path = 's3://bjs-enterprise-data-lake-stage/Personalization_Engine/inbound/BBM_Scoring/'
+
+- Go into: assignment/config/config_template.yml and edit the s3 paths of output files to a temp path: 
+        This is a reference list of estimated keys to edit, please check the full file: 
+                COUPON_DISCOUNT
+                COUPON_MEMTRIP
+                COUPON_MEMUSAGE
+                COUPON_QUALS
+                COUPON_MAP
+                COUPON_BANK
+                COUPON_BACKFILL_ELIGIBILITY_LOG
+                ASSIGNMENT_PATH
+                CONSTRUCTS_PATH
+                SUBSET
+                MAILFILE
+                QC_REPORT
+
+## - Deploy the DAB in prod with the current path changes
+## - Run pipelines 
+## - Compare tables using UAT notebooks
+## - Compare outputs in s3 between the temp and current production path, if they match, proceed, review and reprocess otherwise
+## - Prepare for Databricks PROD run 
+----> disable current prod processes that write to s3 (if the output does not match the databricks outputs the systems can still be run in parallel )
+----> roll back s3 paths edits in databricks and redeploy assets 
+----> pipelines should run automatically at next trigger. 
