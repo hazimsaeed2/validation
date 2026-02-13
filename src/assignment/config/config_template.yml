@@ -10,9 +10,9 @@ paths:
       # ITEM_MASTER: 's3://memberanalytics-data-out-prod/pipelined_intermediates/master/item'
       SAME_DAY_ZIPCODES: 's3://memberanalytics-data-out-prod/AD_HOC/same_day_delivery_zip_codes/Same Day Zip Codes Covered 8.22.19.csv'
       # CDSA
-      CDSA_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/'
-      ASSN_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/cdsa/assn_output/'
-      LOG_LOC: 's3://memberanalytics-data-out-prod/ASSIGNMENTS/logs/'
+      CDSA_LOC: 's3://memberanalytics-data-out-prod/dbx_test/ASSIGNMENTS/cdsa/'
+      ASSN_LOC: 's3://memberanalytics-data-out-prod/dbx_test/ASSIGNMENTS/cdsa/assn_output/'
+      LOG_LOC: 's3://memberanalytics-data-out-prod/dbx_test/ASSIGNMENTS/logs/'
       ### UPDATE PER CAMPAIGN
       CUBE: 's3://memberanalytics-data-out-prod/CUBES/customer_cube_2026-02-09/' # use most recently available date
       # --------- end of fairly static ------------ #
