@@ -1150,8 +1150,13 @@ class Campaign:
         trips = trips.dropna(subset=["cpn_nbr", "mbrshp_sid"])
         usage = read_subset_and_cast(env_path(self.paths["COUPON_MEMUSAGE"], self.vol_base, self.env), "parquet")
         cf_pred = read_subset_and_cast(self.paths["PRED_LIST"], "table")
-        max_cf_run = cf_pred.agg(sqlf.max("RUN_NAME").alias('max_dt')).first()['max_dt']
-        cf_pred = cf_pred.filter(sqlf.col('RUN_NAME')==max_cf_run).drop('RUN_NAME', 'CATEORY_CD', 'START_DATE', 'END_DATE')
+        max_run_df = cf_pred.select(sqlf.max("RUN_NAME").alias("RUN_NAME"))
+        # max_cf_run = cf_pred.agg(sqlf.max("RUN_NAME").alias('max_dt')).first()['max_dt']
+        cf_pred = (
+            cf_pred.join(max_run_df, on="RUN_NAME", how="inner")
+                .drop("RUN_NAME", "CATEGORY_CD", "START_DATE", "END_DATE")
+        )
+        # cf_pred = cf_pred.filter(sqlf.col('RUN_NAME')==max_cf_run).drop('RUN_NAME', 'CATEORY_CD', 'START_DATE', 'END_DATE')
 
         # 3. Consolidate coupon data
         coups_quals = coups_quals[coups_quals.experiment_id == self.experiment]
