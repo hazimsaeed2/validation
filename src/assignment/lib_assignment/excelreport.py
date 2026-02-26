@@ -494,7 +494,16 @@ def write_report_dbx(job, tables, dbutils ):
 
 
     # 4. WRITE EXCEL TO DATABRICKS VOLUME
+    filename = output_path.split("/")[-1] 
     dbutils.fs.mkdirs("/".join(output_path.split("/")[:-1]))  # ensure dir exists
-    with open(output_path, "wb") as f:
-        f.write(buffer.getvalue())
+    if job.env=='prod':
+        with open(f"/Volumes/datascience_ea_prod/pe/helpers/{filename}", "wb") as f:
+            f.write(buffer.getvalue())
+        dbutils.fs.mv(
+            f"/Volumes/datascience_ea_prod/pe/helpers/{filename}",
+            output_path
+        )
+    else:
+        with open(output_path, "wb") as f:
+            f.write(buffer.getvalue())
 
