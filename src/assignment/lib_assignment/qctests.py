@@ -17,7 +17,14 @@ from lib_assignment.campaign import Campaign
 from lib.spark_util import get_logger
 from lib_assignment.assn_utils  import  env_path
 # ---- Helpers ---- #
-
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.getOrCreate()
+# sparkContext = spark.sparkContext
+try:
+    dbutils  
+except NameError:
+    from pyspark.dbutils import DBUtils
+    dbutils = DBUtils(spark)  
 
 def calc_avg_col_value(df, colname):
     """Calculate the average value of dataframe column.
@@ -304,24 +311,24 @@ def check_sensitive_content(job, dbutils=None):
             )
         else: 
             
-            if env =='prod': # legacy code
+            # if env =='prod': # legacy code
 
-                # There is no incorrect assignment to write, but we don't want old
-                # incorrect assignment from a previous run to remain
+            #     # There is no incorrect assignment to write, but we don't want old
+            #     # incorrect assignment from a previous run to remain
                 
-                bucket, key = iotools.split_path_bucket_key(path)
+            #     bucket, key = iotools.split_path_bucket_key(path)
                 
-                if iotools.is_s3_path(bucket, key):
-                    iotools.s3_delete(
-                        bucket, key, allowed_paths=path
-                    )  # OK to pass variable because it's not actually in the config, but set in assn_io
-            else:
+            #     if iotools.is_s3_path(bucket, key):
+            #         iotools.s3_delete(
+            #             bucket, key, allowed_paths=path
+            #         )  # OK to pass variable because it's not actually in the config, but set in assn_io
+            # else:
 
-                # No assignment → delete previous run's directory
-                try:
-                    dbutils.fs.rm(path, recurse=True)
-                except Exception as e:
-                    print(f"Could not delete {path}: {e}")
+            # No assignment → delete previous run's directory
+            try:
+                dbutils.fs.rm(path, recurse=True)
+            except Exception as e:
+                print(f"Could not delete {path}: {e}")
 
 
 
