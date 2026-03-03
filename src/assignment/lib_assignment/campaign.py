@@ -1887,7 +1887,7 @@ class Campaign:
             current_group = current_group.filter(current_group["rank"] == 1)
             current_group = current_group.drop("rank")
 
-        w = W.partitionBy("MBRSHP_SID").orderBy("IS_BACKFILL", "SLOT_NBR")
+        w = W.partitionBy("MBRSHP_SID").orderBy("IS_BACKFILL", "SLOT_NBR","cpn_nbr")
         current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
 
         current_group = current_group.filter(
