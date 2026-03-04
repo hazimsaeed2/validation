@@ -99,24 +99,23 @@ def check_execution_overwrite(job, paths_to_check):
 
     for path in paths_to_check:
         path = env_path(path, job.vol_base, job.env)
-        if job.env in ['dev', 'qa']:
-            try:
-                dbutils.fs.ls(path)
-                raise Exception(
-                    "There already has been a campaign executed with the same"
-                    " campaign and run name. Change the names in the config or"
-                    " use --force in order to overwrite the last execution."
-                )
-            except:
-                pass
-        else:
-            bucket, key = split_path_bucket_key(path)
-            if is_s3_path(bucket, key) or is_s3_file(bucket, key):
-                raise Exception(
-                    "There already has been a campaign executed with the same"
-                    " campaign and run name. Change the names in the config or"
-                    " use --force in order to overwrite the last execution."
-                )
+        try:
+            dbutils.fs.ls(path)
+            raise Exception(
+                "There already has been a campaign executed with the same"
+                " campaign and run name. Change the names in the config or"
+                " use --force in order to overwrite the last execution."
+            )
+        except:
+            pass
+        # else:
+        #     bucket, key = split_path_bucket_key(path)
+        #     if is_s3_path(bucket, key) or is_s3_file(bucket, key):
+        #         raise Exception(
+        #             "There already has been a campaign executed with the same"
+        #             " campaign and run name. Change the names in the config or"
+        #             " use --force in order to overwrite the last execution."
+        #         )
 
 
 
