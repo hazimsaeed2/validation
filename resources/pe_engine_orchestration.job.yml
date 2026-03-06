@@ -11,6 +11,10 @@ resources:
       queue:
         enabled: true
 
+      permissions:                                     
+        - service_principal_name: ${var.service_principal}
+          level: CAN_MANAGE_RUN
+
       parameters:
         - name: environment
           default: "${bundle.target}"
@@ -47,13 +51,9 @@ resources:
                   
         - task_key: current_trial_file_check
           notebook_task:
-            notebook_path: ../src/medallion/bronze/input_file_check_for_recent_saturday.ipynb  
-            base_parameters:
-              target_emails: dgarayalde@bjs.com #, hsaeed@bjs.com  #, nmiya@bjs.com, gparmar@bjs.com, atrivedi1@bjs.com, pborpujari@bjs.com, achatterjee5@bjs.com
-              subject: "${bundle.target} - File Check Results: PE weekly refresh"
-              body: "Hi, Kindly find below the complete file integrity check report: \n \n{output_report_str} \n \nKind Regards, Team Genpact"
+            notebook_path: "../src/medallion/bronze/input_file_check_for_recent_saturday.ipynb"
 
-        - task_key: notify_started                        # ← NEW
+        - task_key: notify_started  
           depends_on:
             - task_key: current_trial_file_check
           notebook_task:
@@ -120,10 +120,34 @@ resources:
           run_job_task:
             job_id: ${resources.jobs.personalization__job_summary_report.id} 
 
-        - task_key: notify_completed                      # ← NEW
+        - task_key: notify_completed 
           depends_on:
             - task_key: run_job_summary_report_and_send_email
           notebook_task:
             notebook_path: "../src/notifications/notify_pipeline_completed.ipynb"
             source: WORKSPACE
+
+        - task_key: notify_failed 
+          depends_on:
+            - task_key: current_trial_file_check
+            - task_key: notify_started
+            - task_key: etl
+            - task_key: member_dna
+            - task_key: category_dna
+            - task_key: model__trip_spend
+            - task_key: model__cf_model
+            - task_key: model__trip_spend_sales
+            - task_key: model__bbm
+            - task_key: model__gm
+            - task_key: run_job_summary_report_and_send_email
+            - task_key: notify_completed
+          run_if: AT_LEAST_ONE_FAILED
+          max_retries: 0
+          min_retry_interval_millis: 0
+          retry_on_timeout: false
+          notebook_task:
+            notebook_path: "../src/notifications/notify_pipeline_failed.ipynb"
+            source: WORKSPACE
+            base_parameters:
+              parent_run_id: "{{tasks.notify_started.values.run_id}}"
         # end
