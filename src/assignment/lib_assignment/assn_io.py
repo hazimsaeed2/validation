@@ -830,18 +830,18 @@ class DataManager:
                 self.params["run_type"].lower() == "prod"
                 and name in OUTBOUND_FILES
             ):
-                if self.env == "prod":
-                    path = generate_outbound_path(name, filetype, self.params, self.paths)
-                else:
-                    path = generate_outbound_path_dbx(
-                                file_name=name, 
-                                file_type=filetype, 
-                                params=self.params,
-                                paths=self.paths,
-                                spark=self.spark, 
-                                vol_base=self.vol_base, 
-                                env=self.env
-                            )
+                # if self.env == "prod":
+                #     path = generate_outbound_path(name, filetype, self.params, self.paths)
+                # else:
+                path = generate_outbound_path_dbx(
+                            file_name=name, 
+                            file_type=filetype, 
+                            params=self.params,
+                            paths=self.paths,
+                            spark=self.spark, 
+                            vol_base=self.vol_base, 
+                            env=self.env
+                        )
             else:
                 path = self.paths.get(pathname,None)
             
@@ -963,19 +963,19 @@ class DataManager:
         ):
             print(f"We are also copying the file to the outbound folder with a particular file name.\n")
 
-            if self.env == "prod":
-                move_to_outbound(path, name, ftype, self.params, self.paths)
-            else:
-                move_to_outbound_dbx(
-                    file_path=path, 
-                    file_name=name, 
-                    file_type=ftype, 
-                    params=self.params,
-                    paths=self.paths,
-                    spark=self.spark, 
-                    vol_base=self.vol_base, 
-                    env=self.env, 
-                    dbutils=dbutils)
+            # if self.env == "prod":
+            #     move_to_outbound(path, name, ftype, self.params, self.paths)
+            # else:
+            move_to_outbound_dbx(
+                file_path=path, 
+                file_name=name, 
+                file_type=ftype, 
+                params=self.params,
+                paths=self.paths,
+                spark=self.spark, 
+                vol_base=self.vol_base, 
+                env=self.env, 
+                dbutils=dbutils)
 
 
 
