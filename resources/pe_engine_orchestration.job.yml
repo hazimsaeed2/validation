@@ -53,10 +53,16 @@ resources:
               subject: "${bundle.target} - File Check Results: PE weekly refresh"
               body: "Hi, Kindly find below the complete file integrity check report: \n \n{output_report_str} \n \nKind Regards, Team Genpact"
 
+        - task_key: notify_started                        # ← NEW
+          depends_on:
+            - task_key: current_trial_file_check
+          notebook_task:
+            notebook_path: "../src/notifications/notify_pipeline_started.ipynb"
+            source: WORKSPACE
 
         - task_key: etl
           depends_on:
-            - task_key: current_trial_file_check
+            - task_key: notify_started
           run_job_task:
             job_id: ${resources.jobs.personalization__etl.id} 
         
@@ -107,12 +113,17 @@ resources:
         #     DNA cube output is updated here:    /src/dna/member/merge
         #     Trip prop output is uptated here:   /src/model/trip_spend_model/predict
         #     Altought not originally in this stage the bbm output too is stored to EDW path. Its done here:   /src/model/bbm_propensity_model/bbm_propensity_model_run
-
-          
+            
         - task_key: run_job_summary_report_and_send_email  # 14) PE_Data_pipline_Summary_Jenkins_API 
           depends_on:
             - task_key: model__gm
           run_job_task:
             job_id: ${resources.jobs.personalization__job_summary_report.id} 
 
+        - task_key: notify_completed                      # ← NEW
+          depends_on:
+            - task_key: run_job_summary_report_and_send_email
+          notebook_task:
+            notebook_path: "../src/notifications/notify_pipeline_completed.ipynb"
+            source: WORKSPACE
         # end

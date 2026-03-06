@@ -44,7 +44,7 @@ targets:
       host: https://dbc-ad8c0ca0-6db0.cloud.databricks.com
       # root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
       # while in dev it may be useful to config mode: development and use this:
-      root_path: /Workspace/Users/hsaeed@bjs.com/add-email-notification-dev/member_analytics/.bundle/${bundle.name}/${bundle.target}
+      root_path: ~/Workspace/Users/${workspace.current_user.userName}/add-email-notification-dev/member_analytics/.bundle/${bundle.name}/${bundle.target}
       # then the notebooks and python files are pulled directly from your workspace and not duplicated into .bundle
   
 
