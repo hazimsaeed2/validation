@@ -554,7 +554,7 @@ def rank_by_cf(
     df = union_with_mismatched_columns(combined_col, aggregation)
 
     if dedupe:
-        deduped = deduplicate(df, order_by=["priority"])
+        deduped = deduplicate(df, order_by=["priority", "rank"])
         assignment = deduped
     else:
         assignment = df
