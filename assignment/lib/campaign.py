@@ -1793,14 +1793,16 @@ class Campaign:
         new_data = source_df["data"].select(*(new_columns + source_df["merge_col"]))
 
         # Removing data with duplicate merge_col
-        seed = 1
-        new_data = new_data.withColumn("randomness", sqlf.rand(seed))
-        w = W.partitionBy(*source_df["merge_col"]).orderBy("randomness")
+        # Use a content-based hash instead of rand() for deterministic dedup
+        hash_cols = [sqlf.coalesce(sqlf.col(c).cast("string"), sqlf.lit("__null__"))
+                     for c in new_data.columns]
+        new_data = new_data.withColumn("_dedup_hash", sqlf.sha2(sqlf.concat_ws("||", *hash_cols), 256))
+        w = W.partitionBy(*source_df["merge_col"]).orderBy("_dedup_hash")
         new_data = (
             new_data.withColumn("rank", sqlf.row_number().over(w))
             .filter(sqlf.col("rank") == 1)
             .drop("rank")
-            .drop("randomness")
+            .drop("_dedup_hash")
         )
 
         extra_info = extra_info.join(new_data, source_df["merge_col"], "left")
