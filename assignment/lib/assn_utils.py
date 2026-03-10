@@ -977,6 +977,12 @@ def deterministic_df(
     ]
     if "mbrshp_sid" in all_columns:
         columns.append(sqlf.col("mbrshp_sid").cast("string"))
+    # Include is_backfill/priority in hash to break ties between
+    # frontfill and backfill rows for the same member+coupon
+    if "is_backfill" in all_columns:
+        columns.append(sqlf.coalesce(sqlf.col("is_backfill").cast("string"), sqlf.lit("0")))
+    if "priority" in all_columns:
+        columns.append(sqlf.coalesce(sqlf.col("priority").cast("string"), sqlf.lit("0")))    
     if extra_hash_columns:
         for column in extra_hash_columns:
             columns.append(column.cast("string"))
