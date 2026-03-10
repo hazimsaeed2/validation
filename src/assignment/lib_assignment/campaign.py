@@ -882,11 +882,16 @@ def _append_source_data(offer_data, source, self, join_not_unique_key=None):
     if join_not_unique_key == 1:
         pass
     else:
-        self.offer_sources_df[source["name"]]["data"] = self.offer_sources_df[
-            source["name"]
-        ]["data"].dropDuplicates(
-            subset=self.offer_sources_df[source["name"]]["merge_col"]
-        )
+        merge_col = self.offer_sources_df[source["name"]]["merge_col"]
+        data = self.offer_sources_df[source["name"]]["data"]
+        hash_cols = [sqlf.coalesce(sqlf.col(c).cast("string"), sqlf.lit("__null__"))
+                    for c in data.columns]
+        data = data.withColumn("_dedup_hash", sqlf.sha2(sqlf.concat_ws("||", *hash_cols), 256))
+        w = W.partitionBy(*merge_col).orderBy("_dedup_hash")
+        data = (data.withColumn("_dedup_rank", sqlf.row_number().over(w))
+                .filter(sqlf.col("_dedup_rank") == 1)
+                .drop("_dedup_rank", "_dedup_hash"))
+        self.offer_sources_df[source["name"]]["data"] = data
 
     self.offer_sources_df[source["name"]]["data"] = truncate_history(
         self.offer_sources_df[source["name"]]["data"], cache=True
@@ -1815,14 +1820,16 @@ class Campaign:
         new_data = source_df["data"].select(*(new_columns + source_df["merge_col"]))
 
         # Removing data with duplicate merge_col
-        seed = 1
-        new_data = new_data.withColumn("randomness", sqlf.rand(seed))
-        w = W.partitionBy(*source_df["merge_col"]).orderBy("randomness")
+         # Use a content-based hash instead of rand() for deterministic dedup
+        hash_cols = [sqlf.coalesce(sqlf.col(c).cast("string"), sqlf.lit("__null__"))
+                     for c in new_data.columns]
+        new_data = new_data.withColumn("_dedup_hash", sqlf.sha2(sqlf.concat_ws("||", *hash_cols), 256))
+        w = W.partitionBy(*source_df["merge_col"]).orderBy("_dedup_hash")
         new_data = (
             new_data.withColumn("rank", sqlf.row_number().over(w))
             .filter(sqlf.col("rank") == 1)
             .drop("rank")
-            .drop("randomness")
+            .drop("_dedup_hash")
         )
 
         extra_info = extra_info.join(new_data, source_df["merge_col"], "left")
