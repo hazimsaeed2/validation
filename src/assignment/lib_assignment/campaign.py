@@ -11,6 +11,7 @@ TODO: Refactor parsing and ingestion along construct/segment lines (i.e. ingest/
 import copy
 import functools
 import itertools
+import os
 import re
 from collections import OrderedDict
 
@@ -69,7 +70,31 @@ from lib.utils import (
 
 spark = SparkSession.builder.getOrCreate()
 # sparkContext = spark.sparkContext
-# log = get_logger("campaign")
+log = get_logger("campaign")
+DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+    "y",
+)
+
+
+def _debug_log(msg):
+    if DEBUG_ASSIGNMENT:
+        log.info(f"[debug] {msg}")
+
+
+def _debug_df_sample(label, df, cols=None, n=10):
+    if (not DEBUG_ASSIGNMENT) or (df is None):
+        return
+    try:
+        _debug_log(f"{label}: rows={df.count()}")
+        use_cols = cols if cols else df.columns[: min(10, len(df.columns))]
+        use_cols = [c for c in use_cols if c in df.columns]
+        if use_cols:
+            df.select(*use_cols).limit(n).show(truncate=False)
+    except Exception as exc:
+        _debug_log(f"{label}: debug sample failed with error={exc}")
 
 # ---- HELPERS ---- #
 
@@ -1351,6 +1376,14 @@ class Campaign:
             assignment (pyspark.sql.DataFrame): dataframe with ranked coupons
         """
         is_backfill = fill_type == Campaign.FillType.BF
+        _debug_log(
+            f"calculate_offers start fill_type={fill_type} is_backfill={is_backfill}"
+        )
+        _debug_df_sample(
+            "calculate_offers input memberdata",
+            memberdata,
+            ["MBRSHP_SID", "MBRSHP_NBR"],
+        )
 
         current_offer = dict()
         current_coupons = copy.copy(coupon_pools)
@@ -1438,6 +1471,14 @@ class Campaign:
                     )
 
             for group in filled_groups:
+                _debug_log(
+                    "calculate_offers running slot group layout_id={} slot_num={} slot_size={} total_coupons={}".format(
+                        group.get("layout_id"),
+                        group.get("slot_num"),
+                        group.get("slot_size"),
+                        total_coupons,
+                    )
+                )
                 assigned_data = _run_slot(
                     memberdata,
                     offer_data_used,
@@ -1446,6 +1487,11 @@ class Campaign:
                     total_coupons,
                     backfill=is_backfill,
                     seed=int(self.experiment),
+                )
+                _debug_df_sample(
+                    "calculate_offers assigned_data",
+                    assigned_data,
+                    ["MBRSHP_SID", "cpn_nbr", "slot_structure", "priority"],
                 )
                 assignments.append(assigned_data)
 
@@ -1459,6 +1505,11 @@ class Campaign:
             # check note 1000001 to understand
             # why assignment can be None
             assignment = None
+        _debug_df_sample(
+            "calculate_offers output assignment",
+            assignment,
+            ["MBRSHP_SID", "cpn_nbr", "slot_structure", "priority"],
+        )
 
         return assignment
 
@@ -1568,6 +1619,11 @@ class Campaign:
             memberdata (pyspark.sql.DataFrame): memberdata with assigned cell column (cell_id)
         """
 
+        _debug_df_sample(
+            "assign_cells input memberdata",
+            memberdata,
+            ["MBRSHP_SID", "MBRSHP_NBR", "sampling_value", "sampling_seg"],
+        )
         # reformat cell info
         cells = self.cells.sort_values("sorting_order")[
             [
@@ -1643,6 +1699,11 @@ class Campaign:
         # assigned_members.groupby("CELL_ID").agg(
         #     sqlf.count("MBRSHP_SID"), sqlf.avg("sampling_value")
         # ).show()
+        _debug_df_sample(
+            "assign_cells output assigned_members",
+            assigned_members,
+            ["MBRSHP_SID", "CELL_ID", "sampling_value", "sampling_seg"],
+        )
 
         return assigned_members
 
@@ -1655,6 +1716,11 @@ class Campaign:
             assignment (pyspark.sql.DataFrame): coupons mapped to slots based
                                                 on user input
         """
+        _debug_df_sample(
+            "map_coupons input assignment",
+            assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR"],
+        )
         for slot_set in self.slots:
             if slot_set["is_default_mapping"]:
                 continue
@@ -1681,6 +1747,11 @@ class Campaign:
                 "NEW_SLOT_NBR", "SLOT_NBR"
             )
 
+        _debug_df_sample(
+            "map_coupons output assignment",
+            assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR"],
+        )
         return assignment
 
     def sort_coupons(self, assignment, assignment_pools, coupon_pools):
@@ -1694,6 +1765,11 @@ class Campaign:
                                                       extra columns +
                                                       slot number
         """
+        _debug_df_sample(
+            "sort_coupons input assignment",
+            assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR"],
+        )
         assignments = list()
         columns = assignment.columns
         at_least_one_sort = False
@@ -1876,6 +1952,14 @@ class Campaign:
             current_pool = partitioned_assignment.filter(
                 partitioned_assignment["CONSTRUCT_NAME"] == group["layout_id"]
             )
+        _debug_log(
+            "_fit_slot_group start layout_id={} slot_num={} include={} pool_type={}".format(
+                group.get("layout_id"),
+                group.get("slot_num"),
+                include,
+                group.get("pool_type"),
+            )
+        )
 
         # deduplication at slot group level should not be needed
         # because a single slot function should not allow duplicates
@@ -1884,21 +1968,50 @@ class Campaign:
             .filter(current_pool["IS_BACKFILL"].isin(*include))
             .withColumn("group_size", sqlf.lit(group["slot_size"]))
         )
+        _debug_df_sample(
+            "_fit_slot_group pre-dedup current_group",
+            current_group,
+            ["MBRSHP_SID", "cpn_nbr", "IS_BACKFILL", "SLOT_NBR", "SLOT_GRP"],
+        )
+        current_group = current_group.withColumn(
+            "_slot_tie_hash",
+            sqlf.sha2(
+                sqlf.concat_ws(
+                    "||",
+                    sqlf.coalesce(sqlf.col("MBRSHP_SID").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("cpn_nbr").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("SLOT_NBR").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("IS_BACKFILL").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("priority").cast("string"), sqlf.lit("")),
+                ),
+                256,
+            ),
+        )
 
         if len(include) > 1 and group["pool_type"] == Campaign.PoolType.LAYOUT:
             # deduplicate within slot group if more than one slot function
             # was used (frontfill slot function + backfill slot function)
             # this is required when apply backfill to a slot group
-            w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy("IS_BACKFILL")
+            w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy(
+                "IS_BACKFILL", "_slot_tie_hash"
+            )
             current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
             current_group = current_group.filter(current_group["rank"] == 1)
             current_group = current_group.drop("rank")
 
-        w = W.partitionBy("MBRSHP_SID").orderBy("IS_BACKFILL", "SLOT_NBR","cpn_nbr")
+        w = W.partitionBy("MBRSHP_SID").orderBy(
+            "IS_BACKFILL", "SLOT_NBR", "cpn_nbr", "_slot_tie_hash"
+        )
         current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
 
         current_group = current_group.filter(
             current_group.rank <= current_group.group_size
+        )
+        current_group = current_group.drop("_slot_tie_hash")
+        _debug_df_sample(
+            "_fit_slot_group output current_group",
+            current_group,
+            ["MBRSHP_SID", "cpn_nbr", "IS_BACKFILL", "SLOT_NBR", "SLOT_GRP", "rank"],
         )
 
         return current_group
@@ -2019,6 +2132,11 @@ class Campaign:
                                                 segmentation
         """
 
+        _debug_df_sample(
+            "fit_coupons input member_data",
+            member_data,
+            ["MBRSHP_SID", "cpn_nbr", "slot_structure", "priority"],
+        )
         assignment = member_data.withColumn("EXPERIMENT_ID", sqlf.lit(self.experiment))
 
         assignment = assignment.withColumn(
@@ -2058,6 +2176,11 @@ class Campaign:
 
         # remove any NULL coupons out of the process from the start
         assignment = assignment.filter(assignment.cpn_nbr.isNotNull())
+        _debug_df_sample(
+            "fit_coupons parsed assignment",
+            assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR", "SLOT_GRP", "IS_BACKFILL"],
+        )
 
         # depending on the priority we can either:
         # 1. frontfill and backfill a slot group
@@ -2076,6 +2199,11 @@ class Campaign:
         # will slow down Spark or even kill the job.
         partitioned_assignment = assignment.repartition("MBRSHP_SID", "cpn_nbr")
         partitioned_assignment = truncate_history(partitioned_assignment, cache=True)
+        _debug_df_sample(
+            "fit_coupons partitioned_assignment",
+            partitioned_assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR", "SLOT_GRP", "IS_BACKFILL"],
+        )
 
         if self.backfill_priority == Campaign.BackfillPriority.HIGH:
             final_assignment = self._frontfill_backfill_slotgroup(
@@ -2093,7 +2221,17 @@ class Campaign:
         final_assignment = final_assignment.drop("rank")
 
         final_assignment = truncate_history(final_assignment, cache=True)
+        _debug_df_sample(
+            "fit_coupons output final_assignment",
+            final_assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR", "SLOT_GRP", "IS_BACKFILL"],
+        )
 
+        _debug_df_sample(
+            "sort_coupons output final_assignment",
+            final_assignment,
+            ["MBRSHP_SID", "cpn_nbr", "CONSTRUCT_NAME", "SLOT_NBR"],
+        )
         return final_assignment
 
     def pivot_assignment(self, assignment):
@@ -2278,6 +2416,11 @@ class Campaign:
             memberdata (pyspark.sql.DataFrame): assignment with specific coupon
                                                 numbers replaced with None
         """
+        _debug_df_sample(
+            "replace_slots_with_null input memberdata",
+            memberdata,
+            ["MBRSHP_SID", "CONSTRUCT_NAME", "SLOT_NBR", "CPN_NBR"],
+        )
         for value in self.replace_with_null:
             memberdata = memberdata.withColumn(
                 "CPN_NBR",
@@ -2286,6 +2429,11 @@ class Campaign:
                 ),
             )
 
+        _debug_df_sample(
+            "replace_slots_with_null output memberdata",
+            memberdata,
+            ["MBRSHP_SID", "CONSTRUCT_NAME", "SLOT_NBR", "CPN_NBR"],
+        )
         return memberdata
 
     def generate_output(self, memberdata):
@@ -2302,6 +2450,11 @@ class Campaign:
                                                    constructs.
         """
 
+        _debug_df_sample(
+            "generate_output input memberdata",
+            memberdata,
+            ["MBRSHP_SID", "CONSTRUCT_NAME", "SLOT_NBR", "CPN_NBR", "IS_BACKFILL"],
+        )
         memberdata = memberdata.withColumn(
             "pool_type", sqlf.lit(Campaign.PoolType.LAYOUT)
         )
@@ -2390,6 +2543,17 @@ class Campaign:
             "bf_construct",
             "cpn_nbr",
             "pool_type",
+        )
+
+        _debug_df_sample(
+            "generate_output assignments",
+            assignments,
+            ["mbrshp_sid", "cell_id", "slot_nbr", "cpn_nbr", "pool_type"],
+        )
+        _debug_df_sample(
+            "generate_output all_constructs",
+            all_constructs,
+            ["mbrshp_sid", "cell_id", "construct", "cpn_nbr", "is_backfill", "pool_type"],
         )
 
         return (assignments, all_constructs)

@@ -3,6 +3,7 @@
 import copy
 import math
 import operator
+import os
 import warnings
 from collections import defaultdict
 from datetime import datetime
@@ -31,6 +32,17 @@ except NameError:
 
 
 # log = get_logger("assn_utils")
+DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+    "y",
+)
+
+
+def _debug_log(msg):
+    if DEBUG_ASSIGNMENT:
+        print(f"[assn_utils][debug] {msg}")
 
 CONSTRUCT_MATCH = r"c([\d_]+)"
 SLOT_MATCH = r"s(\d+)"
@@ -830,10 +842,28 @@ def rdd_rank_by_col(
         df(pyspark.sql.DataFrame): dataframe after ranked
     """
     hash_num = df.count()
-    df_h = df.withColumn(
-        "hash_col",
-        sqlf.hash(sqlf.col(hash_col) + sqlf.lit(hash_num))
+    if DEBUG_ASSIGNMENT:
+        tie_count = (
+            df.groupBy(sort_col_asc, sort_col_desc)
+            .count()
+            .filter(sqlf.col("count") > 1)
+            .count()
+        )
+        _debug_log(
+            "rdd_rank_by_col input rows={} ties_on_sort_keys={} sort=({}, {})".format(
+                hash_num, tie_count, sort_col_asc, sort_col_desc
+            )
+        )
+        df.select(hash_col, sort_col_asc, sort_col_desc).limit(10).show(
+            truncate=False
+        )
+
+    hash_expr = sqlf.concat_ws(
+        "||",
+        sqlf.coalesce(sqlf.col(hash_col).cast("string"), sqlf.lit("")),
+        sqlf.lit(str(hash_num)),
     )
+    df_h = df.withColumn("hash_col", sqlf.hash(hash_expr))
 
     w = Window.orderBy(
         sqlf.col(sort_col_asc).asc(),
@@ -841,9 +871,16 @@ def rdd_rank_by_col(
         sqlf.col("hash_col").asc()
     )
 
-    df_ranked = df_h.withColumn(new_col_name, sqlf.row_number().over(w) - sqlf.lit(1))
+    df_ranked = df_h.withColumn(
+        new_col_name, sqlf.row_number().over(w) - sqlf.lit(1)
+    )
 
     df_ranked = df_ranked.drop("hash_col")
+    if DEBUG_ASSIGNMENT:
+        _debug_log(f"rdd_rank_by_col output sample with {new_col_name}")
+        df_ranked.select(
+            hash_col, sort_col_asc, sort_col_desc, new_col_name
+        ).orderBy(new_col_name).limit(10).show(truncate=False)
     return df_ranked
 
 

@@ -1,4 +1,5 @@
 """Function bank for Coupon Creation File. """
+import os
 import warnings
 from datetime import datetime
 
@@ -42,6 +43,29 @@ except NameError:
 
 
 # log = get_logger("coupon_utils")
+DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+    "y",
+)
+
+
+def _debug_log(msg):
+    if DEBUG_ASSIGNMENT:
+        print(f"[coupon_utils][debug] {msg}")
+
+
+def _debug_column_sample(df, column, label):
+    if (not DEBUG_ASSIGNMENT) or (column not in df.columns):
+        return
+    null_count = df.filter(col(column).isNull()).count()
+    sample = [r[column] for r in df.select(column).limit(10).collect()]
+    _debug_log(
+        "{} column={} null_count={} sample={}".format(
+            label, column, null_count, sample
+        )
+    )
 
 # ---- Helpers --- #
 
@@ -207,9 +231,13 @@ def cast(df, cols=None):
             "TRIPS",
             "cpn_nbr",
         ]:
+            _debug_column_sample(df, column, "before cast(long/try_cast)")
             df = df.withColumn(column, col(column).try_cast("long"))
+            _debug_column_sample(df, column, "after cast(long/try_cast)")
         if column in ["EXTENDED_PRC_AMT", "prediction for MMPC"]:
+            _debug_column_sample(df, column, "before cast(float)")
             df = df.withColumn(column, col(column).cast("float"))
+            _debug_column_sample(df, column, "after cast(float)")
     return df
 
 
@@ -392,8 +420,14 @@ def calculate_member_trips(transactions, item, start, end):
     by_ah4 = by_ah4.withColumnRenamed("AH4_CD", "category")
     mbr_trips = by_art.union(by_ah5).union(by_ah4)
 
+    _debug_column_sample(
+        mbr_trips, "category", "before category cast in calculate_member_trips"
+    )
     mbr_trips = mbr_trips.withColumn(
         "category", mbr_trips.category.try_cast("long")
+    )
+    _debug_column_sample(
+        mbr_trips, "category", "after category cast in calculate_member_trips"
     )
 
     mbr_trips = mbr_trips.dropna(subset=["mbrshp_sid", "category"])
@@ -503,7 +537,15 @@ def clean_cpg_coupon_file(coupons, coupon_types):
         .withColumn("articles", trim(col("articles")))
         .filter("articles != ''")
     )
+    _debug_column_sample(
+        coupons, "articles", "before article_nbr cast in clean_cpg_coupon_file"
+    )
     coupons = coupons.withColumn("article_nbr", coupons.articles.try_cast("long"))
+    _debug_column_sample(
+        coupons,
+        "article_nbr",
+        "after article_nbr cast in clean_cpg_coupon_file",
+    )
 
     # 2. subset and reformat data
     coupons = coupons.select(
