@@ -36,15 +36,15 @@ targets:
     # - Deployed resources get prefixed with '[dev my_user_name]'
     # - Any job schedules and triggers are paused by default.
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
-    # mode: production
-    mode: development 
+    mode: production
+    # mode: development 
 
     default: true
     workspace:
       host: https://dbc-ad8c0ca0-6db0.cloud.databricks.com
-      # root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
       # while in dev it may be useful to config mode: development and use this:
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      # root_path: ~/Workspace/Users/${workspace.current_user.userName}/add-email-notification-dev/member_analytics/.bundle/${bundle.name}/${bundle.target}
       # then the notebooks and python files are pulled directly from your workspace and not duplicated into .bundle
   
 
@@ -146,8 +146,8 @@ variables:
         default: 000B99C28D480B81
 
 permissions:
-- user_name: ${workspace.current_user.userName}  
-  level: CAN_MANAGE  
+# - user_name: ${workspace.current_user.userName}  
+  # level: CAN_MANAGE  
 # - service_principal_name: ${var.service_principal}
 #   level: CAN_MANAGE
 - group_name: Databricks-${var.env}-Lovelytics-Users
