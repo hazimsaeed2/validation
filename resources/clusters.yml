@@ -32,7 +32,7 @@ resources:
       data_security_mode: SINGLE_USER
       runtime_engine: PHOTON # for coupons was STANDARD
       spark_conf:
-        spark.driver.maxResultSize: 250g # for couponspe was 170g
+        spark.driver.maxResultSize: 350g # for couponspe was 170g
       aws_attributes:
         first_on_demand: 1
         availability: SPOT_WITH_FALLBACK
@@ -73,7 +73,7 @@ resources:
       data_security_mode: SINGLE_USER
       runtime_engine: PHOTON # for coupons was STANDARD
       spark_conf:
-        spark.driver.maxResultSize: 250g # for couponspe was 170g
+        spark.driver.maxResultSize: 350g # for couponspe was 170g
       aws_attributes:
         first_on_demand: 1
         availability: SPOT_WITH_FALLBACK
@@ -114,7 +114,7 @@ resources:
       data_security_mode: SINGLE_USER
       runtime_engine: PHOTON # for coupons was STANDARD
       spark_conf:
-        spark.driver.maxResultSize: 250g # for couponspe was 170g
+        spark.driver.maxResultSize: 350g # for couponspe was 170g
       aws_attributes:
         first_on_demand: 1
         availability: SPOT_WITH_FALLBACK

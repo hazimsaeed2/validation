@@ -277,7 +277,7 @@ def check_cell_size(cell):
         return "Fail"
 
 
-def check_sensitive_content(job, dbutils=None):
+def check_sensitive_content(job):
     """
     Check that members who have not purchased from sensitive categories in the
     last 52 weeks have not been backfilled with sensitive coupons.
@@ -294,7 +294,7 @@ def check_sensitive_content(job, dbutils=None):
         (str): Pass / Fail / NA indicator
     """
 
-    def cleanup(assignment=None, vol_base=None, env='dev', dbutils=None):
+    def cleanup(assignment=None, vol_base=None, env='dev'):
         """
         Cleanup before exiting, writing any inccorrect sensitive assignments
         to s3.
@@ -335,14 +335,14 @@ def check_sensitive_content(job, dbutils=None):
     rules = job.data.tables.get("exclusion_rules")
 
     if not rules:
-        cleanup(vol_base=job.vol_base, env=job.env, dbutils=dbutils)
+        cleanup(vol_base=job.vol_base, env=job.env)
         return "NA"
 
     sensitive_exclusions = rules.filter(
         rules.EXCLUSION_TYPE == "SENSITIVE"
     ).filter(rules.INCLUDE_OR_EXCLUDE == "exclude")
     if len(sensitive_exclusions.head(1)) == 0:
-        cleanup(vol_base=job.vol_base, env=job.env, dbutils=dbutils)
+        cleanup(vol_base=job.vol_base, env=job.env)
         return "NA"
 
     assignment = job.data.tables["assignment"]
@@ -379,7 +379,7 @@ def check_sensitive_content(job, dbutils=None):
 
     sens_assn = assignment.filter(assignment.EXCLUSION_TYPE == "SENSITIVE")
     if len(sens_assn.head(1)) == 0:
-        cleanup(vol_base=job.vol_base, env=job.env, dbutils=dbutils)
+        cleanup(vol_base=job.vol_base, env=job.env)
         return "NA"
 
     cf = job.data.tables["cf_original"]
@@ -404,7 +404,7 @@ def check_sensitive_content(job, dbutils=None):
     ).filter(assignment.EXCLUSION_TYPE == "SENSITIVE")
 
     if len(assignment.head(1)) == 0:
-        cleanup(vol_base=job.vol_base, env=job.env, dbutils=dbutils)
+        cleanup(vol_base=job.vol_base, env=job.env)
         return "Pass"
 
     sensitive_map = {
@@ -432,10 +432,10 @@ def check_sensitive_content(job, dbutils=None):
     )
 
     if len(assignment.head(1)) == 0:
-        cleanup(vol_base=job.vol_base, env=job.env, dbutils=dbutils)
+        cleanup(vol_base=job.vol_base, env=job.env)
         return "Pass"
     else:
-        cleanup(assignment=assignment,vol_base=job.vol_base, env=job.env, dbutils=dbutils)
+        cleanup(assignment=assignment,vol_base=job.vol_base, env=job.env)
         return "Fail"
 
 
