@@ -34,7 +34,7 @@ from lib.iotools_assignment import (
 # log = get_logger("assn_io")
 
 CUR_FILE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-OUTBOUND_FILE_DIR = "s3://memberanalytics-data-out-prod/ASSIGNMENTS/outbound/"
+OUTBOUND_FILE_DIR = "s3://memberanalytics-data-out-prod/dbx_test/ASSIGNMENTS/outbound/"
 OUTBOUND_FILES = [
     "final_mailhouse",
     "cpn_redemption",
