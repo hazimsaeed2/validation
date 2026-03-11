@@ -20,6 +20,19 @@ def _debug_log(msg):
         print(f"[validators][debug] {msg}")
 
 
+def _parse_timestamp_multi_format(column):
+    formats = ["MM/dd/yyyy", "M/dd/yyyy", "MM/d/yyyy", "M/d/yyyy"]
+    if hasattr(sqlf, "try_to_timestamp"):
+        parsers = [
+            sqlf.try_to_timestamp(sqlf.col(column), sqlf.lit(fmt))
+            for fmt in formats
+        ]
+    else:
+        # Spark/PySpark compatibility fallback (e.g., EMR Spark 3.4.x)
+        parsers = [sqlf.to_timestamp(sqlf.col(column), fmt) for fmt in formats]
+    return sqlf.coalesce(*parsers)
+
+
 def check_header(df, schema):
     """
     Takes a dataframe (pyspark/pandas) and a schema, check if the dataframe contains all the columns specified in the schema.
@@ -214,20 +227,10 @@ def check_date_range(df, earlier_date_column, later_date_column):
 
         df = df.withColumn(
             earlier_date_column,
-            sqlf.coalesce(
-                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("MM/dd/yyyy")),
-                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/dd/yyyy")),
-                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("MM/d/yyyy")),
-                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/d/yyyy")),
-            ),
+            _parse_timestamp_multi_format(earlier_date_column),
         ).withColumn(
             later_date_column,
-            sqlf.coalesce(
-                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("MM/dd/yyyy")),
-                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/dd/yyyy")),
-                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("MM/d/yyyy")),
-                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/d/yyyy")),
-            ),
+            _parse_timestamp_multi_format(later_date_column),
         )
         if DEBUG_ASSIGNMENT:
             earlier_parse_fail = df.filter(
