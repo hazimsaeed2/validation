@@ -1,4 +1,5 @@
 import functools
+import os
 
 import pandas
 import pyspark.sql.functions as sqlf
@@ -6,6 +7,17 @@ import pyspark.sql.functions as sqlf
 import pe_memberdna.assignment.lib.input_checks.exceptions as excp
 
 DATE_PATTERN = "^([1-9]|1[0-2])\/([1-9]|[12]\d|3[01])\/([12]\d{3})$"
+DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+    "y",
+)
+
+
+def _debug_log(msg):
+    if DEBUG_ASSIGNMENT:
+        print(f"[validators][debug] {msg}")
 
 
 def check_header(df, schema):
@@ -187,13 +199,69 @@ def check_date_range(df, earlier_date_column, later_date_column):
             ranges[ranges[earlier_date_column] > ranges[later_date_column]]
         )
     else:
+        raw_earlier_column = f"__raw_{earlier_date_column}"
+        raw_later_column = f"__raw_{later_date_column}"
+        df = df.withColumn(raw_earlier_column, sqlf.col(earlier_date_column))
+        df = df.withColumn(raw_later_column, sqlf.col(later_date_column))
+        if DEBUG_ASSIGNMENT:
+            _debug_log(
+                f"check_date_range input sample for {earlier_date_column}, {later_date_column}"
+            )
+            df.select(
+                raw_earlier_column,
+                raw_later_column,
+            ).limit(10).show(truncate=False)
+
         df = df.withColumn(
             earlier_date_column,
-            sqlf.to_timestamp(sqlf.col(earlier_date_column), "MM/dd/yyyy"),
+            sqlf.coalesce(
+                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("MM/dd/yyyy")),
+                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/dd/yyyy")),
+                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("MM/d/yyyy")),
+                sqlf.try_to_timestamp(sqlf.col(earlier_date_column), sqlf.lit("M/d/yyyy")),
+            ),
         ).withColumn(
             later_date_column,
-            sqlf.to_timestamp(sqlf.col(later_date_column), "MM/dd/yyyy"),
+            sqlf.coalesce(
+                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("MM/dd/yyyy")),
+                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/dd/yyyy")),
+                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("MM/d/yyyy")),
+                sqlf.try_to_timestamp(sqlf.col(later_date_column), sqlf.lit("M/d/yyyy")),
+            ),
         )
+        if DEBUG_ASSIGNMENT:
+            earlier_parse_fail = df.filter(
+                sqlf.col(raw_earlier_column).isNotNull()
+                & sqlf.col(earlier_date_column).isNull()
+            ).count()
+            later_parse_fail = df.filter(
+                sqlf.col(raw_later_column).isNotNull()
+                & sqlf.col(later_date_column).isNull()
+            ).count()
+            _debug_log(
+                "check_date_range parse failures: {}={} {}={}".format(
+                    earlier_date_column,
+                    earlier_parse_fail,
+                    later_date_column,
+                    later_parse_fail,
+                )
+            )
+            if earlier_parse_fail or later_parse_fail:
+                df.filter(
+                    (
+                        sqlf.col(raw_earlier_column).isNotNull()
+                        & sqlf.col(earlier_date_column).isNull()
+                    )
+                    | (
+                        sqlf.col(raw_later_column).isNotNull()
+                        & sqlf.col(later_date_column).isNull()
+                    )
+                ).select(
+                    raw_earlier_column,
+                    earlier_date_column,
+                    raw_later_column,
+                    later_date_column,
+                ).limit(10).show(truncate=False)
 
         num_wrong_date_range = (
             df.withColumn(
@@ -207,6 +275,7 @@ def check_date_range(df, earlier_date_column, later_date_column):
             .agg(sqlf.sum("date_range_correct"))
             .collect()[0][0]
         )
+        df = df.drop(raw_earlier_column, raw_later_column)
 
     if num_wrong_date_range != 0:
         msg = "{} has date after {}".format(
