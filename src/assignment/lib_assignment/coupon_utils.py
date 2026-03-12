@@ -35,11 +35,26 @@ from urllib.parse import urlparse
 
 
 spark = SparkSession.builder.getOrCreate()
-try:
-    dbutils  
-except NameError:
-    from pyspark.dbutils import DBUtils
-    dbutils = DBUtils(spark)  
+
+
+def _resolve_dbutils():
+    try:
+        from IPython import get_ipython
+
+        ip = get_ipython()
+        if ip and "dbutils" in ip.user_ns:
+            return ip.user_ns["dbutils"]
+    except Exception:
+        pass
+    try:
+        from pyspark.dbutils import DBUtils
+
+        return DBUtils(spark)
+    except Exception:
+        return None
+
+
+dbutils = _resolve_dbutils()
 
 
 # log = get_logger("coupon_utils")

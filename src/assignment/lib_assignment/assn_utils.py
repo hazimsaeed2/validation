@@ -24,11 +24,26 @@ from lib.utils import convert_id_cols_to_str, next_fiscal_week_end
 
 spark = SparkSession.builder.getOrCreate()
 # sparkContext = spark.sparkContext
-try:
-    dbutils  
-except NameError:
-    from pyspark.dbutils import DBUtils
-    dbutils = DBUtils(spark)  
+
+
+def _resolve_dbutils():
+    try:
+        from IPython import get_ipython
+
+        ip = get_ipython()
+        if ip and "dbutils" in ip.user_ns:
+            return ip.user_ns["dbutils"]
+    except Exception:
+        pass
+    try:
+        from pyspark.dbutils import DBUtils
+
+        return DBUtils(spark)
+    except Exception:
+        return None
+
+
+dbutils = _resolve_dbutils()
 
 
 # log = get_logger("assn_utils")
@@ -60,7 +75,8 @@ def env_path(path, vol_base="/Volumes/datascience_ea_dev/pe/outputs_for_s3", env
     if env.lower() in ["dev", "qa"]:
         if "s3://" in path:
             vol_path = vol_base + urlparse(path).path
-            dbutils.fs.mkdirs('/'.join(vol_path.split('/')[:-1]))
+            if dbutils is not None:
+                dbutils.fs.mkdirs("/".join(vol_path.split("/")[:-1]))
             return vol_path
         else:
             return path

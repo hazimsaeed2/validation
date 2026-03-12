@@ -20,11 +20,26 @@ from lib_assignment.assn_utils  import  env_path
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.getOrCreate()
 # sparkContext = spark.sparkContext
-try:
-    dbutils  
-except NameError:
-    from pyspark.dbutils import DBUtils
-    dbutils = DBUtils(spark)  
+
+
+def _resolve_dbutils():
+    try:
+        from IPython import get_ipython
+
+        ip = get_ipython()
+        if ip and "dbutils" in ip.user_ns:
+            return ip.user_ns["dbutils"]
+    except Exception:
+        pass
+    try:
+        from pyspark.dbutils import DBUtils
+
+        return DBUtils(spark)
+    except Exception:
+        return None
+
+
+dbutils = _resolve_dbutils()
 
 def calc_avg_col_value(df, colname):
     """Calculate the average value of dataframe column.
