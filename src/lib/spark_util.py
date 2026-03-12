@@ -101,7 +101,9 @@ def _join_all(dfs, columns, depth):
 
 
 def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
-    truncated_df = df.rdd.toDF(df.schema)
+    # Use a cluster-mode agnostic implementation so behavior is consistent
+    # across shared/single-user Databricks and EMR environments.
+    truncated_df = df.select("*")
     if cache:
         truncated_df = truncated_df.persist(storage)
         truncated_df.count()
