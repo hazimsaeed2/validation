@@ -607,6 +607,11 @@ def move_to_outbound(file_path, file_name, file_type, params, paths):
     _, dest_key = split_path_bucket_key(dest_path)
 
     if file_found:     
+        print(
+            "Copying outbound file for {}: s3://{}/{} -> {}".format(
+                file_name, src_bucket, src_key_with_file, dest_path
+            )
+        ) 
         s3_copy(src_bucket, src_key_with_file, dest_key)
     else:
         raise Exception(
