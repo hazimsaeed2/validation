@@ -1946,6 +1946,11 @@ class Campaign:
             current_group,
             ["MBRSHP_SID", "cpn_nbr", "IS_BACKFILL", "SLOT_NBR", "SLOT_GRP"],
         )
+        priority_tie_col = (
+            sqlf.coalesce(sqlf.col("priority").cast("string"), sqlf.lit(""))
+            if "priority" in current_group.columns
+            else sqlf.lit("")
+        )
         current_group = current_group.withColumn(
             "_slot_tie_hash",
             sqlf.sha2(
@@ -1955,7 +1960,7 @@ class Campaign:
                     sqlf.coalesce(sqlf.col("cpn_nbr").cast("string"), sqlf.lit("")),
                     sqlf.coalesce(sqlf.col("SLOT_NBR").cast("string"), sqlf.lit("")),
                     sqlf.coalesce(sqlf.col("IS_BACKFILL").cast("string"), sqlf.lit("")),
-                    sqlf.coalesce(sqlf.col("priority").cast("string"), sqlf.lit("")),
+                    priority_tie_col,
                 ),
                 256,
             ),
