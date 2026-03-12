@@ -553,6 +553,11 @@ def move_to_outbound(file_path, file_name, file_type, params, paths):
     _, dest_key = split_path_bucket_key(dest_path)
 
     if file_found:
+        log.info(
+            "Copying outbound file for {}: s3://{}/{} -> {}".format(
+                file_name, src_bucket, src_key_with_file, dest_path
+            )
+        )
         s3_copy(src_bucket, src_key_with_file, dest_key)
     else:
         raise Exception(
@@ -758,6 +763,13 @@ class DataManager:
             csvpath = path
         elif ftype == "parquet":
             pqpath = path
+        else:
+            csvpath = None
+            pqpath = None
+
+        log.info(
+            "Output base location for {} ({}): {}".format(name, ftype, path)
+        )
 
         if singlefile:
             table = table.repartition(1)
@@ -773,13 +785,28 @@ class DataManager:
                 if ftype in ("csv", "dual"):
                     log.info("writing csv...")
                     writer.csv(csvpath, mode=mode, header=True)
+                    log.info(
+                        "Final output location for {} (csv): {}".format(
+                            name, csvpath
+                        )
+                    )
 
                 if ftype in ("parquet", "dual"):
                     log.info("writing parquet..")
                     writer.parquet(pqpath, mode=mode)
+                    log.info(
+                        "Final output location for {} (parquet): {}".format(
+                            name, pqpath
+                        )
+                    )
 
             else:
                 write_local_to_s3(table, path, mode=mode)
+                log.info(
+                    "Final output location for {} (local/object): {}".format(
+                        name, path
+                    )
+                )
 
         elif writetype == "local":
             if isinstance(table, DataFrame):
@@ -792,6 +819,12 @@ class DataManager:
             self.params["run_type"].lower() == "prod"
             and name in OUTBOUND_FILES
         ):
+            outbound_path = generate_outbound_path(
+                name, ftype, self.params, self.paths
+            )
+            log.info(
+                "Outbound destination for {}: {}".format(name, outbound_path)
+            )
             move_to_outbound(path, name, ftype, self.params, self.paths)
 
     def checkpoint(self, name):
