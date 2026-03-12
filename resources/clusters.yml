@@ -16,6 +16,7 @@ resources:
       cluster_name: ML_Compute_PE_L
       policy_id: "0017E64C73C3F843"
       kind: CLASSIC_PREVIEW
+      autotermination_minutes: 15
       data_security_mode: DATA_SECURITY_MODE_AUTO
       runtime_engine: PHOTON
       spark_version: 17.3.x-scala2.13
