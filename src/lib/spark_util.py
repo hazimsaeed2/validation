@@ -10,6 +10,7 @@ Util functions that require a spark session
 #     findspark.init()
 
 import time
+import logging
 from datetime import datetime as dt
 
 import pyspark.sql.functions as sqlf  # moving forward standard
@@ -22,9 +23,23 @@ spark = SparkSession.builder.getOrCreate()
 
 
 def get_logger(name="default"):
-    log = spark._jvm.org.apache.log4j.LogManager.getLogger(name)
-    log.setLevel(spark._jvm.org.apache.log4j.Level.INFO)
-    return log
+    try:
+        log = spark._jvm.org.apache.log4j.LogManager.getLogger(name)
+        log.setLevel(spark._jvm.org.apache.log4j.Level.INFO)
+        return log
+    except Exception:
+        # Shared Databricks clusters block direct JVM access.
+        py_log = logging.getLogger(name)
+        if not py_log.handlers:
+            handler = logging.StreamHandler()
+            handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s %(levelname)s %(name)s - %(message)s"
+                )
+            )
+            py_log.addHandler(handler)
+        py_log.setLevel(logging.INFO)
+        return py_log
 
 
 # log = get_logger("spark_util")
