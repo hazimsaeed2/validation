@@ -19,6 +19,7 @@ from datetime import datetime
 
 import yaml
 from lib_assignment.assn_utils import env_path
+from lib.spark_util import configure_spark_for_cluster
 
 from lib.iotools_assignment import (
     is_s3_file, is_volume_file, 
@@ -1039,6 +1040,7 @@ class JobManager(object):
         # from pyspark.sql import SparkSession
 
         self.spark = spark # SparkSession.builder.appName(appname).getOrCreate()
+        configure_spark_for_cluster(self.spark)
         # self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
         # self.sc = self.spark.sparkContext
         # self.sc.setLogLevel("WARN")
