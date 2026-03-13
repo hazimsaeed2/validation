@@ -25,7 +25,7 @@ spark = SparkSession.builder.getOrCreate()
 sparkContext = spark.sparkContext
 
 log = get_logger("assn_utils")
-DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
+DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "0").lower() in (
     "1",
     "true",
     "yes",
@@ -845,7 +845,9 @@ def rdd_rank_by_col(
     )
     df_h = df.withColumn("hash_col", sqlf.hash(hash_expr))
 
-    w = Window.orderBy(
+    # Avoid a global unpartitioned window which can collapse to a single
+    # partition on shared/serverless runtimes.
+    w = Window.partitionBy(sqlf.col(sort_col_asc)).orderBy(
         sqlf.col(sort_col_asc).asc(),
         sqlf.col(sort_col_desc).desc(),
         sqlf.col("hash_col").asc(),
@@ -917,10 +919,11 @@ def palindrome_sample(df, sample_size, group_num=100):
         df, group_num, "sampling_rank", "sampling_group"
     )
     seed(hash(initial_size))
-    print(group_num)
-    print(sample_group)
-    print(sample_size)
-    print(initial_size)
+    if DEBUG_ASSIGNMENT:
+        print(group_num)
+        print(sample_group)
+        print(sample_size)
+        print(initial_size)
     selected_groups = sample(list(range(1, group_num + 1)), int(sample_group))
     df = df.filter(df.sampling_group.isin(selected_groups))
     df = df.select(cols)
