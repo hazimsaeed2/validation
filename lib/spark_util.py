@@ -33,6 +33,68 @@ wait_time = 20
 retry_times = 3
 
 
+def configure_spark_for_cluster(
+    spark_session,
+    min_shuffle_partitions=256,
+    shuffle_multiplier=3,
+    max_shuffle_partitions=4000,
+):
+    """
+    Set cluster-size-aware Spark SQL execution settings.
+
+    This is performance tuning only; it does not change business logic.
+    """
+    try:
+        default_parallelism = spark_session.sparkContext.defaultParallelism
+    except Exception:
+        default_parallelism = min_shuffle_partitions
+
+    target_shuffle = int(
+        max(
+            min_shuffle_partitions,
+            min(max_shuffle_partitions, default_parallelism * shuffle_multiplier),
+        )
+    )
+
+    before = {
+        "spark.sql.shuffle.partitions": spark_session.conf.get(
+            "spark.sql.shuffle.partitions", "unset"
+        ),
+        "spark.sql.adaptive.enabled": spark_session.conf.get(
+            "spark.sql.adaptive.enabled", "unset"
+        ),
+    }
+    log.info(
+        "[SPARK_TUNE][before] defaultParallelism={}, shuffle.partitions={}, adaptive.enabled={}".format(
+            default_parallelism,
+            before["spark.sql.shuffle.partitions"],
+            before["spark.sql.adaptive.enabled"],
+        )
+    )
+
+    spark_session.conf.set("spark.sql.adaptive.enabled", "true")
+    spark_session.conf.set(
+        "spark.sql.adaptive.coalescePartitions.enabled", "true"
+    )
+    spark_session.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+    spark_session.conf.set("spark.sql.shuffle.partitions", target_shuffle)
+
+    after = {
+        "spark.sql.shuffle.partitions": spark_session.conf.get(
+            "spark.sql.shuffle.partitions", "unset"
+        ),
+        "spark.sql.adaptive.enabled": spark_session.conf.get(
+            "spark.sql.adaptive.enabled", "unset"
+        ),
+    }
+    log.info(
+        "[SPARK_TUNE][after] shuffle.partitions={}, adaptive.enabled={}".format(
+            after["spark.sql.shuffle.partitions"],
+            after["spark.sql.adaptive.enabled"],
+        )
+    )
+
+
 def safe_join(df1, df2, how, key):
     """
     Join two dataframes after they have been aggregated.

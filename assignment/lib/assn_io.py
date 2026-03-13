@@ -28,7 +28,10 @@ from pe_memberdna.lib.iotools import (
     write_local_to_s3,
     write_yaml_to_s3,
 )
-from pe_memberdna.lib.spark_util import get_logger
+from pe_memberdna.lib.spark_util import (
+    configure_spark_for_cluster,
+    get_logger,
+)
 
 log = get_logger("assn_io")
 
@@ -878,6 +881,7 @@ class JobManager(object):
         from pyspark.sql import SparkSession
 
         self.spark = SparkSession.builder.appName(appname).getOrCreate()
+        configure_spark_for_cluster(self.spark)
         self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
         self.sc = self.spark.sparkContext
         self.sc.setLogLevel("WARN")
