@@ -71,12 +71,30 @@ def configure_spark_for_cluster(
         )
     )
 
+    def _safe_conf_get(key, default="unset"):
+        try:
+            return spark_session.conf.get(key, default)
+        except Exception:
+            return default
+
+    def _safe_conf_set(key, value):
+        try:
+            spark_session.conf.set(key, value)
+            return True
+        except Exception as err:
+            print(
+                "[SPARK_TUNE][skip] {}={} not applied: {}".format(
+                    key, value, str(err)
+                )
+            )
+            return False
+
     before = {
-        "spark.sql.shuffle.partitions": spark_session.conf.get(
-            "spark.sql.shuffle.partitions", "unset"
+        "spark.sql.shuffle.partitions": _safe_conf_get(
+            "spark.sql.shuffle.partitions"
         ),
-        "spark.sql.adaptive.enabled": spark_session.conf.get(
-            "spark.sql.adaptive.enabled", "unset"
+        "spark.sql.adaptive.enabled": _safe_conf_get(
+            "spark.sql.adaptive.enabled"
         ),
     }
     print(
@@ -87,19 +105,17 @@ def configure_spark_for_cluster(
         )
     )
 
-    spark_session.conf.set("spark.sql.adaptive.enabled", "true")
-    spark_session.conf.set(
-        "spark.sql.adaptive.coalescePartitions.enabled", "true"
-    )
-    spark_session.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
-    spark_session.conf.set("spark.sql.shuffle.partitions", target_shuffle)
+    _safe_conf_set("spark.sql.adaptive.enabled", "true")
+    _safe_conf_set("spark.sql.adaptive.coalescePartitions.enabled", "true")
+    _safe_conf_set("spark.sql.adaptive.skewJoin.enabled", "true")
+    _safe_conf_set("spark.sql.shuffle.partitions", target_shuffle)
 
     after = {
-        "spark.sql.shuffle.partitions": spark_session.conf.get(
-            "spark.sql.shuffle.partitions", "unset"
+        "spark.sql.shuffle.partitions": _safe_conf_get(
+            "spark.sql.shuffle.partitions"
         ),
-        "spark.sql.adaptive.enabled": spark_session.conf.get(
-            "spark.sql.adaptive.enabled", "unset"
+        "spark.sql.adaptive.enabled": _safe_conf_get(
+            "spark.sql.adaptive.enabled"
         ),
     }
     print(
