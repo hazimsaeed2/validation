@@ -71,7 +71,13 @@ from lib.utils import (
 spark = SparkSession.builder.getOrCreate()
 # sparkContext = spark.sparkContext
 log = get_logger("campaign")
-DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
+DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "0").lower() in (
+    "1",
+    "true",
+    "yes",
+    "y",
+)
+DEBUG_ASSIGNMENT_LIGHT = os.getenv("ASSIGNMENT_DEBUG_LIGHT", "1").lower() in (
     "1",
     "true",
     "yes",
@@ -80,7 +86,7 @@ DEBUG_ASSIGNMENT = os.getenv("ASSIGNMENT_DEBUG", "1").lower() in (
 
 
 def _debug_log(msg):
-    if DEBUG_ASSIGNMENT:
+    if DEBUG_ASSIGNMENT or DEBUG_ASSIGNMENT_LIGHT:
         log.info(f"[debug] {msg}")
 
 
@@ -1656,9 +1662,12 @@ class Campaign:
 
             cell_sample, memberdata = _assign_cell_sample(cell_sample, memberdata, cell)
 
-            print(
-                f"assigned {cell_sample.count()} past longitudinal members to cell"
-            )
+            if DEBUG_ASSIGNMENT:
+                print(
+                    f"assigned {cell_sample.count()} past longitudinal members to cell"
+                )
+            else:
+                print("assigned past longitudinal members to cell")
             cell_samples.append(cell_sample)
 
         for cell in cells:
@@ -1692,7 +1701,10 @@ class Campaign:
 
             cell_sample, memberdata = _assign_cell_sample(cell_sample, memberdata, cell)
 
-            print(f"assigned {cell_sample.count()} members to cell")
+            if DEBUG_ASSIGNMENT:
+                print(f"assigned {cell_sample.count()} members to cell")
+            else:
+                print("assigned members to cell")
             cell_samples.append(cell_sample)
 
         assigned_members = apply_unionall(*cell_samples)
