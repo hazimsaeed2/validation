@@ -14,18 +14,42 @@ from pe_memberdna.lib.utils import apply_unionall
 def main(conf_path_in=None):
     run_start = perf_counter()
     last_step = run_start
+    last_label = None
 
     def log_step(msg):
-        nonlocal last_step
+        nonlocal last_step, last_label
         now = perf_counter()
         total_min = (now - run_start) / 60.0
-        delta_min = (now - last_step) / 60.0
+        if last_label is not None:
+            delta_min = (now - last_step) / 60.0
+            job.log.info(
+                "[progress][END] {} | duration_min={:.2f} | elapsed_total_min={:.2f}".format(
+                    last_label, delta_min, total_min
+                )
+            )
         job.log.info(
-            "[progress] {} | elapsed_total_min={:.2f} | since_last_step_min={:.2f}".format(
-                msg, total_min, delta_min
+            "[progress][START] {} | elapsed_total_min={:.2f}".format(
+                msg, total_min
             )
         )
         last_step = now
+        last_label = msg
+
+    def log_done(msg="done"):
+        now = perf_counter()
+        total_min = (now - run_start) / 60.0
+        if last_label is not None:
+            delta_min = (now - last_step) / 60.0
+            job.log.info(
+                "[progress][END] {} | duration_min={:.2f} | elapsed_total_min={:.2f}".format(
+                    last_label, delta_min, total_min
+                )
+            )
+        job.log.info(
+            "[progress][DONE] {} | elapsed_total_min={:.2f}".format(
+                msg, total_min
+            )
+        )
 
     name = "CampaignAssignment"
     job = JobManager("assignment", name, conf_path_in)
@@ -200,7 +224,7 @@ def main(conf_path_in=None):
 
     write_local_to_s3(log_line, job.config.paths["ASSIGN_LOG"])
 
-    log_step("done")
+    log_done("done")
 
 
 if __name__ == "__main__":
