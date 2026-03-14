@@ -1034,7 +1034,7 @@ class JobManager(object):
         # from pyspark.sql import SparkSession
 
         self.spark = spark # SparkSession.builder.appName(appname).getOrCreate()
-        # self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
+        self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
         # self.sc = self.spark.sparkContext
         # self.sc.setLogLevel("WARN")
         # self.log = get_logger(appname)

@@ -207,7 +207,7 @@ def cast(df, cols=None):
             "TRIPS",
             "cpn_nbr",
         ]:
-            df = df.withColumn(column, col(column).try_cast("long"))
+            df = df.withColumn(column, col(column).cast("long"))
         if column in ["EXTENDED_PRC_AMT", "prediction for MMPC"]:
             df = df.withColumn(column, col(column).cast("float"))
     return df
@@ -282,7 +282,13 @@ def generate_coupon_member_trips(coupons, mbr_trips, cat_dna, rel_month):
     cat_cols = [col("cpn_ah4_cd"), col("cpn_ah5_cd"), col("article_nbr")]
 
     #  1. Join on raw trips per coupon per category per member
-    coups = coupons.fillna(0, subset=cat_colnames)
+    # Normalize -1 to 0 to match S3/parquet null representation
+    coups = coupons
+    for colname in cat_colnames:
+        coups = coups.withColumn(
+            colname, when(col(colname) == -1, 0).otherwise(col(colname))
+        )
+    coups = coups.fillna(0, subset=cat_colnames)
     for cols in cat_colnames:
         coups = coups.withColumn(
             cols, when(coups[cols].isNull(), 0).otherwise(coups[cols])
@@ -393,7 +399,7 @@ def calculate_member_trips(transactions, item, start, end):
     mbr_trips = by_art.union(by_ah5).union(by_ah4)
 
     mbr_trips = mbr_trips.withColumn(
-        "category", mbr_trips.category.try_cast("long")
+        "category", mbr_trips.category.cast("long")
     )
 
     mbr_trips = mbr_trips.dropna(subset=["mbrshp_sid", "category"])
@@ -503,7 +509,7 @@ def clean_cpg_coupon_file(coupons, coupon_types):
         .withColumn("articles", trim(col("articles")))
         .filter("articles != ''")
     )
-    coupons = coupons.withColumn("article_nbr", coupons.articles.try_cast("long"))
+    coupons = coupons.withColumn("article_nbr", coupons.articles.cast("long"))
 
     # 2. subset and reformat data
     coupons = coupons.select(

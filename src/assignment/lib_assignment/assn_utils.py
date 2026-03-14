@@ -667,7 +667,7 @@ def read_subset_and_cast(
         df = df.withColumn("MBRSHP_NBR", df.MBRSHP_NBR.cast("string"))
         df = df.withColumn("MBRSHP_NBR", sqlf.lpad(df.MBRSHP_NBR, 11, "0"))
     if "cpn_nbr" in df.columns:
-        df = df.withColumn("cpn_nbr", df.cpn_nbr.try_cast("string"))
+        df = df.withColumn("cpn_nbr", df.cpn_nbr.cast("string"))
     if "offer_id" in df.columns:
         df = df.withColumn("offer_id", df.offer_id.cast("integer"))
     if "EXTENDED_PRC_AMT" in df.columns:
@@ -830,20 +830,16 @@ def rdd_rank_by_col(
         df(pyspark.sql.DataFrame): dataframe after ranked
     """
     hash_num = df.count()
-    df_h = df.withColumn(
-        "hash_col",
-        sqlf.hash(sqlf.col(hash_col) + sqlf.lit(hash_num))
+    df = df.withColumn("hash_col", sqlf.hash(sqlf.col(hash_col) + hash_num))
+    df_sorted = df.orderBy(sort_col_asc, sqlf.desc(sort_col_desc), "hash_col")
+    df_ranked = df_sorted.rdd.zipWithIndex()
+    new_schema = (
+        sqlt.StructType()
+        .add("data", df_sorted.schema)
+        .add(new_col_name, sqlt.LongType())
     )
-
-    w = Window.orderBy(
-        sqlf.col(sort_col_asc).asc(),
-        sqlf.col(sort_col_desc).desc(),
-        sqlf.col("hash_col").asc()
-    )
-
-    df_ranked = df_h.withColumn(new_col_name, sqlf.row_number().over(w) - sqlf.lit(1))
-
-    df_ranked = df_ranked.drop("hash_col")
+    columns = ["data." + i for i in df_sorted.columns] + [new_col_name]
+    df_ranked = spark.createDataFrame(df_ranked, new_schema).select(columns)
     return df_ranked
 
 

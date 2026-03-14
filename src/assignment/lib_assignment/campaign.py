@@ -934,8 +934,7 @@ def _assign_cell_sample(cell_sample, memberdata, cell):
     memberdata = truncate_history(memberdata, True)
 
     memberdata = memberdata.join(cell_sample, "MBRSHP_SID", "leftanti")
-    memberdata.persist(StorageLevel.DISK_ONLY)
-    assert memberdata.join(cell_sample, "MBRSHP_SID").count() == 0
+    memberdata = memberdata.localCheckpoint(eager=True)
 
     return cell_sample, memberdata
 
@@ -1149,7 +1148,7 @@ class Campaign:
 
         for names in col_names:
             article_map = article_map.withColumnRenamed(names, names.lower())
-        article_map = article_map.withColumn('article_nbr', sqlf.col('article_nbr').try_cast('integer'))
+        article_map = article_map.withColumn('article_nbr', sqlf.col('article_nbr').cast('long'))
 
         trips = read_subset_and_cast(env_path(self.paths["COUPON_MEMTRIP"], self.vol_base, self.env), "parquet")
         trips = trips.dropna(subset=["cpn_nbr", "mbrshp_sid"])
@@ -1205,14 +1204,13 @@ class Campaign:
             cf_pred, join_category_agnostic(coups), ["CATEGORY_ID"]
         )
 
-        # repartition then cache into memory
-        cf_pred = cf_pred.repartition("MBRSHP_SID", "CATEGORY_ID").cache()
-        trips = trips.repartition("MBRSHP_SID", "cpn_nbr").cache()
+        # repartition then checkpoint into memory (breaks lineage properly)
+        cf_pred = cf_pred.repartition("MBRSHP_SID", "CATEGORY_ID")
+        cf_pred = cf_pred.localCheckpoint(eager=True)
+        trips = trips.repartition("MBRSHP_SID", "cpn_nbr")
+        trips = trips.localCheckpoint(eager=True)
 
-        print("Repartitioning and caching cf predictions and trips.")
-        trips.count()
-        cf_pred.count()
-        print("Done")
+        print("CF predictions and trips repartitioned and checkpointed.")
 
         # 5. Ingest data dynamically
         assignment_pools = dict()
@@ -1885,21 +1883,46 @@ class Campaign:
             .withColumn("group_size", sqlf.lit(group["slot_size"]))
         )
 
+        priority_tie_col = (
+            sqlf.coalesce(sqlf.col("priority").cast("string"), sqlf.lit(""))
+            if "priority" in current_group.columns
+            else sqlf.lit("")
+        )
+        current_group = current_group.withColumn(
+            "_slot_tie_hash",
+            sqlf.sha2(
+                sqlf.concat_ws(
+                    "||",
+                    sqlf.coalesce(sqlf.col("MBRSHP_SID").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("cpn_nbr").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("SLOT_NBR").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("IS_BACKFILL").cast("string"), sqlf.lit("")),
+                    priority_tie_col,
+                ),
+                256,
+            ),
+        )
+
         if len(include) > 1 and group["pool_type"] == Campaign.PoolType.LAYOUT:
             # deduplicate within slot group if more than one slot function
             # was used (frontfill slot function + backfill slot function)
             # this is required when apply backfill to a slot group
-            w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy("IS_BACKFILL")
+            w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy(
+                "IS_BACKFILL", "_slot_tie_hash"
+            )
             current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
             current_group = current_group.filter(current_group["rank"] == 1)
             current_group = current_group.drop("rank")
 
-        w = W.partitionBy("MBRSHP_SID").orderBy("IS_BACKFILL", "SLOT_NBR","cpn_nbr")
+        w = W.partitionBy("MBRSHP_SID").orderBy(
+            "IS_BACKFILL", "SLOT_NBR", "cpn_nbr", "_slot_tie_hash"
+        )
         current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
 
         current_group = current_group.filter(
             current_group.rank <= current_group.group_size
         )
+        current_group = current_group.drop("_slot_tie_hash")
 
         return current_group
 
