@@ -1858,21 +1858,46 @@ class Campaign:
             .withColumn("group_size", sqlf.lit(group["slot_size"]))
         )
 
+        priority_tie_col = (
+            sqlf.coalesce(sqlf.col("priority").cast("string"), sqlf.lit(""))
+            if "priority" in current_group.columns
+            else sqlf.lit("")
+        )
+        current_group = current_group.withColumn(
+            "_slot_tie_hash",
+            sqlf.sha2(
+                sqlf.concat_ws(
+                    "||",
+                    sqlf.coalesce(sqlf.col("MBRSHP_SID").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("cpn_nbr").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("SLOT_NBR").cast("string"), sqlf.lit("")),
+                    sqlf.coalesce(sqlf.col("IS_BACKFILL").cast("string"), sqlf.lit("")),
+                    priority_tie_col,
+                ),
+                256,
+            ),
+        )
+
         if len(include) > 1 and group["pool_type"] == Campaign.PoolType.LAYOUT:
             # deduplicate within slot group if more than one slot function
             # was used (frontfill slot function + backfill slot function)
             # this is required when apply backfill to a slot group
-            w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy("IS_BACKFILL")
+            w = W.partitionBy("MBRSHP_SID", "cpn_nbr").orderBy(
+                "IS_BACKFILL", "_slot_tie_hash"
+            )
             current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
             current_group = current_group.filter(current_group["rank"] == 1)
             current_group = current_group.drop("rank")
 
-        w = W.partitionBy("MBRSHP_SID").orderBy("IS_BACKFILL", "SLOT_NBR","cpn_nbr")
+        w = W.partitionBy("MBRSHP_SID").orderBy(
+            "IS_BACKFILL", "SLOT_NBR", "cpn_nbr", "_slot_tie_hash"
+        )
         current_group = current_group.withColumn("rank", sqlf.row_number().over(w))
 
         current_group = current_group.filter(
             current_group.rank <= current_group.group_size
         )
+        current_group = current_group.drop("_slot_tie_hash")
 
         return current_group
 
@@ -1924,7 +1949,7 @@ class Campaign:
                     frontfill_assignment = frontfill_assignment.union(current_group)
 
         backfill = partitioned_assignment.filter(
-            per_layout_assignment["IS_BACKFILL"] == self.FillTypeValue.BF
+            sqlf.col("IS_BACKFILL") == self.FillTypeValue.BF
         )
         assignments = backfill.union(frontfill_assignment.select(*backfill.columns))
 
