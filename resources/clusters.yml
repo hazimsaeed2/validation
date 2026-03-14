@@ -1,5 +1,43 @@
 resources:
   clusters:
+    pe_ml_cluster_assignment_l:
+      permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
+      - service_principal_name: ${var.service_principal}
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-Lovelytics-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Users
+        level: CAN_MANAGE
+      - group_name: Databricks-${var.env}-DS-PE-Admins
+        level: CAN_MANAGE
+
+      cluster_name: ML_Compute_PE_L
+      spark_version: 16.4.x-scala2.12
+      policy_id: "00061DF90167287D"
+      kind: CLASSIC_PREVIEW
+      autotermination_minutes: 15
+      enable_elastic_disk: false
+      enable_local_disk_encryption: true
+      data_security_mode: USER_ISOLATION
+      runtime_engine: PHOTON
+      node_type_id: r6id.12xlarge
+      driver_node_type_id: r6id.4xlarge
+      is_single_node: false
+      autoscale:
+        min_workers: 2
+        max_workers: 8
+      aws_attributes:
+        first_on_demand: 1
+        availability: SPOT_WITH_FALLBACK
+        zone_id: auto
+        spot_bid_price_percent: 100
+      custom_tags:
+        Project: dbx_ds_pe
+        Owner: PE
+        Environment: Prod
+
     pe_ml_cluster_1: # <-- this will be used as reference
     
       permissions:
