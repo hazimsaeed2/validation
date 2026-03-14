@@ -44,11 +44,7 @@ targets:
       host: https://dbc-ad8c0ca0-6db0.cloud.databricks.com
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
       # while in dev it may be useful to config mode: development and use this:
-<<<<<<< Updated upstream
       # root_path: ~/Workspace/Users/${workspace.current_user.userName}/add-email-notification-dev/member_analytics/.bundle/${bundle.name}/${bundle.target}
-=======
-      # root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
->>>>>>> Stashed changes
       # then the notebooks and python files are pulled directly from your workspace and not duplicated into .bundle
   
 
@@ -152,8 +148,8 @@ variables:
 permissions:
 # - user_name: ${workspace.current_user.userName}  
   # level: CAN_MANAGE  
-# - service_principal_name: ${var.service_principal}
-#   level: CAN_MANAGE
+- service_principal_name: ${var.service_principal}
+  level: CAN_MANAGE
 - group_name: Databricks-${var.env}-Lovelytics-Users
   level: CAN_MANAGE
 - group_name: Databricks-${var.env}-DS-PE-Users
