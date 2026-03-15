@@ -810,7 +810,17 @@ def rdd_rank_by_col(
         df(pyspark.sql.DataFrame): dataframe after ranked
     """
     hash_num = df.count()
-    df = df.withColumn("hash_col", sqlf.hash(sqlf.col(hash_col) + hash_num))
+    df = df.withColumn(
+        "hash_col",
+        sqlf.sha2(
+            sqlf.concat_ws(
+                "||",
+                sqlf.col(hash_col).cast("string"),
+                sqlf.lit(str(hash_num)),
+            ),
+            256,
+        ),
+    )
     df_sorted = df.orderBy(sort_col_asc, sqlf.desc(sort_col_desc), "hash_col")
     df_ranked = df_sorted.rdd.zipWithIndex()
     new_schema = (
