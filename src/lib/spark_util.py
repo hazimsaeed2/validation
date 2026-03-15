@@ -88,15 +88,20 @@ def _join_all(dfs, columns, depth):
 def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
     """Break Spark lineage to prevent overly complex query plans.
     
-    Uses checkpoint() which truncates both Catalyst plan and RDD lineage,
-    writing to reliable distributed storage (DBFS). Unlike localCheckpoint,
-    this survives executor loss on shared/spot Databricks clusters.
-    Requires spark.sparkContext.setCheckpointDir() to be called first.
+    Primary: localCheckpoint() — fast, truncates lineage, no sparkContext needed,
+    works on shared Databricks clusters (Unity Catalog access mode).
+    Fallback: persist() + count() if localCheckpoint fails due to executor loss.
     """
-    if cache:
-        truncated_df = df.checkpoint(eager=True)
-    else:
-        truncated_df = df.checkpoint(eager=False)
+    try:
+        if cache:
+            truncated_df = df.localCheckpoint(eager=True)
+        else:
+            truncated_df = df.localCheckpoint(eager=False)
+    except Exception as e:
+        print(f"localCheckpoint failed ({type(e).__name__}), falling back to persist+count")
+        df.persist(storage)
+        df.count()
+        truncated_df = df
     return truncated_df
 
 
