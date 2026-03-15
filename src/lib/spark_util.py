@@ -19,6 +19,7 @@ from pyspark.sql.functions import lit  # legacy tech debt
 from pyspark.sql.window import Window
 
 spark = SparkSession.builder.getOrCreate()
+DEFAULT_TRUNCATE_HISTORY_DIR = "dbfs:/tmp/assignment_truncate_history"
 
 
 def get_logger(name="default"):
@@ -86,22 +87,41 @@ def _join_all(dfs, columns, depth):
 
 
 def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
-    """Break Spark lineage to prevent overly complex query plans.
+    """Break Spark lineage using durable checkpointing when available.
     
-    Primary: localCheckpoint() — fast, truncates lineage, no sparkContext needed,
-    works on shared Databricks clusters (Unity Catalog access mode).
-    Fallback: persist() + count() if localCheckpoint fails due to executor loss.
+    Prefer Spark checkpoint() first, then save/load checkpoint(), and use
+    persist()+count() only as the final fallback.
     """
     try:
-        if cache:
-            truncated_df = df.localCheckpoint(eager=True)
-        else:
-            truncated_df = df.localCheckpoint(eager=False)
-    except Exception as e:
-        print(f"localCheckpoint failed ({type(e).__name__}), falling back to persist+count")
-        df.persist(storage)
-        df.count()
-        truncated_df = df
+        truncated_df = df.checkpoint(eager=True)
+    except Exception as checkpoint_error:
+        try:
+            checkpoint_dir = spark.conf.get(
+                "assignment.truncate_history.base_dir",
+                DEFAULT_TRUNCATE_HISTORY_DIR,
+            )
+            print(
+                "checkpoint() failed ({}), falling back to save/load at {}".format(
+                    type(checkpoint_error).__name__, checkpoint_dir
+                )
+            )
+            truncated_df = checkpoint(
+                df,
+                base_dir=checkpoint_dir,
+                storage=StorageLevel.DISK_ONLY,
+            )
+        except Exception as durable_error:
+            print(
+                "durable checkpoint failed ({}), falling back to persist+count".format(
+                    type(durable_error).__name__
+                )
+            )
+            df.persist(storage)
+            df.count()
+            truncated_df = df
+    if cache:
+        truncated_df = truncated_df.persist(storage)
+        truncated_df.count()
     return truncated_df
 
 
