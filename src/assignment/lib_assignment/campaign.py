@@ -934,7 +934,7 @@ def _assign_cell_sample(cell_sample, memberdata, cell):
     memberdata = truncate_history(memberdata, True)
 
     memberdata = memberdata.join(cell_sample, "MBRSHP_SID", "leftanti")
-    memberdata = memberdata.localCheckpoint(eager=True)
+    memberdata = memberdata.checkpoint(eager=True)
 
     return cell_sample, memberdata
 
@@ -1204,11 +1204,11 @@ class Campaign:
             cf_pred, join_category_agnostic(coups), ["CATEGORY_ID"]
         )
 
-        # repartition then checkpoint into memory (breaks lineage properly)
+        # repartition then checkpoint to reliable storage (breaks lineage properly)
         cf_pred = cf_pred.repartition("MBRSHP_SID", "CATEGORY_ID")
-        cf_pred = cf_pred.localCheckpoint(eager=True)
+        cf_pred = cf_pred.checkpoint(eager=True)
         trips = trips.repartition("MBRSHP_SID", "cpn_nbr")
-        trips = trips.localCheckpoint(eager=True)
+        trips = trips.checkpoint(eager=True)
 
         print("CF predictions and trips repartitioned and checkpointed.")
 
