@@ -1776,10 +1776,27 @@ class Campaign:
                 else sqlf.col(column).asc_nulls_last()
                 for column in sort_columns
             ]
+
+            # Deterministic tie-breaker for sort_coupons (same pattern as _fit_slot_group)
+            current_layout = current_layout.withColumn(
+                "_sort_tie_hash",
+                sqlf.sha2(
+                    sqlf.concat_ws(
+                        "||",
+                        sqlf.coalesce(sqlf.col("MBRSHP_SID").cast("string"), sqlf.lit("")),
+                        sqlf.coalesce(sqlf.col("cpn_nbr").cast("string"), sqlf.lit("")),
+                        sqlf.coalesce(sqlf.col("SLOT_NBR").cast("string"), sqlf.lit("")),
+                        sqlf.coalesce(sqlf.col("IS_BACKFILL").cast("string"), sqlf.lit("")),
+                    ),
+                    256,
+                ),
+            )
+            sort_columns.append(sqlf.col("_sort_tie_hash").asc_nulls_last())
+
             w = W.partitionBy("MBRSHP_SID").orderBy(*sort_columns)
             current_layout = (
                 current_layout.withColumn("NEW_SLOT_NBR", sqlf.row_number().over(w))
-                .drop("SLOT_NBR")
+                .drop("SLOT_NBR", "_sort_tie_hash")
                 .withColumnRenamed("NEW_SLOT_NBR", "SLOT_NBR")
             )
 

@@ -819,6 +819,12 @@ def rdd_rank_by_col(
 ):
     """rank the full dataframe in scalable way
 
+    Uses Window row_number() with a SHA-256 tie-breaker column to produce
+    a fully deterministic global ranking. SHA-256 has effectively zero
+    collisions, making row_number() equivalent to the RDD zipWithIndex()
+    approach used on EMR, while being compatible with shared Databricks
+    clusters that do not allow RDD operations.
+
     Parameters:
         df(pyspark.sql.DataFrame): spark dataframe to be bucketed
         sort_col_asc(str): column name to be sorted ascending
@@ -830,17 +836,25 @@ def rdd_rank_by_col(
         df(pyspark.sql.DataFrame): dataframe after ranked
     """
     hash_num = df.count()
-    df = df.withColumn("hash_col", sqlf.hash(sqlf.col(hash_col) + hash_num))
-    df_sorted = df.orderBy(sort_col_asc, sqlf.desc(sort_col_desc), "hash_col")
-    df_ranked = df_sorted.rdd.zipWithIndex()
-    new_schema = (
-        sqlt.StructType()
-        .add("data", df_sorted.schema)
-        .add(new_col_name, sqlt.LongType())
+    df = df.withColumn(
+        "_rank_tie_hash",
+        sqlf.sha2(
+            sqlf.concat_ws(
+                "||",
+                sqlf.col(hash_col).cast("string"),
+                sqlf.lit(str(hash_num)),
+            ),
+            256,
+        ),
     )
-    columns = ["data." + i for i in df_sorted.columns] + [new_col_name]
-    df_ranked = spark.createDataFrame(df_ranked, new_schema).select(columns)
-    return df_ranked
+    w = Window.orderBy(
+        sqlf.col(sort_col_asc).asc(),
+        sqlf.col(sort_col_desc).desc(),
+        sqlf.col("_rank_tie_hash").asc(),
+    )
+    df = df.withColumn(new_col_name, sqlf.row_number().over(w))
+    df = df.drop("_rank_tie_hash")
+    return df
 
 
 def palindrome_rank_group(df, num_groups, rank_col_name, new_col_name):

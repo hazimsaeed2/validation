@@ -88,16 +88,14 @@ def _join_all(dfs, columns, depth):
 def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
     """Break Spark lineage to prevent overly complex query plans.
     
-    Uses localCheckpoint which truly truncates both Catalyst plan and RDD lineage,
-    unlike the old df.rdd.toDF() trick which only broke the Catalyst plan.
-    When cache=True, eagerly materializes. When cache=False, uses the old
-    rdd.toDF() trick to preserve original lazy behavior.
+    Uses localCheckpoint which truly truncates both Catalyst plan and RDD lineage.
+    When cache=True, eagerly materializes. When cache=False, lazily breaks lineage.
+    No RDD operations are used, so this is safe on shared Databricks clusters.
     """
     if cache:
         truncated_df = df.localCheckpoint(eager=True)
     else:
-        # Preserve original lazy lineage-break behavior
-        truncated_df = df.rdd.toDF(df.schema)
+        truncated_df = df.localCheckpoint(eager=False)
     return truncated_df
 
 
