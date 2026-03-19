@@ -1,9 +1,9 @@
 import warnings
 from datetime import datetime
-
+ 
 import pandas as pd
 import pyspark.sql.functions as sqlf
-
+ 
 # # from pe_memberdna.assignment.lib.assn_io import get_run_args
 from lib.iotools import (
     is_s3_file,
@@ -12,23 +12,23 @@ from lib.iotools import (
     split_path_bucket_key,
     write_local_to_s3,
 )
-
+ 
 from lib_assignment.assn_utils import env_path
-
+ 
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.getOrCreate()
-
+ 
 try:
     dbutils  
 except NameError:
     from pyspark.dbutils import DBUtils
     dbutils = DBUtils(spark)  
-
-
+ 
+ 
 def get_datetime_now():
     return datetime.now()
-
-
+ 
+ 
 def check_prod_status(job):
     """Ensure this job won't cause a conflict with an existing running job.
     Given centralized coupon bank, coupon etl cannot allow prod run by multi user
@@ -71,7 +71,7 @@ def check_prod_status(job):
             "Collision!!! You are colliding with other jobs running coupon etl,"
             " please wait till they finish and retry!"
         )
-
+ 
     log_line = {
         "campaign": job.config.params["campaign"],
         "run_name": job.config.params["run_name"],
@@ -79,10 +79,10 @@ def check_prod_status(job):
         "log_event": "START",
         "time": str(get_datetime_now().strftime("%Y-%m-%d-%H-%M-%S")),
     }
-
+ 
     write_local_to_s3(log_line, job.config.paths["COUPON_LOG"], 'overwrite',job.vol_base, job.env)
-
-
+ 
+ 
 def check_execution_overwrite(job, paths_to_check):
     """
         Check used to stop execution if paths_to_check would risk to be
@@ -93,22 +93,28 @@ def check_execution_overwrite(job, paths_to_check):
         None
     """
     # args = get_run_args()
-
+ 
     # if args.force:
     #     return
-
+ 
     for path in paths_to_check:
         path = env_path(path, job.vol_base, job.env)
         try:
             dbutils.fs.ls(path)
-        except Exception:
-            pass  # path doesn't exist, safe to proceed
-        else:
-            raise Exception(
-                "There already has been a campaign executed with the same"
-                " campaign and run name. Change the names in the config or"
-                " use --force in order to overwrite the last execution."
+            print(
+                "WARNING: There already has been a campaign executed with the same"
+                " campaign and run name. Change the names in the config"
             )
+        except:
+            pass
+        # except Exception:
+        #     pass  # path doesn't exist, safe to proceed
+        # else:
+        #     raise Exception(
+        #         "There already has been a campaign executed with the same"
+        #         " campaign and run name. Change the names in the config or"
+        #         " use --force in order to overwrite the last execution."
+        #     )
         # else:
         #     bucket, key = split_path_bucket_key(path)
         #     if is_s3_path(bucket, key) or is_s3_file(bucket, key):
@@ -117,15 +123,15 @@ def check_execution_overwrite(job, paths_to_check):
         #             " campaign and run name. Change the names in the config or"
         #             " use --force in order to overwrite the last execution."
         #         )
-
-
-
-
+ 
+ 
+ 
+ 
 def check_multi_long_tests(memberdata, cells, allow_multi_long_tests):
     """
     Check used to stop execution if a members if eligible for multiple
     longitudinal tests as a past member.
-
+ 
     Parameters:
         memberdata (pyspark.sql.DataFrame): memberdata with segment
             filters applied
@@ -138,7 +144,7 @@ def check_multi_long_tests(memberdata, cells, allow_multi_long_tests):
         long_id = cell["longitudinal_id"]
         if pd.isna(long_id):
             continue
-
+ 
         colname = str(cell["segment_id"])
         memberdata = memberdata.withColumn(
             "long_tests",
@@ -148,12 +154,13 @@ def check_multi_long_tests(memberdata, cells, allow_multi_long_tests):
                 sqlf.col("long_tests") + sqlf.lit(1),
             ).otherwise(sqlf.col("long_tests")),
         )
-
+ 
     multi_long_tests = memberdata.filter(sqlf.col("long_tests") > 1).head()
-
+ 
     if multi_long_tests and not allow_multi_long_tests:
         raise Exception(
             "There are members eligible for multiple longitudinal"
             " tests. If this is part of the design use,"
             " --allow-multi-long-tests when running the script."
         )
+ 
