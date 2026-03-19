@@ -160,6 +160,8 @@ def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
                     df.persist(storage)
                     df.count()
                     truncated_df = df
+    truncated_df = truncated_df.toDF(*truncated_df.columns)
+
     if cache:
         truncated_df = truncated_df.persist(storage)
         truncated_df.count()
