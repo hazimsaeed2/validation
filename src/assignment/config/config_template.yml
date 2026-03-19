@@ -54,6 +54,7 @@ shared: # This section is shared among all scripts - UPDATE PER RUN
       assignment_date: '2026-03-19' #YYYY-MM-DD On Final run, should be updated to be near the final updated date (update before final run)
       sampling_weeks_rev_columns: 'LAST_TWENTY-SIX_WEEK_SPEND'
       tmp_location: 's3://memberanalytics-data-out-prod/work/tmp'
+      truncate_history_base_dir: 's3://memberanalytics-data-out-prod/work/tmp/assignment_truncate_history'
       s3_bucket: 'memberanalytics-data-out-prod'
 coupon_creation: # create_coupons.py
       coupon_inhome_date: '2026-04-01' # Date(YYYY-MM-DD) in which the mmpc/bbm will arrive in home - for determining adjusted trips seasonality - UPDATE PER CAMPAIGN

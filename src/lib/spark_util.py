@@ -19,7 +19,9 @@ from pyspark.sql.functions import lit  # legacy tech debt
 from pyspark.sql.window import Window
 
 spark = SparkSession.builder.getOrCreate()
-DEFAULT_TRUNCATE_HISTORY_DIR = "dbfs:/tmp/assignment_truncate_history"
+DEFAULT_TRUNCATE_HISTORY_DIR = (
+    "s3://memberanalytics-data-out-prod/work/tmp/assignment_truncate_history"
+)
 
 
 def get_logger(name="default"):
@@ -87,38 +89,45 @@ def _join_all(dfs, columns, depth):
 
 
 def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
-    """Break Spark lineage using durable checkpointing when available.
-    
-    Prefer Spark checkpoint() first, then save/load checkpoint(), and use
-    persist()+count() only as the final fallback.
+    """Break Spark lineage using the best available checkpoint strategy.
+
+    Prefer localCheckpoint() first for shared/serverless Databricks,
+    then Spark checkpoint(), then save/load checkpointing to a configured
+    external path, and use persist()+count() only as the final fallback.
     """
     try:
-        truncated_df = df.checkpoint(eager=True)
-    except Exception as checkpoint_error:
+        truncated_df = df.localCheckpoint(eager=True)
+    except Exception as local_checkpoint_error:
         try:
+            truncated_df = df.checkpoint(eager=True)
+        except Exception as checkpoint_error:
             checkpoint_dir = spark.conf.get(
                 "assignment.truncate_history.base_dir",
                 DEFAULT_TRUNCATE_HISTORY_DIR,
-            )
-            print(
-                "checkpoint() failed ({}), falling back to save/load at {}".format(
-                    type(checkpoint_error).__name__, checkpoint_dir
+            ).rstrip("/")
+            try:
+                print(
+                    "localCheckpoint() failed ({}), checkpoint() failed ({}), "
+                    "falling back to save/load at {}".format(
+                        type(local_checkpoint_error).__name__,
+                        type(checkpoint_error).__name__,
+                        checkpoint_dir,
+                    )
                 )
-            )
-            truncated_df = checkpoint(
-                df,
-                base_dir=checkpoint_dir,
-                storage=StorageLevel.DISK_ONLY,
-            )
-        except Exception as durable_error:
-            print(
-                "durable checkpoint failed ({}), falling back to persist+count".format(
-                    type(durable_error).__name__
+                truncated_df = checkpoint(
+                    df,
+                    base_dir=checkpoint_dir,
+                    storage=StorageLevel.DISK_ONLY,
                 )
-            )
-            df.persist(storage)
-            df.count()
-            truncated_df = df
+            except Exception as durable_error:
+                print(
+                    "durable checkpoint failed ({}), falling back to persist+count".format(
+                        type(durable_error).__name__
+                    )
+                )
+                df.persist(storage)
+                df.count()
+                truncated_df = df
     if cache:
         truncated_df = truncated_df.persist(storage)
         truncated_df.count()
@@ -127,7 +136,7 @@ def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
 
 def checkpoint(
     df,
-    base_dir="s3://memberanalytics-data-out/work/checkpoints",
+    base_dir=DEFAULT_TRUNCATE_HISTORY_DIR,
     storage=StorageLevel.DISK_ONLY,
 ):
     start = time.time()
@@ -135,7 +144,7 @@ def checkpoint(
     print("Checkpointing to: {}".format(dir))
     df.persist(storage)
     df.count()
-    df.write.save(dir)
+    df.write.mode("overwrite").save(dir)
     df.unpersist()
 
     time.sleep(wait_time)

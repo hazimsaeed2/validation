@@ -819,11 +819,8 @@ def rdd_rank_by_col(
 ):
     """rank the full dataframe in scalable way
 
-    Uses Window row_number() with a SHA-256 tie-breaker column to produce
-    a fully deterministic global ranking. SHA-256 has effectively zero
-    collisions, making row_number() equivalent to the RDD zipWithIndex()
-    approach used on EMR, while being compatible with shared Databricks
-    clusters that do not allow RDD operations.
+    Preserve the EMR global ordering semantics without relying on
+    rdd.zipWithIndex() or a single global unpartitioned window.
 
     Parameters:
         df(pyspark.sql.DataFrame): spark dataframe to be bucketed
@@ -836,8 +833,17 @@ def rdd_rank_by_col(
         df(pyspark.sql.DataFrame): dataframe after ranked
     """
     hash_num = df.count()
+    sort_key_col = "_rank_sort_key"
+    tie_hash_col = "_rank_tie_hash"
+    local_rank_col = "_rank_local"
+    offset_col = "_rank_offset"
+
     df = df.withColumn(
-        "_rank_tie_hash",
+        sort_key_col,
+        sqlf.coalesce(sqlf.col(sort_col_asc).cast("string"), sqlf.lit("__null__")),
+    )
+    df = df.withColumn(
+        tie_hash_col,
         sqlf.sha2(
             sqlf.concat_ws(
                 "||",
@@ -847,14 +853,49 @@ def rdd_rank_by_col(
             256,
         ),
     )
-    w = Window.orderBy(
-        sqlf.col(sort_col_asc).asc(),
+
+    within_group = Window.partitionBy(sort_key_col).orderBy(
         sqlf.col(sort_col_desc).desc(),
-        sqlf.col("_rank_tie_hash").asc(),
+        sqlf.col(tie_hash_col).asc(),
     )
-    df = df.withColumn(new_col_name, sqlf.row_number().over(w))
-    df = df.drop("_rank_tie_hash")
-    return df
+    df = df.withColumn(
+        local_rank_col, sqlf.row_number().over(within_group) - sqlf.lit(1)
+    )
+
+    group_counts = (
+        df.select(sort_key_col, sort_col_asc)
+        .groupBy(sort_key_col, sort_col_asc)
+        .count()
+        .orderBy(sqlf.col(sort_col_asc).asc())
+        .collect()
+    )
+
+    running_offset = 0
+    offset_rows = []
+    for row in group_counts:
+        offset_rows.append((row[sort_key_col], running_offset))
+        running_offset += row["count"]
+
+    offset_df = spark.createDataFrame(
+        offset_rows,
+        schema=sqlt.StructType(
+            [
+                sqlt.StructField(sort_key_col, sqlt.StringType(), False),
+                sqlt.StructField(offset_col, sqlt.LongType(), False),
+            ]
+        ),
+    )
+
+    df = df.join(offset_df, sort_key_col, "left")
+    df = df.withColumn(
+        new_col_name,
+        (
+            sqlf.col(local_rank_col).cast("long") +
+            sqlf.col(offset_col).cast("long")
+        ).cast("long"),
+    )
+
+    return df.drop(sort_key_col, tie_hash_col, local_rank_col, offset_col)
 
 
 def palindrome_rank_group(df, num_groups, rank_col_name, new_col_name):
