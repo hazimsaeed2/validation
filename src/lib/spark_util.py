@@ -91,25 +91,27 @@ def _join_all(dfs, columns, depth):
 def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
     """Break Spark lineage using the best available checkpoint strategy.
 
-    Prefer localCheckpoint() first for shared/serverless Databricks,
-    then Spark checkpoint(), then save/load checkpointing to a configured
-    external path, and use persist()+count() only as the final fallback.
+    For cache=True callers, prefer durable checkpointing because the result is
+    reused across multiple downstream actions. For cache=False callers, prefer
+    localCheckpoint() first for speed, then Spark checkpoint(), then save/load
+    checkpointing to a configured external path, and use persist()+count() only
+    as the final fallback.
     """
-    try:
-        truncated_df = df.localCheckpoint(eager=True)
-    except Exception as local_checkpoint_error:
+    checkpoint_dir = spark.conf.get(
+        "assignment.truncate_history.base_dir",
+        DEFAULT_TRUNCATE_HISTORY_DIR,
+    ).rstrip("/")
+
+    # localCheckpoint is not durable. When callers ask for cache=True, they
+    # typically reuse the dataframe across multiple downstream actions, so go
+    # straight to a durable truncation path.
+    if cache:
         try:
             truncated_df = df.checkpoint(eager=True)
         except Exception as checkpoint_error:
-            checkpoint_dir = spark.conf.get(
-                "assignment.truncate_history.base_dir",
-                DEFAULT_TRUNCATE_HISTORY_DIR,
-            ).rstrip("/")
             try:
                 print(
-                    "localCheckpoint() failed ({}), checkpoint() failed ({}), "
-                    "falling back to save/load at {}".format(
-                        type(local_checkpoint_error).__name__,
+                    "checkpoint() failed ({}), falling back to save/load at {}".format(
                         type(checkpoint_error).__name__,
                         checkpoint_dir,
                     )
@@ -128,6 +130,36 @@ def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
                 df.persist(storage)
                 df.count()
                 truncated_df = df
+    else:
+        try:
+            truncated_df = df.localCheckpoint(eager=True)
+        except Exception as local_checkpoint_error:
+            try:
+                truncated_df = df.checkpoint(eager=True)
+            except Exception as checkpoint_error:
+                try:
+                    print(
+                        "localCheckpoint() failed ({}), checkpoint() failed ({}), "
+                        "falling back to save/load at {}".format(
+                            type(local_checkpoint_error).__name__,
+                            type(checkpoint_error).__name__,
+                            checkpoint_dir,
+                        )
+                    )
+                    truncated_df = checkpoint(
+                        df,
+                        base_dir=checkpoint_dir,
+                        storage=StorageLevel.DISK_ONLY,
+                    )
+                except Exception as durable_error:
+                    print(
+                        "durable checkpoint failed ({}), falling back to persist+count".format(
+                            type(durable_error).__name__
+                        )
+                    )
+                    df.persist(storage)
+                    df.count()
+                    truncated_df = df
     if cache:
         truncated_df = truncated_df.persist(storage)
         truncated_df.count()
