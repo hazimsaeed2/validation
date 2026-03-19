@@ -63,8 +63,9 @@ resources:
             notebook_path: ../src/assignment/scripts/assign_offers.ipynb
             base_parameters:
               allow_multi_long_tests: "False"
-          # existing_cluster_id: ${resources.clusters.pe_ml_cluster_assignment_l.id} 
-          existing_cluster_id: "0312-211824-xa1hfl0g" 
+          # existing_cluster_id: ${resources.clusters.pe_ml_cluster_assignment_l.id}
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id}  
+          # existing_cluster_id: "0312-211824-xa1hfl0g" 
 
 
         - task_key: subsample_population   # 10min ?
@@ -73,7 +74,8 @@ resources:
           notebook_task:
             notebook_path: ../src/assignment/scripts/subsample_population.ipynb
           # existing_cluster_id: ${resources.clusters.pe_ml_cluster_assignment_l.id} 
-          existing_cluster_id: "0312-211824-xa1hfl0g" 
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id} 
+          # existing_cluster_id: "0312-211824-xa1hfl0g" 
     
 
         - task_key: generate_output_file   # 10min ?
@@ -89,6 +91,7 @@ resources:
           notebook_task:
             notebook_path: ../src/assignment/scripts/qc_assignments.ipynb 
           # existing_cluster_id: ${resources.clusters.pe_ml_cluster_assignment_l.id}
-          existing_cluster_id: "0312-211824-xa1hfl0g"
+          existing_cluster_id: ${resources.clusters.pe_ml_cluster_1.id} 
+          # existing_cluster_id: "0312-211824-xa1hfl0g"
 
         # end
