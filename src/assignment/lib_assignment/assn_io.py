@@ -46,6 +46,16 @@ OUTBOUND_FILES = [
 
 
 #-------------------------------------------------------------------------------------------------------------------------
+def _is_spark_dataframe(obj):
+    """Return True for both classic PySpark and Spark Connect dataframes."""
+    return (
+        hasattr(obj, "write")
+        and hasattr(obj, "columns")
+        and callable(getattr(obj, "toPandas", None))
+    )
+
+
+#-------------------------------------------------------------------------------------------------------------------------
 def get_run_args():
     """Return the command line arguments used to start the script:
         --config file_name: specifies the config file to use
@@ -904,8 +914,6 @@ class DataManager:
         Returns:
             None
         """
-        from pyspark.sql import DataFrame
-
         writetype   = writetype.lower()
         table       = self.tables[name]
         base_path   = self.paths[pathname]
@@ -933,7 +941,7 @@ class DataManager:
 
         if writetype == "s3":
 
-            if isinstance(table, DataFrame):
+            if _is_spark_dataframe(table):
                 writer = table.write
                 if isinstance(partitionby, str):
                     writer = writer.partitionBy(partitionby)
@@ -949,7 +957,7 @@ class DataManager:
 
         elif writetype == "local":
 
-            if isinstance(table, DataFrame):
+            if _is_spark_dataframe(table):
                 table.toPandas().to_csv(path, index=False)
             else:
                 with open(path, "w+") as f:

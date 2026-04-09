@@ -113,7 +113,7 @@ def sql(
     df = deduplicate(df, order_by=["cpn_nbr"])
 
     df.createOrReplaceTempView("df")
-    assignment = spark.sql(sql_string)
+    assignment = df.sparkSession.sql(sql_string)
 
     return assignment
 

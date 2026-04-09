@@ -43,7 +43,7 @@ def sql(df, colname, sql_string="select * from df"):
     """
     df.createOrReplaceTempView("df")
     sql_string = sql_string.format(colname)
-    return spark.sql(sql_string)
+    return df.sparkSession.sql(sql_string)
 
 
 @make_available_to_filters

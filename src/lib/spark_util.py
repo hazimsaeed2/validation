@@ -36,6 +36,10 @@ wait_time = 20
 retry_times = 3
 
 
+def _is_connect_dataframe(df):
+    return type(df).__module__.startswith("pyspark.sql.connect.")
+
+
 def safe_join(df1, df2, how, key):
     """
     Join two dataframes after they have been aggregated.
@@ -106,13 +110,10 @@ def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
     # typically reuse the dataframe across multiple downstream actions, so go
     # straight to a durable truncation path.
     if cache:
-        try:
-            truncated_df = df.checkpoint(eager=True)
-        except Exception as checkpoint_error:
+        if _is_connect_dataframe(df):
             try:
                 print(
-                    "checkpoint() failed ({}), falling back to save/load at {}".format(
-                        type(checkpoint_error).__name__,
+                    "Spark Connect dataframe detected, using save/load checkpoint at {}".format(
                         checkpoint_dir,
                     )
                 )
@@ -130,6 +131,31 @@ def truncate_history(df, cache=False, storage=StorageLevel.MEMORY_ONLY):
                 df.persist(storage)
                 df.count()
                 truncated_df = df
+        else:
+            try:
+                truncated_df = df.checkpoint(eager=True)
+            except Exception as checkpoint_error:
+                try:
+                    print(
+                        "checkpoint() failed ({}), falling back to save/load at {}".format(
+                            type(checkpoint_error).__name__,
+                            checkpoint_dir,
+                        )
+                    )
+                    truncated_df = checkpoint(
+                        df,
+                        base_dir=checkpoint_dir,
+                        storage=StorageLevel.DISK_ONLY,
+                    )
+                except Exception as durable_error:
+                    print(
+                        "durable checkpoint failed ({}), falling back to persist+count".format(
+                            type(durable_error).__name__
+                        )
+                    )
+                    df.persist(storage)
+                    df.count()
+                    truncated_df = df
     else:
         try:
             truncated_df = df.localCheckpoint(eager=True)

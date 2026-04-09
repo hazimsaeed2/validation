@@ -280,12 +280,12 @@ def downsample_rows(df, column, value, ratio, seed=None):
         where = " where {} != {}"
     if seed:
         rand = " or rand({}) < {}"
-        return spark.sql(
+        return df.sparkSession.sql(
             (query + where + rand).format(column, value, seed, ratio)
         )
     else:
         rand = " or rand() < {}"
-        return spark.sql((query + where + rand).format(column, value, ratio))
+        return df.sparkSession.sql((query + where + rand).format(column, value, ratio))
 
     return
 
@@ -876,7 +876,7 @@ def rdd_rank_by_col(
         offset_rows.append((row[sort_key_col], running_offset))
         running_offset += row["count"]
 
-    offset_df = spark.createDataFrame(
+    offset_df = df.sparkSession.createDataFrame(
         offset_rows,
         schema=sqlt.StructType(
             [
@@ -1123,7 +1123,8 @@ def load_past_longitudinal_mbrs(
     if len(long_cells) == 0:
         print(f"longitudinal id {longitudinal_id} has no past cells")
 
-        mbrs = spark.createDataFrame({}, "mbrshp_sid: string")
+        session = SparkSession.getActiveSession() or spark
+        mbrs = session.createDataFrame([], "mbrshp_sid string")
 
     else:
         assignment = read_subset_and_cast(assignment_path, "parquet")
